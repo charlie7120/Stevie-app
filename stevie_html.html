@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stevie – Deine Lernbegleiterin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg,#f5f0ff,#fce4f0,#e8f4ff); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* API Key Screen */
+    #key-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    #key-screen .card { background: white; border-radius: 24px; padding: 36px 32px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(150,100,200,.15); text-align: center; }
+    #key-screen .avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(167,139,250,.4); }
+    #key-screen h1 { font-size: 24px; color: #3b1f6e; margin-bottom: 8px; }
+    #key-screen p { color: #7c6fa0; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+    #key-screen input { width: 100%; border: 2px solid #e9d5ff; border-radius: 12px; padding: 12px 16px; font-size: 15px; outline: none; color: #2d1b4e; margin-bottom: 12px; }
+    #key-screen input:focus { border-color: #a78bfa; }
+    #key-screen button { width: 100%; background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(124,58,237,.3); }
+    #key-screen .hint { font-size: 12px; color: #b8a8d0; margin-top: 12px; }
+
+    /* App */
+    #app { display: none; flex-direction: column; min-height: 100vh; }
+    header { background: white; padding: 14px 20px; box-shadow: 0 2px 12px rgba(150,100,200,.12); display: flex; align-items: center; gap: 14px; }
+    .avatar-sm { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(167,139,250,.4); flex-shrink: 0; }
+    .header-info h2 { font-size: 18px; color: #3b1f6e; font-weight: 700; }
+    .header-info p { font-size: 13px; color: #9c6fc4; }
+    .voice-btn { margin-left: auto; border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: 2px solid; transition: all .2s; }
+    .voice-on { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .voice-off { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+
+    #messages { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .msg-row { display: flex; align-items: flex-end; gap: 8px; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,.08); white-space: pre-wrap; }
+    .bubble.stevie { background: white; color: #2d1b4e; border-bottom-left-radius: 4px; }
+    .bubble.user { background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; border-bottom-right-radius: 4px; }
+    .replay-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: .45; padding: 2px; flex-shrink: 0; }
+    .replay-btn:hover { opacity: .8; }
+    .typing { display: flex; gap: 6px; padding: 14px 16px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #a78bfa; animation: bounce 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+    .speaking-bar { background: #ede9fe; color: #7c3aed; font-size: 12px; padding: 4px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; }
+    .stop-btn { background: none; border: none; cursor: pointer; color: #7c3aed; font-size: 12px; text-decoration: underline; }
+
+    #img-preview { padding: 0 16px 8px; display: none; }
+    #img-preview img { height: 70px; border-radius: 10px; border: 2px solid #a78bfa; }
+    #img-preview .remove { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 13px; font-weight: 700; }
+
+    footer { background: white; padding: 12px 16px; box-shadow: 0 -2px 12px rgba(150,100,200,.1); display: flex; gap: 8px; align-items: flex-end; }
+    .icon-btn { border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: 18px; flex-shrink: 0; border: 2px dashed #c4b5fd; background: #f5f3ff; transition: all .2s; }
+    .icon-btn.active { background: #ede9fe; border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,.15); }
+    #msg-input { flex: 1; border: 2px solid #e9d5ff; border-radius: 14px; padding: 10px 14px; font-size: 15px; resize: none; font-family: inherit; outline: none; line-height: 1.4; background: #fafaf9; color: #2d1b4e; transition: border-color .2s; }
+    #msg-input:focus { border-color: #a78bfa; }
+    #send-btn { background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; border: none; border-radius: 14px; padding: 10px 16px; cursor: pointer; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(124,58,237,.3); transition: all .2s; }
+    #send-btn:disabled { background: #e9d5ff; color: #c4b5fd; box-shadow: none; cursor: default; }
+
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  </style>
+</head>
+<body>
+
+<!-- API Key Screen -->
+<div id="key-screen">
+  <div class="card">
+    <div class="avatar">🌟</div>
+    <h1>Hallo! Ich bin Stevie</h1>
+    <p>Deine persönliche Lernbegleiterin.<br>Bitte gib einmalig deinen Anthropic API-Key ein, damit wir loslegen können.</p>
+    <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+    <button onclick="saveKey()">Los geht's! ✨</button>
+    <p class="hint">Der Key wird nur in deinem Browser gespeichert und nirgendwo übertragen.</p>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app">
+  <header>
+    <div class="avatar-sm">🌟</div>
+    <div class="header-info">
+      <h2>Stevie</h2>
+      <p>Deine persönliche Lernbegleiterin</p>
+    </div>
+    <button id="voice-toggle" class="voice-btn voice-on" onclick="toggleVoice()">🔊 Stimme an</button>
+  </header>
+
+  <div id="messages"></div>
+
+  <div id="img-preview" style="position:relative;display:none;">
+    <img id="img-thumb" src="" alt="preview" />
+    <button class="remove" onclick="removeImage()">×</button>
+  </div>
+
+  <footer>
+    <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Bild hochladen">📷</button>
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleImage(event)" />
+    <textarea id="msg-input" rows="1" placeholder="Schreib oder sprich mit Stevie..." onkeydown="handleKey(event)"></textarea>
+    <button class="icon-btn" id="mic-btn" onclick="toggleListen()" title="Sprechen">🎙️</button>
+    <button id="send-btn" onclick="sendMessage()">➤</button>
+  </footer>
+</div>
+
+<script>
+  const SYSTEM = `Du bist Stevie, ein KI-Lernbegleiter für Kinder im Alter von 10-12 Jahren (5. Klasse Gymnasium). Du fühlst dich an wie eine freundliche, warmherzige ältere Schwester – niemals schulmeisterlich, immer ermutigend.
+
+DEINE PERSÖNLICHKEIT:
+- Warm, locker, verständnisvoll – wie eine coole große Schwester
+- Du fragst lieber als du erklärst (aktives Erinnern)
+- Nach jeder Antwort gibst du kurzes, ehrliches Feedback (nicht übertrieben lobend, aber immer motivierend)
+- Du verwendest einfache Sprache, Emojis sparsam aber gezielt 🌟
+- Du machst Mut, wenn etwas schwierig ist
+- Du stellst immer nur EINE Frage auf einmal
+
+LERNMETHODIK:
+1. Wenn ein Bild hochgeladen wird: Analysiere den Inhalt, fasse kurz zusammen was du siehst, und frage ob das stimmt
+2. Erstelle dann einen kleinen Lernplan: "Wir schauen uns heute X, Y und Z an – womit willst du starten?"
+3. Stelle aktive Fragen zum Thema – lass das Kind antworten, bevor du erklärst
+4. Gib nach jeder Antwort kurzes Feedback (1-2 Sätze) und stelle die nächste Frage
+5. Am Ende einer Einheit: kurze Zusammenfassung was das Kind heute gelernt hat
+
+WICHTIG: Antworte auf Deutsch. Sei nie zu formal. Halte Antworten kurz (2-4 Sätze) damit sie gut vorgelesen werden können.`;
+
+  let messages = [];
+  let imageData = null;
+  let voiceEnabled = true;
+  let listening = false;
+  let recognition = null;
+  const synth = window.speechSynthesis;
+
+  // --- Key management ---
+  function saveKey() {
+    const k = document.getElementById('api-key-input').value.trim();
+    if (!k.startsWith('sk-')) return alert('Bitte einen gültigen Anthropic API-Key eingeben (beginnt mit sk-)');
+    localStorage.setItem('stevie_key', k);
+    startApp();
+  }
+
+  function getKey() { return localStorage.getItem('stevie_key'); }
+
+  window.onload = () => {
+    if (getKey()) startApp();
+  };
+
+  function startApp() {
+    document.getElementById('key-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    addMessage('assistant', 'Hey! Ich bin Stevie 👋 Deine persönliche Lernbegleiterin.\n\nDu kannst mir ein Foto schicken, schreiben – oder einfach mit mir sprechen! Was hast du heute auf dem Plan? 📚');
+  }
+
+  // --- Messages ---
+  function addMessage(role, content, imgSrc) {
+    messages.push({ role, content });
+    const row = document.createElement('div');
+    row.className = `msg-row ${role}`;
+    if (role === 'assistant') {
+      row.innerHTML = `<div class="msg-avatar">🌟</div>`;
+    }
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${role === 'assistant' ? 'stevie' : 'user'}`;
+    if (imgSrc) {
+      const img = document.createElement('img');
+      img.src = imgSrc; img.style.cssText = 'max-width:180px;border-radius:10px;margin-bottom:6px;display:block';
+      bubble.appendChild(img);
+    }
+    bubble.appendChild(document.createTextNode(typeof content === 'string' ? content : ''));
+    row.appendChild(bubble);
+    if (role === 'assistant') {
+      const rb = document.createElement('button');
+      rb.className = 'replay-btn'; rb.textContent = '🔁'; rb.title = 'Nochmal vorlesen';
+      rb.onclick = () => speak(content);
+      row.appendChild(rb);
+    }
+    document.getElementById('messages').appendChild(row);
+    document.getElementById('messages').scrollTop = 999999;
+    if (role === 'assistant') speak(content);
+  }
+
+  function showTyping() {
+    const d = document.createElement('div');
+    d.className = 'msg-row'; d.id = 'typing';
+    d.innerHTML = `<div class="msg-avatar">🌟</div><div class="bubble stevie"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+    document.getElementById('messages').appendChild(d);
+    document.getElementById('messages').scrollTop = 999999;
+  }
+  function hideTyping() { document.getElementById('typing')?.remove(); }
+
+  // --- Send ---
+  async function sendMessage() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text && !imageData) return;
+
+    stopSpeaking();
+    const userContent = [];
+    let imgSrc = null;
+    if (imageData) {
+      userContent.push({ type: 'image', source: { type: 'base64', media_type: imageData.type, data: imageData.data } });
+      imgSrc = document.getElementById('img-thumb').src;
+    }
+    if (text) userContent.push({ type: 'text', text });
+
+    addMessage('user', text, imgSrc);
+    input.value = '';
+    removeImage();
+    document.getElementById('send-btn').disabled = true;
+    showTyping();
+
+    const apiMsgs = messages.map(m => ({ role: m.role, content: m.content }));
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': getKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM, messages: apiMsgs })
+      });
+      const data = await res.json();
+      hideTyping();
+      if (data.error) throw new Error(data.error.message);
+      const reply = data.content?.find(b => b.type === 'text')?.text || 'Hmm, da ist etwas schiefgelaufen 🙈';
+      addMessage('assistant', reply);
+    } catch(e) {
+      hideTyping();
+      addMessage('assistant', `Ups, kurzer Fehler: ${e.message} 😅`);
+    }
+    document.getElementById('send-btn').disabled = false;
+  }
+
+  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+
+  // --- Image ---
+  function handleImage(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      imageData = { data: ev.target.result.split(',')[1], type: file.type };
+      document.getElementById('img-thumb').src = ev.target.result;
+      document.getElementById('img-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  function removeImage() {
+    imageData = null;
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('file-input').value = '';
+  }
+
+  // --- Voice output ---
+  function speak(text) {
+    if (!voiceEnabled) return;
+    synth.cancel();
+    const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'de-DE'; utt.rate = 0.95; utt.pitch = 1.1;
+    const voices = synth.getVoices();
+    const v = voices.find(v => v.lang.startsWith('de') && /anna|petra|hedda|female/i.test(v.name))
+           || voices.find(v => v.lang.startsWith('de'));
+    if (v) utt.voice = v;
+    synth.speak(utt);
+  }
+  function stopSpeaking() { synth.cancel(); }
+  function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+    stopSpeaking();
+    const btn = document.getElementById('voice-toggle');
+    btn.textContent = voiceEnabled ? '🔊 Stimme an' : '🔇 Stimme aus';
+    btn.className = 'voice-btn ' + (voiceEnabled ? 'voice-on' : 'voice-off');
+  }
+
+  // --- Voice input ---
+  function toggleListen() {
+    if (listening) { recognition?.stop(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Spracheingabe benötigt Chrome oder Edge.'); return; }
+    recognition = new SR();
+    recognition.lang = 'de-DE'; recognition.continuous = false; recognition.interimResults = false;
+    recognition.onresult = e => {
+      document.getElementById('msg-input').value = e.results[0][0].transcript;
+      setListening(false);
+    };
+    recognition.onerror = recognition.onend = () => setListening(false);
+    recognition.start();
+    setListening(true);
+  }
+  function setListening(val) {
+    listening = val;
+    const btn = document.getElementById('mic-btn');
+    btn.textContent = val ? '⏹️' : '🎙️';
+    btn.classList.toggle('active', val);
+  }
+
+  // Load voices async
+  synth.onvoiceschanged = () => synth.getVoices();
+</script>
+</body>
+</html>
