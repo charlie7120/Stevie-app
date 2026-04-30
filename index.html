@@ -77,12 +77,19 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .voff{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
 
 /* BOTTOM NAV */
-.bottom-nav{background:white;border-top:1px solid #ede9fe;display:flex;flex-shrink:0;box-shadow:0 -2px 12px rgba(150,100,200,.08);}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 12px;cursor:pointer;transition:all .2s;border:none;background:none;gap:3px;}
-.nav-item span{font-size:20px;}
-.nav-item p{font-size:10px;font-weight:600;color:#b8a8d0;}
+.bottom-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px 18px;gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;transition:all .2s;border:none;background:none;gap:3px;border-radius:16px;}
+.nav-item span{font-size:22px;transition:transform .2s;}
+.nav-item p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.3px;transition:color .2s;}
+.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(168,85,247,.08));}
 .nav-item.active p{color:var(--tc);}
-.nav-item.active span{filter:drop-shadow(0 0 4px var(--cbr));}
+.nav-item.active span{transform:scale(1.15);filter:drop-shadow(0 2px 6px var(--cbr));}
+.nav-item:hover:not(.active){background:#faf5ff;}
+.nav-center{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;background:none;padding:0 8px;position:relative;top:-14px;}
+.nav-center-pill{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:all .2s;border:3px solid white;}
+.nav-center-pill:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(124,58,237,.55);}
+.nav-center-pill.active{box-shadow:0 6px 24px rgba(124,58,237,.6),0 0 0 4px rgba(167,139,250,.2);}
+.nav-center p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.3px;}
 
 /* APP TABS */
 .app-tab{display:none;flex:1;flex-direction:column;overflow:hidden;}
@@ -167,32 +174,43 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 
 /* PROFIL TAB */
 #profil-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 80px;}
-.profil-hero{background:linear-gradient(135deg,var(--ga),var(--gc));padding:28px 20px;text-align:center;}
-.profil-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.5);}
-.profil-name{font-size:22px;font-weight:800;color:white;margin-bottom:4px;}
-.profil-sub{font-size:14px;color:rgba(255,255,255,.75);}
-.profil-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede9fe;margin:14px;border-radius:16px;overflow:hidden;}
-.stat-box{background:white;padding:14px 8px;text-align:center;}
-.stat-num{font-size:22px;font-weight:800;color:var(--tc);}
-.stat-lbl{font-size:11px;color:#9c6fc4;margin-top:2px;}
-.profil-section{background:white;border-radius:18px;margin:0 14px 12px;padding:16px;box-shadow:0 2px 10px rgba(150,100,200,.06);}
-.profil-section h3{font-size:14px;font-weight:700;color:#3b1f6e;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.noten-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f0ff;}
+.profil-hero{position:relative;padding:32px 20px 70px;text-align:center;overflow:hidden;background:linear-gradient(135deg,var(--ga) 0%,var(--gb) 50%,var(--gc) 100%);}
+.profil-hero-bg{position:absolute;inset:0;opacity:.15;}
+.profil-hero-bg circle{fill:white;}
+.profil-avatar-wrap{position:relative;display:inline-block;margin-bottom:14px;}
+.profil-avatar{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid rgba(255,255,255,.6);box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.profil-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.profil-name{font-size:24px;font-weight:800;color:white;margin-bottom:4px;text-shadow:0 2px 8px rgba(0,0,0,.2);}
+.profil-sub{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;}
+.profil-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-44px 14px 0;position:relative;z-index:2;}
+.stat-card{background:white;border-radius:18px;padding:16px 10px 14px;text-align:center;box-shadow:0 4px 20px rgba(150,100,200,.15);}
+.stat-icon{font-size:20px;margin-bottom:6px;}
+.stat-num{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--ga),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.stat-lbl{font-size:10px;font-weight:700;color:#b8a8d0;letter-spacing:.5px;margin-top:4px;text-transform:uppercase;}
+.profil-section{background:white;border-radius:20px;margin:12px 14px 0;padding:18px 16px;box-shadow:0 2px 16px rgba(150,100,200,.08);}
+.profil-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.profil-section-head h3{font-size:14px;font-weight:700;color:#3b1f6e;display:flex;align-items:center;gap:7px;}
+.profil-section-head .see-all{font-size:12px;color:var(--tc);font-weight:600;background:var(--cbg);border:none;border-radius:20px;padding:4px 10px;cursor:pointer;}
+.noten-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f8f4ff;}
 .noten-row:last-child{border-bottom:none;}
-.noten-fach{font-size:14px;color:#3b1f6e;flex:1;}
-.noten-datum{font-size:11px;color:#b8a8d0;}
-.noten-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;}
-.n1{background:#dcfce7;color:#15803d;}
-.n2{background:#d1fae5;color:#15803d;}
-.n3{background:#fef9c3;color:#854d0e;}
-.n4{background:#ffedd5;color:#c2410c;}
-.n5,.n6{background:#fee2e2;color:#dc2626;}
-.add-note-btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
-.session-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f5f0ff;}
+.noten-info{flex:1;}
+.noten-fach{font-size:14px;font-weight:600;color:#3b1f6e;}
+.noten-datum{font-size:11px;color:#b8a8d0;margin-top:1px;}
+.noten-badge{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.n1{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;}
+.n2{background:linear-gradient(135deg,#4ade80,#22c55e);color:white;}
+.n3{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:white;}
+.n4{background:linear-gradient(135deg,#fb923c,#ea580c);color:white;}
+.n5,.n6{background:linear-gradient(135deg,#f87171,#dc2626);color:white;}
+.add-note-btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;box-shadow:0 4px 16px rgba(124,58,237,.25);transition:transform .15s;}
+.add-note-btn:hover{transform:translateY(-1px);}
+.session-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f8f4ff;}
 .session-row:last-child{border-bottom:none;}
-.session-dot{width:8px;height:8px;border-radius:50%;background:var(--ga);flex-shrink:0;}
-.session-text{font-size:13px;color:#3b1f6e;flex:1;}
+.session-icon{width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.session-text{font-size:13px;font-weight:600;color:#3b1f6e;flex:1;}
 .session-time{font-size:11px;color:#b8a8d0;}
+.trend-bar{height:4px;border-radius:99px;background:#f0ebff;margin-top:8px;overflow:hidden;}
+.trend-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ga),var(--gc));}
 
 /* MODALS */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;justify-content:center;}
@@ -336,35 +354,46 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
   <!-- PROFIL TAB -->
   <div id="profil-tab" class="app-tab">
     <div class="profil-hero">
-      <div class="profil-avatar">👤</div>
+      <svg class="profil-hero-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;">
+        <circle cx="350" cy="30" r="120"/><circle cx="50" cy="160" r="90"/><circle cx="200" cy="100" r="60"/>
+      </svg>
+      <div class="profil-avatar-wrap">
+        <div class="profil-avatar">🧑‍🎓</div>
+        <div class="profil-badge">⭐</div>
+      </div>
       <div class="profil-name" id="p-name">–</div>
       <div class="profil-sub" id="p-sub">–</div>
     </div>
-    <div class="profil-stats">
-      <div class="stat-box"><div class="stat-num" id="stat-faecher">0</div><div class="stat-lbl">Fächer</div></div>
-      <div class="stat-box"><div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">Sessions</div></div>
-      <div class="stat-box"><div class="stat-num" id="stat-noten">–</div><div class="stat-lbl">Ø Note</div></div>
+    <div class="profil-cards">
+      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-num" id="stat-faecher">0</div><div class="stat-lbl">Fächer</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">Sessions</div></div>
+      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-num" id="stat-noten">–</div><div class="stat-lbl">Ø Note</div></div>
     </div>
-    <div class="profil-section">
-      <h3>📝 Eingetragene Noten</h3>
-      <div id="noten-list"><p style="font-size:13px;color:#b8a8d0;">Noch keine Noten eingetragen.</p></div>
+    <div class="profil-section" style="margin-top:16px;">
+      <div class="profil-section-head">
+        <h3>📝 Meine Noten</h3>
+      </div>
+      <div id="noten-list"><p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Noten eingetragen.</p></div>
       <button class="add-note-btn" onclick="openModal('note-modal')">＋ Note eintragen</button>
     </div>
     <div class="profil-section">
-      <h3>🕐 Letzte Sessions</h3>
-      <div id="sessions-list"><p style="font-size:13px;color:#b8a8d0;">Noch keine Sessions.</p></div>
+      <div class="profil-section-head">
+        <h3>🕐 Letzte Sessions</h3>
+      </div>
+      <div id="sessions-list"><p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p></div>
     </div>
   </div>
 
   <div class="bottom-nav">
     <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')">
-      <span>💬</span><p>Chat</p>
+      <span>💬</span><p>CHAT</p>
     </button>
-    <button class="nav-item" id="nav-mappe" onclick="switchTab('mappe')">
-      <span>📁</span><p>Mappe</p>
+    <button class="nav-center" id="nav-mappe" onclick="switchTab('mappe')">
+      <div class="nav-center-pill">📁</div>
+      <p>MAPPE</p>
     </button>
     <button class="nav-item" id="nav-profil" onclick="switchTab('profil')">
-      <span>👤</span><p>Profil</p>
+      <span>👤</span><p>PROFIL</p>
     </button>
   </div>
 </div>
@@ -701,9 +730,11 @@ function saveNote(){
 // ══ TABS ══
 function switchTab(tab){
   document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.nav-center').forEach(n=>n.classList.remove('active'));
   document.getElementById(tab+'-tab').classList.add('active');
   document.getElementById('nav-'+tab).classList.add('active');
+  if(tab==='mappe'){document.querySelector('.nav-center-pill')?.classList.add('active');}
+  else{document.querySelector('.nav-center-pill')?.classList.remove('active');}
   if(tab==='mappe')renderMappe();
   if(tab==='profil')renderProfilTab();
 }
