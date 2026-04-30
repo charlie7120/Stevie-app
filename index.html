@@ -1,414 +1,699 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stevie – Deine Lernbegleiterin</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg,#f5f0ff,#fce4f0,#e8f4ff); min-height: 100vh; display: flex; flex-direction: column; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Stevie – Deine Lernbegleiterin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0d1a;min-height:100vh;color:#f3eeff;}
 
-    /* ── SPLASH SCREEN ── */
-    #splash { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; background:#0d0d1a; overflow:hidden; position:relative; }
-    #splash canvas { position:absolute; inset:0; pointer-events:none; }
-    #splash .glass { position:relative; z-index:2; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:32px; padding:48px 40px 40px; max-width:440px; width:100%; text-align:center; backdrop-filter:blur(24px); }
-    #splash .logo-ring { width:96px; height:96px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#f472b6); display:flex; align-items:center; justify-content:center; font-size:42px; margin:0 auto 24px; box-shadow:0 0 48px rgba(167,139,250,.5); animation:pulse-ring 2.5s ease-in-out infinite; }
-    #splash h1 { font-size:38px; font-weight:800; letter-spacing:-1px; background:linear-gradient(90deg,#c4b5fd,#f9a8d4,#93c5fd); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; }
-    #splash .tagline { font-size:15px; color:rgba(255,255,255,0.55); margin-bottom:36px; line-height:1.5; }
-    #splash .tagline span { color:#c4b5fd; font-weight:600; }
-    #splash .features { display:flex; gap:10px; justify-content:center; margin-bottom:32px; flex-wrap:wrap; }
-    #splash .chip { background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); border-radius:20px; padding:6px 14px; font-size:13px; color:#e2d9fa; }
-    #splash .start-btn { width:100%; background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899); color:white; border:none; border-radius:16px; padding:16px; font-size:17px; font-weight:700; cursor:pointer; letter-spacing:0.3px; margin-bottom:12px; transition:transform .15s, box-shadow .15s; box-shadow:0 8px 32px rgba(124,58,237,.45); }
-    #splash .start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(124,58,237,.6); }
-    #splash .start-btn:active { transform:scale(0.98); }
-    #splash .sub { font-size:12px; color:rgba(255,255,255,0.3); }
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
 
-    /* API Key Screen */
-    #key-screen { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; background:#0d0d1a; }
-    #key-screen .card { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:28px; padding:36px 32px; max-width:420px; width:100%; text-align:center; backdrop-filter:blur(24px); }
-    #key-screen .avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,#a78bfa,#ec4899); display:flex; align-items:center; justify-content:center; font-size:30px; margin:0 auto 16px; box-shadow:0 0 32px rgba(167,139,250,.4); }
-    #key-screen h2 { font-size:22px; font-weight:700; color:#f3eeff; margin-bottom:8px; }
-    #key-screen p { color:rgba(255,255,255,0.45); font-size:14px; margin-bottom:24px; line-height:1.6; }
-    #key-screen input { width:100%; background:rgba(255,255,255,0.08); border:1.5px solid rgba(167,139,250,0.3); border-radius:12px; padding:12px 16px; font-size:15px; outline:none; color:#f3eeff; margin-bottom:12px; }
-    #key-screen input:focus { border-color:#a78bfa; }
-    #key-screen input::placeholder { color:rgba(255,255,255,0.3); }
-    #key-screen button { width:100%; background:linear-gradient(135deg,#7c3aed,#a855f7); color:white; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:700; cursor:pointer; }
-    #key-screen .hint { font-size:12px; color:rgba(255,255,255,0.25); margin-top:12px; }
+/* ── SPLASH ── */
+#splash{align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+#splash canvas{position:absolute;inset:0;pointer-events:none;}
+.glass{position:relative;z-index:2;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:32px;padding:48px 40px 40px;max-width:440px;width:100%;text-align:center;backdrop-filter:blur(24px);}
+.logo-ring{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#f472b6);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 24px;box-shadow:0 0 48px rgba(167,139,250,.5);animation:pulse-ring 2.5s ease-in-out infinite;}
+.splash-title{font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,#c4b5fd,#f9a8d4,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.tagline{font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:32px;line-height:1.6;}
+.tagline span{color:#c4b5fd;font-weight:600;}
+.chips{display:flex;gap:8px;justify-content:center;margin-bottom:32px;flex-wrap:wrap;}
+.chip{background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);border-radius:20px;padding:6px 14px;font-size:13px;color:#e2d9fa;}
+.btn-primary{width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);color:white;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 32px rgba(124,58,237,.45);transition:transform .15s,box-shadow .15s;margin-bottom:10px;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,58,237,.6);}
+.sub-hint{font-size:12px;color:rgba(255,255,255,0.28);}
 
-    /* App */
-    #app { display: none; flex-direction: column; min-height: 100vh; }
-    header { background: white; padding: 14px 20px; box-shadow: 0 2px 12px rgba(150,100,200,.12); display: flex; align-items: center; gap: 14px; }
-    .avatar-sm { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(167,139,250,.4); flex-shrink: 0; }
-    .header-info h2 { font-size: 18px; color: #3b1f6e; font-weight: 700; }
-    .header-info p { font-size: 13px; color: #9c6fc4; }
-    .voice-btn { margin-left: auto; border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: 2px solid; transition: all .2s; }
-    .voice-on { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
-    .voice-off { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+/* ── SETUP SCREEN ── */
+#setup{background:linear-gradient(160deg,#0d0d1a 0%,#1a0d2e 100%);align-items:center;justify-content:center;padding:24px;}
+.setup-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:480px;width:100%;backdrop-filter:blur(24px);}
+.setup-card h2{font-size:24px;font-weight:700;margin-bottom:6px;background:linear-gradient(90deg,#c4b5fd,#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.setup-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:28px;}
+.field-label{font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:8px;display:block;}
+.dark-input{width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(167,139,250,0.3);border-radius:12px;padding:12px 16px;font-size:15px;color:#f3eeff;outline:none;margin-bottom:20px;}
+.dark-input:focus{border-color:#a78bfa;}
+.dark-input::placeholder{color:rgba(255,255,255,0.3);}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px;}
+.day-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(167,139,250,0.2);border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;color:#e2d9fa;font-size:15px;font-weight:600;}
+.day-btn:hover{background:rgba(167,139,250,0.2);border-color:#a78bfa;}
+.day-btn.selected{background:linear-gradient(135deg,#7c3aed,#a855f7);border-color:#a78bfa;color:white;box-shadow:0 4px 16px rgba(124,58,237,.4);}
+.day-label{font-size:10px;color:rgba(255,255,255,0.4);margin-top:3px;}
 
-    #messages { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .msg-row { display: flex; align-items: flex-end; gap: 8px; }
-    .msg-row.user { justify-content: flex-end; }
-    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,.08); white-space: pre-wrap; }
-    .bubble.stevie { background: white; color: #2d1b4e; border-bottom-left-radius: 4px; }
-    .bubble.user { background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; border-bottom-right-radius: 4px; }
-    .replay-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: .45; padding: 2px; flex-shrink: 0; }
-    .replay-btn:hover { opacity: .8; }
-    .typing { display: flex; gap: 6px; padding: 14px 16px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #a78bfa; animation: bounce 1.2s infinite; }
-    .dot:nth-child(2) { animation-delay: .2s; }
-    .dot:nth-child(3) { animation-delay: .4s; }
-    .speaking-bar { background: #ede9fe; color: #7c3aed; font-size: 12px; padding: 4px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; }
-    .stop-btn { background: none; border: none; cursor: pointer; color: #7c3aed; font-size: 12px; text-decoration: underline; }
+/* ── MATERIAL SCREEN ── */
+#material{background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;}
+.material-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:520px;width:100%;backdrop-filter:blur(24px);}
+.material-card h2{font-size:22px;font-weight:700;margin-bottom:6px;color:#f3eeff;}
+.material-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:24px;}
+.upload-zone{border:2px dashed rgba(167,139,250,0.4);border-radius:16px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;background:rgba(167,139,250,0.05);}
+.upload-zone:hover{border-color:#a78bfa;background:rgba(167,139,250,0.1);}
+.upload-zone .icon{font-size:36px;margin-bottom:12px;}
+.upload-zone p{color:rgba(255,255,255,0.5);font-size:14px;}
+.upload-zone strong{color:#c4b5fd;}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.thumb{position:relative;width:72px;height:72px;}
+.thumb img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid rgba(167,139,250,0.4);}
+.thumb .del{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.skip-btn{width:100%;background:none;border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px;font-size:14px;color:rgba(255,255,255,0.4);cursor:pointer;margin-top:8px;transition:all .2s;}
+.skip-btn:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.6);}
 
-    #img-preview { padding: 0 16px 8px; display: none; }
-    #img-preview img { height: 70px; border-radius: 10px; border: 2px solid #a78bfa; }
-    #img-preview .remove { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 13px; font-weight: 700; }
+/* ── PLAN SCREEN ── */
+#planscreen{background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;}
+.plan-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:540px;width:100%;backdrop-filter:blur(24px);}
+.plan-card h2{font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:4px;}
+.plan-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:24px;}
+.plan-generating{text-align:center;padding:32px 0;}
+.plan-generating .spinner{width:48px;height:48px;border:3px solid rgba(167,139,250,0.2);border-top-color:#a78bfa;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+.plan-generating p{color:rgba(255,255,255,0.5);font-size:14px;}
+.day-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:all .2s;}
+.day-card:hover{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.3);}
+.day-card.today{border-color:#a78bfa;background:rgba(124,58,237,0.15);}
+.day-card.done{opacity:0.5;}
+.day-card .day-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.day-card .day-num{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;}
+.day-card .day-title{font-weight:600;font-size:15px;color:#f3eeff;}
+.day-card .day-topics{display:flex;flex-wrap:wrap;gap:6px;}
+.topic-pill{background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.25);border-radius:20px;padding:3px 10px;font-size:12px;color:#c4b5fd;}
+.topic-pill.done-pill{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#86efac;}
+.plan-footer{display:flex;gap:10px;margin-top:20px;}
+.plan-footer .btn-primary{margin-bottom:0;}
 
-    footer { background: white; padding: 12px 16px; box-shadow: 0 -2px 12px rgba(150,100,200,.1); display: flex; gap: 8px; align-items: flex-end; }
-    .icon-btn { border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: 18px; flex-shrink: 0; border: 2px dashed #c4b5fd; background: #f5f3ff; transition: all .2s; }
-    .icon-btn.active { background: #ede9fe; border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,.15); }
-    #msg-input { flex: 1; border: 2px solid #e9d5ff; border-radius: 14px; padding: 10px 14px; font-size: 15px; resize: none; font-family: inherit; outline: none; line-height: 1.4; background: #fafaf9; color: #2d1b4e; transition: border-color .2s; }
-    #msg-input:focus { border-color: #a78bfa; }
-    #send-btn { background: linear-gradient(135deg,#7c3aed,#a855f7); color: white; border: none; border-radius: 14px; padding: 10px 16px; cursor: pointer; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(124,58,237,.3); transition: all .2s; }
-    #send-btn:disabled { background: #e9d5ff; color: #c4b5fd; box-shadow: none; cursor: default; }
+/* ── MAIN APP ── */
+#app{background:linear-gradient(135deg,#f5f0ff,#fce4f0,#e8f4ff);}
+header{background:white;padding:12px 16px;box-shadow:0 2px 12px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.hdr-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(167,139,250,.4);flex-shrink:0;}
+.hdr-info h2{font-size:16px;color:#3b1f6e;font-weight:700;}
+.hdr-info p{font-size:12px;color:#9c6fc4;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.voice-btn{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid;}
+.voice-on{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
+.voice-off{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
+.icon-btn-hdr{background:none;border:none;cursor:pointer;font-size:18px;padding:4px;opacity:0.55;}
+.icon-btn-hdr:hover{opacity:1;}
 
-    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-    @keyframes pulse-ring { 0%,100%{box-shadow:0 0 48px rgba(167,139,250,.5)} 50%{box-shadow:0 0 72px rgba(244,114,182,.7)} }
-  </style>
+/* Day progress bar */
+#progress-bar{background:white;padding:8px 16px;border-bottom:1px solid rgba(150,100,200,.1);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+#progress-bar .day-info{font-size:13px;font-weight:600;color:#3b1f6e;white-space:nowrap;}
+#progress-bar .bar-track{flex:1;height:6px;background:#e9d5ff;border-radius:99px;overflow:hidden;}
+#progress-bar .bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width .4s;}
+#progress-bar .pct{font-size:12px;color:#9c6fc4;white-space:nowrap;}
+
+/* Topic chips row */
+#topic-row{background:white;padding:8px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;gap:8px;overflow-x:auto;flex-shrink:0;}
+#topic-row::-webkit-scrollbar{display:none;}
+.topic-chip{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:20px;padding:5px 12px;font-size:12px;color:#7c3aed;white-space:nowrap;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.topic-chip:hover{background:#ede9fe;border-color:#a78bfa;}
+.topic-chip.active-chip{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-color:#7c3aed;}
+.topic-chip.done-chip{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
+
+#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.msg-row{display:flex;align-items:flex-end;gap:8px;}
+.msg-row.user{justify-content:flex-end;}
+.msg-avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.bubble{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.07);white-space:pre-wrap;}
+.bubble.stevie{background:white;color:#2d1b4e;border-bottom-left-radius:4px;}
+.bubble.user{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-bottom-right-radius:4px;}
+.bubble-meta{display:flex;gap:6px;margin-top:4px;}
+.bubble-tag{background:#f0e6ff;color:#7c3aed;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
+.replay-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:.4;padding:2px;flex-shrink:0;}
+.replay-btn:hover{opacity:.8;}
+.typing{display:flex;gap:5px;padding:12px 14px;}
+.dot{width:7px;height:7px;border-radius:50%;background:#a78bfa;animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+.speaking-ind{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 12px;border-radius:20px;display:none;align-items:center;gap:6px;margin-left:38px;}
+
+/* Quick reply buttons */
+.quick-replies{display:flex;gap:6px;flex-wrap:wrap;margin-left:38px;}
+.qr-btn{background:white;border:1.5px solid #e9d5ff;border-radius:20px;padding:6px 14px;font-size:13px;color:#7c3aed;cursor:pointer;transition:all .2s;}
+.qr-btn:hover{background:#f5f3ff;border-color:#a78bfa;}
+
+/* Image preview */
+#img-preview{padding:0 16px 8px;display:none;}
+#img-thumb{height:64px;border-radius:10px;border:2px solid #a78bfa;}
+.remove-img{position:absolute;top:-7px;right:-7px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;font-weight:700;}
+
+footer{background:white;padding:10px 14px;box-shadow:0 -2px 12px rgba(150,100,200,.1);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;}
+.foot-btn{border-radius:12px;padding:9px 11px;cursor:pointer;font-size:16px;flex-shrink:0;border:2px dashed #c4b5fd;background:#f5f3ff;transition:all .2s;}
+.foot-btn.active{background:#ede9fe;border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+#msg-input{flex:1;border:2px solid #e9d5ff;border-radius:13px;padding:9px 13px;font-size:14px;resize:none;font-family:inherit;outline:none;line-height:1.4;background:#fafaf9;color:#2d1b4e;transition:border-color .2s;}
+#msg-input:focus{border-color:#a78bfa;}
+#send-btn{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;border-radius:13px;padding:9px 15px;cursor:pointer;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.3);transition:all .2s;}
+#send-btn:disabled{background:#e9d5ff;color:#c4b5fd;box-shadow:none;cursor:default;}
+
+/* ── MODAL (Settings) ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;padding:24px;}
+.modal-bg.open{display:flex;}
+.modal{background:white;border-radius:24px;padding:28px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:17px;font-weight:700;color:#3b1f6e;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#9c6fc4;}
+.modal label{font-size:13px;font-weight:600;color:#7c6fa0;display:block;margin-bottom:6px;}
+.modal input{width:100%;border:2px solid #e9d5ff;border-radius:10px;padding:10px 14px;font-size:14px;outline:none;color:#2d1b4e;margin-bottom:16px;}
+.modal input:focus{border-color:#a78bfa;}
+.modal .btn-save{width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;}
+
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 48px rgba(167,139,250,.5)}50%{box-shadow:0 0 72px rgba(244,114,182,.7)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
 </head>
 <body>
 
-<!-- Splash Screen -->
-<div id="splash">
+<!-- ══ SPLASH ══ -->
+<div id="splash" class="screen active">
   <canvas id="stars"></canvas>
   <div class="glass">
     <div class="logo-ring">🌟</div>
-    <h1>Stevie</h1>
+    <div class="splash-title">Stevie</div>
     <p class="tagline">Deine <span>persönliche Lernbegleiterin</span><br>– die coole große Schwester für die Schule</p>
-    <div class="features">
-      <div class="chip">📸 Foto hochladen</div>
-      <div class="chip">🧠 KI erklärt</div>
+    <div class="chips">
+      <div class="chip">📸 Material hochladen</div>
+      <div class="chip">🗓️ Lernplan</div>
+      <div class="chip">🧠 Quizfragen</div>
       <div class="chip">🎙️ Sprechen</div>
-      <div class="chip">✅ Quizfragen</div>
     </div>
-    <button class="start-btn" onclick="showNextScreen()">Los geht's ✨</button>
-    <p class="sub">Kein Account nötig · Läuft direkt im Browser</p>
+    <button class="btn-primary" onclick="splashNext()">Los geht's ✨</button>
+    <p class="sub-hint">Kein Account nötig · Läuft direkt im Browser</p>
   </div>
 </div>
 
-<!-- API Key Screen -->
-<div id="key-screen">
-  <div class="card">
-    <div class="avatar">🌟</div>
-    <h2>Fast da!</h2>
-    <p>Gib einmalig deinen Anthropic API-Key ein.<br>Er wird nur in deinem Browser gespeichert.</p>
-    <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-    <input type="password" id="eleven-key-input" placeholder="ElevenLabs API-Key (optional, für echte Stimme)" style="margin-top:0" />
-    <button onclick="saveKey()">Stevie starten ✨</button>
-    <p class="hint">Anthropic-Key: Pflicht · ElevenLabs-Key: optional, aber empfohlen für natürliche Stimme.<br>Beide Keys bleiben nur in deinem Browser.</p>
+<!-- ══ KEY SETUP ══ -->
+<div id="keyscreen" class="screen" style="background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;">
+  <div class="setup-card">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div class="logo-ring" style="width:64px;height:64px;font-size:28px;margin-bottom:16px;">🌟</div>
+      <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:6px;">Fast da!</h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:14px;">Gib deinen Anthropic API-Key ein.</p>
+    </div>
+    <span class="field-label">Anthropic API-Key</span>
+    <input class="dark-input" type="password" id="api-key-input" placeholder="sk-ant-..."/>
+    <span class="field-label">ElevenLabs Key <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional, für echte Stimme)</span></span>
+    <input class="dark-input" type="password" id="eleven-key-input" placeholder="Dein ElevenLabs Key..."/>
+    <button class="btn-primary" onclick="saveKeys()">Stevie starten ✨</button>
+    <p class="sub-hint" style="text-align:center;margin-top:10px;">Keys bleiben nur in deinem Browser</p>
   </div>
 </div>
 
-<!-- Settings Modal -->
-<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;padding:24px;">
-  <div style="background:white;border-radius:24px;padding:32px;max-width:400px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,.2);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-      <h2 style="font-size:18px;font-weight:700;color:#3b1f6e;margin:0;">⚙️ Einstellungen</h2>
-      <button onclick="closeSettings()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#9c6fc4;">×</button>
-    </div>
-    <label style="font-size:13px;font-weight:600;color:#7c6fa0;display:block;margin-bottom:6px;">Anthropic API-Key</label>
-    <input type="password" id="settings-anthropic" placeholder="sk-ant-..." style="width:100%;border:2px solid #e9d5ff;border-radius:10px;padding:10px 14px;font-size:14px;outline:none;color:#2d1b4e;margin-bottom:16px;" />
-    <label style="font-size:13px;font-weight:600;color:#7c6fa0;display:block;margin-bottom:6px;">ElevenLabs API-Key <span style="font-weight:400;color:#b8a8d0;">(für natürliche Stimme)</span></label>
-    <input type="password" id="settings-eleven" placeholder="Dein ElevenLabs Key..." style="width:100%;border:2px solid #e9d5ff;border-radius:10px;padding:10px 14px;font-size:14px;outline:none;color:#2d1b4e;margin-bottom:8px;" />
-    <p style="font-size:12px;color:#b8a8d0;margin-bottom:24px;">Hole deinen kostenlosen Key auf <a href="https://elevenlabs.io" style="color:#a78bfa;">elevenlabs.io</a> → Profil → API Key</p>
-    <button onclick="saveSettings()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;">Speichern ✓</button>
+<!-- ══ SETUP: Fach & Tage ══ -->
+<div id="setup" class="screen" style="background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;">
+  <div class="setup-card">
+    <h2>Neue Lernrunde 🎯</h2>
+    <p class="sub">Sag mir womit wir starten – ich baue dir einen Plan.</p>
+    <span class="field-label">Welches Fach?</span>
+    <input class="dark-input" id="subject-input" placeholder="z.B. Biologie, Mathe, Geschichte…"/>
+    <span class="field-label">Wie viele Tage hast du Zeit?</span>
+    <div class="days-grid" id="days-grid"></div>
+    <div id="days-display" style="text-align:center;color:#c4b5fd;font-size:14px;margin-bottom:20px;min-height:20px;"></div>
+    <button class="btn-primary" onclick="goToMaterial()">Weiter → Material hochladen</button>
   </div>
 </div>
-<div id="app">
+
+<!-- ══ MATERIAL ══ -->
+<div id="material" class="screen">
+  <div class="material-card" style="margin:auto;">
+    <h2>📸 Dein Lernmaterial</h2>
+    <p class="sub">Lade Fotos von Schulbuchseiten, deiner Mappe oder der Checkliste hoch.<br>Stevie liest alles und baut daraus deinen Lernplan.</p>
+    <div class="upload-zone" onclick="document.getElementById('mat-upload').click()">
+      <div class="icon">📷</div>
+      <p><strong>Tippe hier</strong> um Fotos hinzuzufügen</p>
+      <p style="font-size:12px;margin-top:4px;">Schulbuch · Mappe · Checkliste · Notizen</p>
+    </div>
+    <input type="file" id="mat-upload" accept="image/*" multiple style="display:none" onchange="handleMatUpload(event)"/>
+    <div class="thumbs" id="mat-thumbs"></div>
+    <button class="btn-primary" id="mat-next-btn" onclick="generatePlan()" style="display:none">Lernplan erstellen 🧠</button>
+    <button class="skip-btn" onclick="generatePlan(true)">Ohne Material fortfahren →</button>
+  </div>
+</div>
+
+<!-- ══ PLAN ══ -->
+<div id="planscreen" class="screen">
+  <div class="plan-card" style="margin:auto;">
+    <h2 id="plan-title">Dein Lernplan ✨</h2>
+    <p class="sub" id="plan-sub"></p>
+    <div id="plan-content">
+      <div class="plan-generating">
+        <div class="spinner"></div>
+        <p>Stevie liest dein Material und baut deinen Plan…</p>
+      </div>
+    </div>
+    <div class="plan-footer" id="plan-footer" style="display:none;">
+      <button class="btn-primary" onclick="startLearning()">Tag 1 starten 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app" class="screen">
   <header>
-    <div class="avatar-sm">🌟</div>
-    <div class="header-info">
+    <div class="hdr-avatar">🌟</div>
+    <div class="hdr-info">
       <h2>Stevie</h2>
-      <p>Deine persönliche Lernbegleiterin</p>
+      <p id="hdr-subtitle">Lernbegleiterin</p>
     </div>
-    <button id="voice-toggle" class="voice-btn voice-on" onclick="toggleVoice()">🔊 Stimme an</button>
-    <button onclick="openSettings()" title="Einstellungen" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px;opacity:0.6;">⚙️</button>
+    <div class="hdr-right">
+      <button id="voice-toggle" class="voice-btn voice-on" onclick="toggleVoice()">🔊</button>
+      <button class="icon-btn-hdr" onclick="showPlan()" title="Lernplan">🗓️</button>
+      <button class="icon-btn-hdr" onclick="openSettings()" title="Einstellungen">⚙️</button>
+    </div>
   </header>
-
-  <div id="messages"></div>
-
-  <div id="img-preview" style="position:relative;display:none;">
-    <img id="img-thumb" src="" alt="preview" />
-    <button class="remove" onclick="removeImage()">×</button>
+  <div id="progress-bar">
+    <span class="day-info" id="progress-day">Tag 1</span>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+    <span class="pct" id="progress-pct">0%</span>
   </div>
-
+  <div id="topic-row"></div>
+  <div id="messages"></div>
+  <div id="img-preview" style="position:relative;">
+    <img id="img-thumb" src="" alt="preview"/>
+    <button class="remove-img" onclick="removeImage()">×</button>
+  </div>
+  <div id="speaking-ind" class="speaking-ind">🔊 Stevie spricht… <button onclick="stopSpeaking()" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button></div>
   <footer>
-    <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Bild hochladen">📷</button>
-    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleImage(event)" />
-    <textarea id="msg-input" rows="1" placeholder="Schreib oder sprich mit Stevie..." onkeydown="handleKey(event)"></textarea>
-    <button class="icon-btn" id="mic-btn" onclick="toggleListen()" title="Sprechen">🎙️</button>
+    <button class="foot-btn" onclick="document.getElementById('chat-upload').click()" title="Foto">📷</button>
+    <input type="file" id="chat-upload" accept="image/*" style="display:none" onchange="handleChatImage(event)"/>
+    <textarea id="msg-input" rows="1" placeholder="Schreib oder sprich mit Stevie…" onkeydown="handleKey(event)"></textarea>
+    <button class="foot-btn" id="mic-btn" onclick="toggleListen()" title="Sprechen">🎙️</button>
     <button id="send-btn" onclick="sendMessage()">➤</button>
   </footer>
 </div>
 
+<!-- ══ SETTINGS MODAL ══ -->
+<div class="modal-bg" id="settings-modal">
+  <div class="modal">
+    <h3>⚙️ Einstellungen <button class="modal-close" onclick="closeSettings()">×</button></h3>
+    <label>Anthropic API-Key</label>
+    <input type="password" id="s-anthropic" placeholder="sk-ant-..."/>
+    <label>ElevenLabs Key <span style="font-weight:400;color:#b8a8d0;">(optional)</span></label>
+    <input type="password" id="s-eleven" placeholder="Für natürliche Stimme"/>
+    <p style="font-size:12px;color:#b8a8d0;margin:-8px 0 16px;">Key holen: <a href="https://elevenlabs.io" style="color:#a78bfa;">elevenlabs.io</a> → Profil</p>
+    <button class="btn-save" onclick="saveSettings()">Speichern ✓</button>
+  </div>
+</div>
+
+<!-- ══ PLAN MODAL ══ -->
+<div class="modal-bg" id="plan-modal">
+  <div class="modal">
+    <h3>🗓️ Lernplan <button class="modal-close" onclick="document.getElementById('plan-modal').classList.remove('open')">×</button></h3>
+    <div id="plan-modal-content"></div>
+  </div>
+</div>
+
 <script>
-  const SYSTEM = `Du bist Stevie, ein KI-Lernbegleiter für Kinder im Alter von 10-12 Jahren (5. Klasse Gymnasium). Du fühlst dich an wie eine freundliche, warmherzige ältere Schwester – niemals schulmeisterlich, immer ermutigend.
+// ══ STATE ══
+let state = {
+  subject:'', days:1, currentDay:1,
+  plan:[], // [{title, topics:[]}]
+  doneTopic:{}, // {day_topic: true}
+  messages:[],
+  matImages:[], // [{data, type}]
+  voiceEnabled:true,
+  listening:false
+};
 
-DEINE PERSÖNLICHKEIT:
-- Warm, locker, verständnisvoll – wie eine coole große Schwester
-- Du fragst lieber als du erklärst (aktives Erinnern)
-- Nach jeder Antwort gibst du kurzes, ehrliches Feedback (nicht übertrieben lobend, aber immer motivierend)
-- Du verwendest einfache Sprache, Emojis sparsam aber gezielt 🌟
-- Du machst Mut, wenn etwas schwierig ist
-- Du stellst immer nur EINE Frage auf einmal
+// ══ STARS ══
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');
+let stars=[];
+function resizeC(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initS(){stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.3,a:Math.random(),sp:Math.random()*.008+.003}));}
+function animS(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.a})`;ctx.fill();});requestAnimationFrame(animS);}
+resizeC();initS();animS();
+window.addEventListener('resize',()=>{resizeC();initS();});
 
-LERNMETHODIK:
-1. Wenn ein Bild hochgeladen wird: Analysiere den Inhalt, fasse kurz zusammen was du siehst, und frage ob das stimmt
-2. Erstelle dann einen kleinen Lernplan: "Wir schauen uns heute X, Y und Z an – womit willst du starten?"
-3. Stelle aktive Fragen zum Thema – lass das Kind antworten, bevor du erklärst
-4. Gib nach jeder Antwort kurzes Feedback (1-2 Sätze) und stelle die nächste Frage
-5. Am Ende einer Einheit: kurze Zusammenfassung was das Kind heute gelernt hat
+// ══ SCREENS ══
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-WICHTIG: Antworte auf Deutsch. Sei nie zu formal. Halte Antworten kurz (2-4 Sätze) damit sie gut vorgelesen werden können.`;
+// ══ SPLASH ══
+function splashNext(){if(getKey())show('setup');else show('keyscreen');}
 
-  let messages = [];
-  let imageData = null;
-  let voiceEnabled = true;
-  let listening = false;
-  let recognition = null;
-  const synth = window.speechSynthesis;
+// ══ KEYS ══
+function getKey(){return localStorage.getItem('stevie_key');}
+function saveKeys(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('sk-'))return alert('Bitte einen gültigen Anthropic API-Key eingeben.');
+  localStorage.setItem('stevie_key',k);
+  const ek=document.getElementById('eleven-key-input').value.trim();
+  if(ek)localStorage.setItem('stevie_eleven_key',ek);
+  show('setup');
+}
 
-  // --- Key management ---
-  // Stars animation
-  const canvas = document.getElementById('stars');
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  function initStars() { stars = Array.from({length:120},()=>({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.5+0.3, a:Math.random(), speed:Math.random()*0.008+0.003 })); }
-  function animateStars() { ctx.clearRect(0,0,canvas.width,canvas.height); stars.forEach(s=>{ s.a += s.speed; if(s.a>1) s.a=0; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(200,180,255,${s.a})`; ctx.fill(); }); requestAnimationFrame(animateStars); }
-  resizeCanvas(); initStars(); animateStars();
-  window.addEventListener('resize',()=>{ resizeCanvas(); initStars(); });
+// ══ DAYS GRID ══
+window.onload=()=>{
+  buildDaysGrid();
+  if(getKey())show('splash');
+  else show('splash');
+};
 
-  function showNextScreen() {
-    if(getKey()) { document.getElementById('splash').style.display='none'; startApp(); }
-    else { document.getElementById('splash').style.display='none'; document.getElementById('key-screen').style.display='flex'; }
+function buildDaysGrid(){
+  const g=document.getElementById('days-grid');
+  g.innerHTML='';
+  for(let i=1;i<=14;i++){
+    const b=document.createElement('div');
+    b.className='day-btn';
+    b.innerHTML=`${i}<div class="day-label">${i===1?'Tag':'Tage'}</div>`;
+    b.onclick=()=>selectDays(i);
+    b.id=`db-${i}`;
+    g.appendChild(b);
   }
+}
 
-  function saveKey() {
-    const k = document.getElementById('api-key-input').value.trim();
-    if (!k.startsWith('sk-')) return alert('Bitte einen gültigen Anthropic API-Key eingeben (beginnt mit sk-)');
-    localStorage.setItem('stevie_key', k);
-    const ek = document.getElementById('eleven-key-input').value.trim();
-    if (ek) localStorage.setItem('stevie_eleven_key', ek);
-    startApp();
-  }
+function selectDays(n){
+  state.days=n;
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById(`db-${n}`).classList.add('selected');
+  document.getElementById('days-display').textContent=
+    n===1?'Du hast 1 Tag – wir fokussieren uns aufs Wesentliche! 💪'
+    :n<=3?`${n} Tage – kompakter Intensivplan 🔥`
+    :n<=7?`${n} Tage – solider Lernplan mit Zeit zum Üben ✅`
+    :`${n} Tage – entspannter Durchstarter-Plan 🌱`;
+}
 
-  function getKey() { return localStorage.getItem('stevie_key'); }
+function goToMaterial(){
+  const s=document.getElementById('subject-input').value.trim();
+  if(!s)return alert('Bitte gib ein Fach ein!');
+  if(!state.days)return alert('Bitte wähle die Anzahl der Tage!');
+  state.subject=s;
+  show('material');
+}
 
-  window.onload = () => {
-    if (getKey()) { document.getElementById('splash').style.display='flex'; }
-    else { document.getElementById('splash').style.display='flex'; }
-  };
-
-  function startApp() {
-    document.getElementById('key-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    addMessage('assistant', 'Hey! Ich bin Stevie 👋 Deine persönliche Lernbegleiterin.\n\nDu kannst mir ein Foto schicken, schreiben – oder einfach mit mir sprechen! Was hast du heute auf dem Plan? 📚');
-  }
-
-  // --- Messages ---
-  function addMessage(role, content, imgSrc) {
-    messages.push({ role, content });
-    const row = document.createElement('div');
-    row.className = `msg-row ${role}`;
-    if (role === 'assistant') {
-      row.innerHTML = `<div class="msg-avatar">🌟</div>`;
-    }
-    const bubble = document.createElement('div');
-    bubble.className = `bubble ${role === 'assistant' ? 'stevie' : 'user'}`;
-    if (imgSrc) {
-      const img = document.createElement('img');
-      img.src = imgSrc; img.style.cssText = 'max-width:180px;border-radius:10px;margin-bottom:6px;display:block';
-      bubble.appendChild(img);
-    }
-    bubble.appendChild(document.createTextNode(typeof content === 'string' ? content : ''));
-    row.appendChild(bubble);
-    if (role === 'assistant') {
-      const rb = document.createElement('button');
-      rb.className = 'replay-btn'; rb.textContent = '🔁'; rb.title = 'Nochmal vorlesen';
-      rb.onclick = () => speak(content);
-      row.appendChild(rb);
-    }
-    document.getElementById('messages').appendChild(row);
-    document.getElementById('messages').scrollTop = 999999;
-    if (role === 'assistant') speak(content);
-  }
-
-  function showTyping() {
-    const d = document.createElement('div');
-    d.className = 'msg-row'; d.id = 'typing';
-    d.innerHTML = `<div class="msg-avatar">🌟</div><div class="bubble stevie"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
-    document.getElementById('messages').appendChild(d);
-    document.getElementById('messages').scrollTop = 999999;
-  }
-  function hideTyping() { document.getElementById('typing')?.remove(); }
-
-  // --- Send ---
-  async function sendMessage() {
-    const input = document.getElementById('msg-input');
-    const text = input.value.trim();
-    if (!text && !imageData) return;
-
-    stopSpeaking();
-    const userContent = [];
-    let imgSrc = null;
-    if (imageData) {
-      userContent.push({ type: 'image', source: { type: 'base64', media_type: imageData.type, data: imageData.data } });
-      imgSrc = document.getElementById('img-thumb').src;
-    }
-    if (text) userContent.push({ type: 'text', text });
-
-    addMessage('user', text, imgSrc);
-    input.value = '';
-    removeImage();
-    document.getElementById('send-btn').disabled = true;
-    showTyping();
-
-    const apiMsgs = messages.map(m => ({ role: m.role, content: m.content }));
-
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': getKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: SYSTEM, messages: apiMsgs })
-      });
-      const data = await res.json();
-      hideTyping();
-      if (data.error) throw new Error(data.error.message);
-      const reply = data.content?.find(b => b.type === 'text')?.text || 'Hmm, da ist etwas schiefgelaufen 🙈';
-      addMessage('assistant', reply);
-    } catch(e) {
-      hideTyping();
-      addMessage('assistant', `Ups, kurzer Fehler: ${e.message} 😅`);
-    }
-    document.getElementById('send-btn').disabled = false;
-  }
-
-  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-
-  // --- Image ---
-  function handleImage(e) {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      imageData = { data: ev.target.result.split(',')[1], type: file.type };
-      document.getElementById('img-thumb').src = ev.target.result;
-      document.getElementById('img-preview').style.display = 'block';
+// ══ MATERIAL UPLOAD ══
+function handleMatUpload(e){
+  Array.from(e.target.files).forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      state.matImages.push({data:ev.target.result.split(',')[1],type:file.type,src:ev.target.result});
+      renderThumbs();
     };
-    reader.readAsDataURL(file);
-  }
-  function removeImage() {
-    imageData = null;
-    document.getElementById('img-preview').style.display = 'none';
-    document.getElementById('file-input').value = '';
+    r.readAsDataURL(file);
+  });
+}
+
+function renderThumbs(){
+  const c=document.getElementById('mat-thumbs');
+  c.innerHTML='';
+  state.matImages.forEach((img,i)=>{
+    const d=document.createElement('div');
+    d.className='thumb';
+    d.innerHTML=`<img src="${img.src}"/><button class="del" onclick="removeMat(${i})">×</button>`;
+    c.appendChild(d);
+  });
+  document.getElementById('mat-next-btn').style.display=state.matImages.length?'block':'none';
+}
+
+function removeMat(i){state.matImages.splice(i,1);renderThumbs();}
+
+// ══ GENERATE PLAN ══
+async function generatePlan(skip=false){
+  show('planscreen');
+  document.getElementById('plan-title').textContent=`Lernplan für ${state.subject} ✨`;
+  document.getElementById('plan-sub').textContent=`${state.days} ${state.days===1?'Tag':'Tage'} · Stevie analysiert dein Material…`;
+
+  const SYSTEM=`Du bist Stevie, eine freundliche KI-Lernbegleiterin. Antworte NUR mit einem JSON-Array ohne Markdown-Backticks.
+Format: [{"day":1,"title":"Kurzer Tagesname","topics":["Thema 1","Thema 2","Thema 3"]}]
+Erstelle einen ${state.days}-Tage-Lernplan für das Fach "${state.subject}". Maximal 3-4 Themen pro Tag. Verteile den Stoff sinnvoll. Kein Markdown, kein Text außer dem JSON-Array.`;
+
+  const userContent=[];
+  if(!skip && state.matImages.length){
+    state.matImages.forEach(img=>userContent.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}));
+    userContent.push({type:'text',text:`Analysiere diese ${state.matImages.length} Bilder und erstelle einen ${state.days}-Tage-Lernplan für ${state.subject}. Nur JSON-Array, kein anderer Text.`});
+  } else {
+    userContent.push({type:'text',text:`Erstelle einen ${state.days}-Tage-Lernplan für ${state.subject}. Nur JSON-Array, kein anderer Text.`});
   }
 
-  // --- Voice output (ElevenLabs) ---
-  let currentAudio = null;
-  const ELEVEN_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Sarah – warm, natürlich
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:SYSTEM,messages:[{role:'user',content:userContent}]})
+    });
+    const d=await res.json();
+    const text=d.content?.find(b=>b.type==='text')?.text||'[]';
+    const clean=text.replace(/```json|```/g,'').trim();
+    state.plan=JSON.parse(clean);
+  }catch(e){
+    // fallback plan
+    state.plan=Array.from({length:state.days},(_,i)=>({day:i+1,title:`Tag ${i+1}`,topics:[`${state.subject} – Teil ${i+1}`]}));
+  }
 
-  async function speak(text) {
-    if (!voiceEnabled) return;
-    stopSpeaking();
-    const key = localStorage.getItem('stevie_eleven_key');
-    if (!key) { fallbackSpeak(text); return; }
-    const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
-    try {
-      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}`, {
-        method: 'POST',
-        headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: clean, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.3, use_speaker_boost: true } })
+  renderPlanScreen();
+}
+
+function renderPlanScreen(){
+  const c=document.getElementById('plan-content');
+  c.innerHTML='';
+  document.getElementById('plan-sub').textContent=`${state.days} ${state.days===1?'Tag':'Tage'} · ${state.subject} · Alles bereit!`;
+  state.plan.forEach((day,i)=>{
+    const d=document.createElement('div');
+    d.className='day-card'+(i===0?' today':'');
+    d.innerHTML=`<div class="day-header"><span class="day-num">Tag ${day.day}</span><span class="day-title">${day.title}</span></div>
+    <div class="day-topics">${day.topics.map(t=>`<span class="topic-pill">${t}</span>`).join('')}</div>`;
+    c.appendChild(d);
+  });
+  document.getElementById('plan-footer').style.display='flex';
+}
+
+// ══ START LEARNING ══
+function startLearning(){
+  state.currentDay=1;
+  show('app');
+  initAppUI();
+  const greeting=`Hey! 👋 Ich bin Stevie, deine Lernbegleiterin!\n\nWir haben ${state.days} ${state.days===1?'Tag':'Tage'} für ${state.subject}. Heute starten wir mit: ${state.plan[0]?.topics?.join(', ')||state.subject}.\n\nWomit möchtest du anfangen?`;
+  addMessage('assistant',greeting,'💬');
+  speak(greeting);
+  renderTopicRow();
+  updateProgress();
+}
+
+function initAppUI(){
+  document.getElementById('hdr-subtitle').textContent=`${state.subject} · Tag ${state.currentDay}/${state.days}`;
+}
+
+function renderTopicRow(){
+  const row=document.getElementById('topic-row');
+  row.innerHTML='';
+  const dayPlan=state.plan[state.currentDay-1];
+  if(!dayPlan)return;
+  dayPlan.topics.forEach(t=>{
+    const key=`${state.currentDay}_${t}`;
+    const done=state.doneTopic[key];
+    const chip=document.createElement('div');
+    chip.className='topic-chip'+(done?' done-chip':'');
+    chip.textContent=(done?'✅ ':'')+t;
+    chip.onclick=()=>focusTopic(t);
+    row.appendChild(chip);
+  });
+}
+
+function focusTopic(topic){
+  const msg=`Lass uns jetzt "${topic}" durchgehen. Ich stelle dir zuerst eine Frage dazu – bereit?`;
+  sendAutoMessage(msg);
+}
+
+function updateProgress(){
+  const dayPlan=state.plan[state.currentDay-1];
+  if(!dayPlan)return;
+  const total=dayPlan.topics.length;
+  const done=dayPlan.topics.filter(t=>state.doneTopic[`${state.currentDay}_${t}`]).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('bar-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-day').textContent=`Tag ${state.currentDay}/${state.days}`;
+}
+
+// ══ CHAT ══
+const STEVIE_SYSTEM=`Du bist Stevie, KI-Lernbegleiterin für Kinder (10-12 Jahre, 5. Klasse Gymnasium). Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich.
+
+METHODIK: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurzes Feedback (1-2 Sätze). Antworten kurz halten (2-4 Sätze) – gut zum Vorlesen.
+
+NACH JEDER ANTWORT: Markiere mit [TAG:Erklärung] oder [TAG:Frage] oder [TAG:Feedback] oder [TAG:Motivation] am Anfang der Nachricht.
+
+Wenn ein Thema vollständig besprochen wurde, schreibe am Ende: [TOPIC_DONE:Themenname]
+
+Antworte auf Deutsch. Sei nie zu formal.`;
+
+let chatImage=null;
+
+function addMessage(role,content,tag,imgSrc){
+  state.messages.push({role,content});
+  const row=document.createElement('div');
+  row.className=`msg-row ${role}`;
+  row.style.animation='fadeIn .3s ease';
+
+  if(role==='assistant'){
+    row.innerHTML=`<div class="msg-avatar-sm">🌟</div>`;
+  }
+
+  const cleanContent=content.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[TOPIC_DONE:[^\]]+\]/g,'').trim();
+  const bubble=document.createElement('div');
+  bubble.className=`bubble ${role==='assistant'?'stevie':'user'}`;
+  if(imgSrc){const img=document.createElement('img');img.src=imgSrc;img.style.cssText='max-width:180px;border-radius:10px;margin-bottom:6px;display:block';bubble.appendChild(img);}
+  bubble.appendChild(document.createTextNode(cleanContent));
+  row.appendChild(bubble);
+
+  if(role==='assistant'){
+    if(tag){const m=document.createElement('div');m.className='bubble-meta';m.innerHTML=`<span class="bubble-tag">${tagEmoji(tag)} ${tag}</span>`;row.appendChild(m);}
+    const rb=document.createElement('button');rb.className='replay-btn';rb.textContent='🔁';rb.onclick=()=>speak(cleanContent);row.appendChild(rb);
+    // Check for TOPIC_DONE
+    const td=content.match(/\[TOPIC_DONE:([^\]]+)\]/);
+    if(td){markTopicDone(td[1]);}
+    // Show quick replies if it's a question
+    if(content.includes('[TAG:Frage]')){
+      setTimeout(()=>showQuickReplies(row),200);
+    }
+  }
+
+  document.getElementById('messages').appendChild(row);
+  document.getElementById('messages').scrollTop=999999;
+}
+
+function tagEmoji(tag){return{Frage:'❓',Erklärung:'📖',Feedback:'✅',Motivation:'💪',Lernplan:'🗓️'}[tag]||'💬';}
+
+function showQuickReplies(afterRow){
+  const qr=document.createElement('div');
+  qr.className='quick-replies';
+  ['Ich weiß es! 🙋','Bin nicht sicher 🤔','Keine Ahnung 😅','Nächstes Thema →'].forEach(label=>{
+    const b=document.createElement('button');b.className='qr-btn';b.textContent=label;
+    b.onclick=()=>{qr.remove();sendAutoMessage(label);};
+    qr.appendChild(b);
+  });
+  afterRow.after(qr);
+}
+
+function markTopicDone(topicName){
+  const dayPlan=state.plan[state.currentDay-1];
+  if(!dayPlan)return;
+  const match=dayPlan.topics.find(t=>topicName.includes(t)||t.includes(topicName));
+  if(match){state.doneTopic[`${state.currentDay}_${match}`]=true;renderTopicRow();updateProgress();}
+}
+
+function showTyping(){const d=document.createElement('div');d.className='msg-row';d.id='typing';d.innerHTML=`<div class="msg-avatar-sm">🌟</div><div class="bubble stevie"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;document.getElementById('messages').appendChild(d);document.getElementById('messages').scrollTop=999999;}
+function hideTyping(){document.getElementById('typing')?.remove();}
+
+async function sendMessage(){
+  const input=document.getElementById('msg-input');
+  const text=input.value.trim();
+  if(!text&&!chatImage)return;
+  stopSpeaking();
+
+  const userContent=[];
+  let imgSrc=null;
+  if(chatImage){userContent.push({type:'image',source:{type:'base64',media_type:chatImage.type,data:chatImage.data}});imgSrc=document.getElementById('img-thumb').src;}
+  if(text)userContent.push({type:'text',text});
+
+  addMessage('user',text||'📷',null,imgSrc);
+  input.value='';removeImage();
+  document.getElementById('send-btn').disabled=true;
+  showTyping();
+
+  const dayPlan=state.plan[state.currentDay-1];
+  const context=dayPlan?`Aktueller Tag: ${state.currentDay}/${state.days}. Fach: ${state.subject}. Heutige Themen: ${dayPlan.topics.join(', ')}.`:'';
+  const systemWithContext=STEVIE_SYSTEM+'\n\n'+context;
+
+  const apiMsgs=state.messages.map(m=>({role:m.role,content:m.content}));
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:systemWithContext,messages:apiMsgs})
+    });
+    const d=await res.json();
+    hideTyping();
+    if(d.error)throw new Error(d.error.message);
+    const reply=d.content?.find(b=>b.type==='text')?.text||'Hmm, kurzer Fehler 🙈';
+    const tagMatch=reply.match(/\[TAG:([^\]]+)\]/);
+    const tag=tagMatch?tagMatch[1]:null;
+    addMessage('assistant',reply,tag);
+    speak(reply.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[TOPIC_DONE:[^\]]+\]/g,'').trim());
+  }catch(e){
+    hideTyping();
+    addMessage('assistant',`Ups: ${e.message} 😅`,'');
+  }
+  document.getElementById('send-btn').disabled=false;
+}
+
+function sendAutoMessage(text){
+  document.getElementById('msg-input').value=text;
+  sendMessage();
+}
+
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+
+// ══ CHAT IMAGE ══
+function handleChatImage(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{chatImage={data:ev.target.result.split(',')[1],type:file.type};document.getElementById('img-thumb').src=ev.target.result;document.getElementById('img-preview').style.display='block';};
+  r.readAsDataURL(file);
+}
+function removeImage(){chatImage=null;document.getElementById('img-preview').style.display='none';document.getElementById('chat-upload').value='';}
+
+// ══ PLAN MODAL ══
+function showPlan(){
+  const c=document.getElementById('plan-modal-content');
+  c.innerHTML='';
+  state.plan.forEach((day,i)=>{
+    const done=day.topics.filter(t=>state.doneTopic[`${day.day}_${t}`]).length;
+    const d=document.createElement('div');
+    d.style.cssText='background:#f9f5ff;border-radius:14px;padding:14px 16px;margin-bottom:10px;';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-radius:7px;padding:3px 9px;font-size:11px;font-weight:700;">Tag ${day.day}</span>
+      <span style="font-weight:600;font-size:14px;color:#3b1f6e;">${day.title}</span>
+      <span style="margin-left:auto;font-size:12px;color:#9c6fc4;">${done}/${day.topics.length}</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;">${day.topics.map(t=>{const dk=state.doneTopic[`${day.day}_${t}`];return`<span style="background:${dk?'#f0fdf4':'#ede9fe'};border:1px solid ${dk?'#bbf7d0':'#c4b5fd'};border-radius:20px;padding:3px 10px;font-size:12px;color:${dk?'#16a34a':'#7c3aed'};">${dk?'✅ ':''} ${t}</span>`;}).join('')}</div>`;
+    c.appendChild(d);
+  });
+  document.getElementById('plan-modal').classList.add('open');
+}
+
+// ══ VOICE OUTPUT ══
+let currentAudio=null;
+const synth=window.speechSynthesis;
+const ELEVEN_VOICE='EXAVITQu4vr4xnSDxMaL';
+
+async function speak(text){
+  if(!state.voiceEnabled)return;
+  stopSpeaking();
+  const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
+  const ek=localStorage.getItem('stevie_eleven_key');
+  if(ek){
+    try{
+      const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE}`,{
+        method:'POST',headers:{'xi-api-key':ek,'Content-Type':'application/json'},
+        body:JSON.stringify({text:clean,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.8,style:.3,use_speaker_boost:true}})
       });
-      if (!res.ok) { fallbackSpeak(text); return; }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      currentAudio = new Audio(url);
-      currentAudio.onended = () => setSpeakingIndicator(false);
-      currentAudio.play();
-      setSpeakingIndicator(true);
-    } catch { fallbackSpeak(text); }
+      if(res.ok){const blob=await res.blob();const url=URL.createObjectURL(blob);currentAudio=new Audio(url);currentAudio.onended=()=>setSpeakInd(false);currentAudio.play();setSpeakInd(true);return;}
+    }catch{}
   }
+  const utt=new SpeechSynthesisUtterance(clean);utt.lang='de-DE';utt.rate=.95;utt.pitch=1.1;
+  const v=synth.getVoices().find(v=>v.lang.startsWith('de'));if(v)utt.voice=v;
+  utt.onend=()=>setSpeakInd(false);synth.speak(utt);setSpeakInd(true);
+}
+function stopSpeaking(){if(currentAudio){currentAudio.pause();currentAudio=null;}synth.cancel();setSpeakInd(false);}
+function setSpeakInd(v){const el=document.getElementById('speaking-ind');if(el)el.style.display=v?'flex':'none';}
+function toggleVoice(){state.voiceEnabled=!state.voiceEnabled;stopSpeaking();const b=document.getElementById('voice-toggle');b.textContent=state.voiceEnabled?'🔊':'🔇';b.className='voice-btn '+(state.voiceEnabled?'voice-on':'voice-off');}
 
-  function fallbackSpeak(text) {
-    const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang = 'de-DE'; utt.rate = 0.95; utt.pitch = 1.1;
-    const v = synth.getVoices().find(v => v.lang.startsWith('de'));
-    if (v) utt.voice = v;
-    utt.onend = () => setSpeakingIndicator(false);
-    synth.speak(utt);
-    setSpeakingIndicator(true);
-  }
+// ══ VOICE INPUT ══
+function toggleListen(){
+  if(state.listening){recognitionRef?.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Spracheingabe benötigt Chrome oder Edge.');return;}
+  const rec=new SR();rec.lang='de-DE';rec.continuous=false;rec.interimResults=false;
+  rec.onresult=e=>{document.getElementById('msg-input').value=e.results[0][0].transcript;setListening(false);};
+  rec.onerror=rec.onend=()=>setListening(false);
+  rec.start();setListening(true);var recognitionRef=rec;
+}
+function setListening(v){state.listening=v;const b=document.getElementById('mic-btn');if(b){b.textContent=v?'⏹️':'🎙️';b.classList.toggle('active',v);}}
 
-  function setSpeakingIndicator(val) {
-    const bar = document.getElementById('speaking-bar');
-    if (bar) bar.style.display = val ? 'inline-flex' : 'none';
-  }
+// ══ SETTINGS ══
+function openSettings(){document.getElementById('s-anthropic').value=localStorage.getItem('stevie_key')||'';document.getElementById('s-eleven').value=localStorage.getItem('stevie_eleven_key')||'';document.getElementById('settings-modal').classList.add('open');}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
+function saveSettings(){const ak=document.getElementById('s-anthropic').value.trim();const ek=document.getElementById('s-eleven').value.trim();if(ak)localStorage.setItem('stevie_key',ak);if(ek)localStorage.setItem('stevie_eleven_key',ek);closeSettings();}
 
-  function stopSpeaking() {
-    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    synth.cancel();
-    setSpeakingIndicator(false);
-  }
-  function toggleVoice() {
-    voiceEnabled = !voiceEnabled;
-    stopSpeaking();
-    const btn = document.getElementById('voice-toggle');
-    btn.textContent = voiceEnabled ? '🔊 Stimme an' : '🔇 Stimme aus';
-    btn.className = 'voice-btn ' + (voiceEnabled ? 'voice-on' : 'voice-off');
-  }
-
-  // --- Voice input ---
-  function toggleListen() {
-    if (listening) { recognition?.stop(); return; }
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert('Spracheingabe benötigt Chrome oder Edge.'); return; }
-    recognition = new SR();
-    recognition.lang = 'de-DE'; recognition.continuous = false; recognition.interimResults = false;
-    recognition.onresult = e => {
-      document.getElementById('msg-input').value = e.results[0][0].transcript;
-      setListening(false);
-    };
-    recognition.onerror = recognition.onend = () => setListening(false);
-    recognition.start();
-    setListening(true);
-  }
-  function setListening(val) {
-    listening = val;
-    const btn = document.getElementById('mic-btn');
-    btn.textContent = val ? '⏹️' : '🎙️';
-    btn.classList.toggle('active', val);
-  }
-
-  function openSettings() {
-    document.getElementById('settings-anthropic').value = localStorage.getItem('stevie_key') || '';
-    document.getElementById('settings-eleven').value = localStorage.getItem('stevie_eleven_key') || '';
-    document.getElementById('settings-modal').style.display = 'flex';
-  }
-  function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-  function saveSettings() {
-    const ak = document.getElementById('settings-anthropic').value.trim();
-    const ek = document.getElementById('settings-eleven').value.trim();
-    if (ak) localStorage.setItem('stevie_key', ak);
-    if (ek) localStorage.setItem('stevie_eleven_key', ek);
-    closeSettings();
-    alert('Gespeichert! ✓');
-  }
-
-  // Load voices async
-  synth.onvoiceschanged = () => synth.getVoices();
+synth.onvoiceschanged=()=>synth.getVoices();
 </script>
 </body>
 </html>
