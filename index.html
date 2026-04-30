@@ -197,16 +197,41 @@ footer{background:white;padding:10px 14px;box-shadow:0 -2px 12px rgba(150,100,20
   </div>
 </div>
 
+<!-- ══ ONBOARDING: Name, Alter, Klasse, Theme ══ -->
+<div id="onboarding" class="screen" style="background:var(--bg-dark,#0d0d1a);align-items:center;justify-content:center;padding:24px;overflow-y:auto;">
+  <div class="setup-card" style="max-width:500px;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div class="logo-ring" style="width:64px;height:64px;font-size:28px;margin-bottom:12px;">🌟</div>
+      <h2 style="font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Wer bist du?</h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:14px;">Stevie passt sich genau auf dich an.</p>
+    </div>
+
+    <span class="field-label">Dein Name</span>
+    <input class="dark-input" id="ob-name" placeholder="z.B. Lena, Max…"/>
+
+    <span class="field-label">Wie alt bist du?</span>
+    <div class="age-grid" id="age-grid"></div>
+
+    <span class="field-label" style="margin-top:4px;">In welcher Klasse bist du?</span>
+    <div class="age-grid" id="class-grid"></div>
+
+    <span class="field-label" style="margin-top:8px;">Wähle dein Design</span>
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <button class="btn-primary" style="margin-top:24px;" onclick="saveOnboarding()">Weiter ✨</button>
+  </div>
+</div>
+
 <!-- ══ SETUP: Fach & Tage ══ -->
-<div id="setup" class="screen" style="background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;">
+<div id="setup" class="screen" style="background:var(--bg-dark,#0d0d1a);align-items:center;justify-content:center;padding:24px;">
   <div class="setup-card">
     <h2>Neue Lernrunde 🎯</h2>
-    <p class="sub">Sag mir womit wir starten – ich baue dir einen Plan.</p>
+    <p class="sub" id="setup-sub">Sag mir womit wir starten – ich baue dir einen Plan.</p>
     <span class="field-label">Welches Fach?</span>
     <input class="dark-input" id="subject-input" placeholder="z.B. Biologie, Mathe, Geschichte…"/>
     <span class="field-label">Wie viele Tage hast du Zeit?</span>
     <div class="days-grid" id="days-grid"></div>
-    <div id="days-display" style="text-align:center;color:#c4b5fd;font-size:14px;margin-bottom:20px;min-height:20px;"></div>
+    <div id="days-display" style="text-align:center;color:var(--accent,#c4b5fd);font-size:14px;margin-bottom:20px;min-height:20px;"></div>
     <button class="btn-primary" onclick="goToMaterial()">Weiter → Material hochladen</button>
   </div>
 </div>
@@ -326,7 +351,14 @@ window.addEventListener('resize',()=>{resizeC();initS();});
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
 // ══ SPLASH ══
-function splashNext(){if(getKey())show('setup');else show('keyscreen');}
+function splashNext(){
+  if(!getKey())show('keyscreen');
+  else{
+    const prof=localStorage.getItem('stevie_profile');
+    if(prof){const p=JSON.parse(prof);Object.assign(state,p);show('setup');}
+    else{buildOnboarding();show('onboarding');}
+  }
+}
 
 // ══ KEYS ══
 function getKey(){return localStorage.getItem('stevie_key');}
@@ -336,14 +368,18 @@ function saveKeys(){
   localStorage.setItem('stevie_key',k);
   const ek=document.getElementById('eleven-key-input').value.trim();
   if(ek)localStorage.setItem('stevie_eleven_key',ek);
-  show('setup');
+  buildOnboarding();show('onboarding');
 }
 
 // ══ DAYS GRID ══
 window.onload=()=>{
+  // Load saved profile
+  const prof=localStorage.getItem('stevie_profile');
+  if(prof){const p=JSON.parse(prof);Object.assign(state,p);applyTheme(p.theme||'purple');if(p.voice)selectedVoice=p.voice;}
+  else{applyTheme('purple');}
   buildDaysGrid();
-  if(getKey())show('splash');
-  else show('splash');
+  buildOnboarding();
+  show('splash');
 };
 
 function buildDaysGrid(){
@@ -503,15 +539,24 @@ function updateProgress(){
 }
 
 // ══ CHAT ══
-const STEVIE_SYSTEM=`Du bist Stevie, KI-Lernbegleiterin für Kinder (10-12 Jahre, 5. Klasse Gymnasium). Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich.
+// ══ STEVIE SYSTEM PROMPT (altersangepasst) ══
+function buildSteviewSystem(){
+  const lvl = state.grade<=4 ? 'Grundschule (sehr einfache Sprache, kurze Sätze, viele Beispiele aus dem Alltag)'
+    : state.grade<=6 ? 'Unterstufe Gymnasium (einfache klare Sprache, anschauliche Vergleiche)'
+    : state.grade<=8 ? 'Mittelstufe (sachlicher aber freundlicher Ton, etwas mehr Tiefe)'
+    : 'Oberstufe (anspruchsvollere Sprache, abstrakte Konzepte ok)';
+  return `Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit ${state.name}, ${state.age} Jahre alt, ${state.grade}. Klasse (${lvl}).
 
-METHODIK: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurzes Feedback (1-2 Sätze). Antworten kurz halten (2-4 Sätze) – gut zum Vorlesen.
+PERSÖNLICHKEIT: Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich. Passe Sprache und Komplexität EXAKT an das Alter und die Klasse an.
 
-NACH JEDER ANTWORT: Markiere mit [TAG:Erklärung] oder [TAG:Frage] oder [TAG:Feedback] oder [TAG:Motivation] am Anfang der Nachricht.
+METHODIK: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurzes Feedback (1-2 Sätze). Antworten kurz halten (2-4 Sätze).
 
-Wenn ein Thema vollständig besprochen wurde, schreibe am Ende: [TOPIC_DONE:Themenname]
+NACH JEDER ANTWORT: Markiere mit [TAG:Erklärung] oder [TAG:Frage] oder [TAG:Feedback] oder [TAG:Motivation].
+Wenn ein Thema vollständig besprochen wurde: [TOPIC_DONE:Themenname]
 
-Antworte auf Deutsch. Sei nie zu formal.`;
+Antworte auf Deutsch. Sprich ${state.name} direkt mit Namen an (aber nicht zu oft).`;
+}
+const STEVIE_SYSTEM=''; // wird dynamisch per buildSteviewSystem() gesetzt
 
 let chatImage=null;
 
@@ -597,7 +642,7 @@ async function sendMessage(){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:systemWithContext,messages:apiMsgs})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:buildSteviewSystem(),messages:apiMsgs})
     });
     const d=await res.json();
     hideTyping();
@@ -659,9 +704,10 @@ async function speak(text){
   stopSpeaking();
   const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
   const ek=localStorage.getItem('stevie_eleven_key');
+  const voiceId = localStorage.getItem('stevie_voice') || selectedVoice;
   if(ek){
     try{
-      const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE}`,{
+      const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,{
         method:'POST',headers:{'xi-api-key':ek,'Content-Type':'application/json'},
         body:JSON.stringify({text:clean,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.8,style:.3,use_speaker_boost:true}})
       });
