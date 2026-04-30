@@ -8,737 +8,774 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0d1a;min-height:100vh;color:#f3eeff;}
 
-/* ── SCREENS ── */
+/* THEMES */
+:root{--ga:#7c3aed;--gb:#a855f7;--gc:#ec4899;--acc:#c4b5fd;--cbg:rgba(167,139,250,.15);--cbr:rgba(167,139,250,.3);--tc:#7c3aed;--ua:#7c3aed;--ub:#a855f7;--bgd:#0d0d1a;--bgd2:#1a0d2e;}
+body.t-ocean{--ga:#0369a1;--gb:#0ea5e9;--gc:#06b6d4;--acc:#7dd3fc;--cbg:rgba(14,165,233,.15);--cbr:rgba(14,165,233,.3);--tc:#0369a1;--ua:#0369a1;--ub:#0ea5e9;--bgd:#030f1a;--bgd2:#061629;}
+body.t-forest{--ga:#15803d;--gb:#22c55e;--gc:#4ade80;--acc:#86efac;--cbg:rgba(34,197,94,.15);--cbr:rgba(34,197,94,.3);--tc:#15803d;--ua:#15803d;--ub:#16a34a;--bgd:#021a0a;--bgd2:#052e16;}
+body.t-sunset{--ga:#c2410c;--gb:#ea580c;--gc:#f59e0b;--acc:#fcd34d;--cbg:rgba(234,88,12,.15);--cbr:rgba(234,88,12,.3);--tc:#c2410c;--ua:#c2410c;--ub:#ea580c;--bgd:#1a0800;--bgd2:#2d1000;}
+body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,72,153,.15);--cbr:rgba(236,72,153,.3);--tc:#be185d;--ua:#be185d;--ub:#db2777;--bgd:#1a0010;--bgd2:#2d0020;}
+
+/* SCREENS */
 .screen{display:none;min-height:100vh;}
 .screen.active{display:flex;flex-direction:column;}
 
-/* ── SPLASH ── */
-#splash{align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
-#splash canvas{position:absolute;inset:0;pointer-events:none;}
-.glass{position:relative;z-index:2;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:32px;padding:48px 40px 40px;max-width:440px;width:100%;text-align:center;backdrop-filter:blur(24px);}
-.logo-ring{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#f472b6);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 24px;box-shadow:0 0 48px rgba(167,139,250,.5);animation:pulse-ring 2.5s ease-in-out infinite;}
-.splash-title{font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,#c4b5fd,#f9a8d4,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
-.tagline{font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:32px;line-height:1.6;}
-.tagline span{color:#c4b5fd;font-weight:600;}
-.chips{display:flex;gap:8px;justify-content:center;margin-bottom:32px;flex-wrap:wrap;}
-.chip{background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);border-radius:20px;padding:6px 14px;font-size:13px;color:#e2d9fa;}
-.btn-primary{width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);color:white;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 32px rgba(124,58,237,.45);transition:transform .15s,box-shadow .15s;margin-bottom:10px;}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,58,237,.6);}
-.sub-hint{font-size:12px;color:rgba(255,255,255,0.28);}
+/* DARK CARD */
+.dcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:36px 32px;backdrop-filter:blur(24px);}
 
-/* ── SETUP SCREEN ── */
-#setup{background:linear-gradient(160deg,#0d0d1a 0%,#1a0d2e 100%);align-items:center;justify-content:center;padding:24px;}
-.setup-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:480px;width:100%;backdrop-filter:blur(24px);}
-.setup-card h2{font-size:24px;font-weight:700;margin-bottom:6px;background:linear-gradient(90deg,#c4b5fd,#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.setup-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:28px;}
-.field-label{font-size:13px;font-weight:600;color:#c4b5fd;margin-bottom:8px;display:block;}
-.dark-input{width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(167,139,250,0.3);border-radius:12px;padding:12px 16px;font-size:15px;color:#f3eeff;outline:none;margin-bottom:20px;}
-.dark-input:focus{border-color:#a78bfa;}
-.dark-input::placeholder{color:rgba(255,255,255,0.3);}
-.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px;}
-.day-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(167,139,250,0.2);border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;color:#e2d9fa;font-size:15px;font-weight:600;}
-.day-btn:hover{background:rgba(167,139,250,0.2);border-color:#a78bfa;}
-.day-btn.selected{background:linear-gradient(135deg,#7c3aed,#a855f7);border-color:#a78bfa;color:white;box-shadow:0 4px 16px rgba(124,58,237,.4);}
-.day-label{font-size:10px;color:rgba(255,255,255,0.4);margin-top:3px;}
+/* SPLASH */
+#splash{align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:var(--bgd);}
+#stars{position:absolute;inset:0;pointer-events:none;}
+.splash-inner{position:relative;z-index:2;max-width:440px;width:100%;text-align:center;}
+.logo-ring{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 20px;box-shadow:0 0 48px rgba(167,139,250,.4);animation:pulse-ring 2.5s ease-in-out infinite;}
+.splash-title{font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,var(--acc),var(--gc),#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+.tagline{font-size:15px;color:rgba(255,255,255,.55);margin-bottom:28px;line-height:1.6;}
+.tagline b{color:var(--acc);}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.chip{background:var(--cbg);border:1px solid var(--cbr);border-radius:20px;padding:6px 14px;font-size:13px;color:#e2d9fa;}
+.btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));color:white;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.35);transition:transform .15s,box-shadow .15s;margin-bottom:10px;}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:scale(.98);}
+.btn-ghost{width:100%;background:none;border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:11px;font-size:14px;color:rgba(255,255,255,.45);cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.65);}
+.sub-hint{font-size:12px;color:rgba(255,255,255,.25);}
 
-/* ── MATERIAL SCREEN ── */
-#material{background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;}
-.material-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:520px;width:100%;backdrop-filter:blur(24px);}
-.material-card h2{font-size:22px;font-weight:700;margin-bottom:6px;color:#f3eeff;}
-.material-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:24px;}
-.upload-zone{border:2px dashed rgba(167,139,250,0.4);border-radius:16px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;background:rgba(167,139,250,0.05);}
-.upload-zone:hover{border-color:#a78bfa;background:rgba(167,139,250,0.1);}
-.upload-zone .icon{font-size:36px;margin-bottom:12px;}
-.upload-zone p{color:rgba(255,255,255,0.5);font-size:14px;}
-.upload-zone strong{color:#c4b5fd;}
-.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.thumb{position:relative;width:72px;height:72px;}
-.thumb img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid rgba(167,139,250,0.4);}
-.thumb .del{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
-.skip-btn{width:100%;background:none;border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px;font-size:14px;color:rgba(255,255,255,0.4);cursor:pointer;margin-top:8px;transition:all .2s;}
-.skip-btn:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.6);}
+/* KEYS */
+#keyscreen{align-items:center;justify-content:center;padding:24px;background:var(--bgd);}
+.field-label{font-size:13px;font-weight:600;color:var(--acc);display:block;margin-bottom:7px;}
+.dinput{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;font-size:15px;color:#f3eeff;outline:none;margin-bottom:18px;font-family:inherit;}
+.dinput:focus{border-color:var(--ga);}
+.dinput::placeholder{color:rgba(255,255,255,.3);}
 
-/* ── PLAN SCREEN ── */
-#planscreen{background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;}
-.plan-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:28px;padding:36px 32px;max-width:540px;width:100%;backdrop-filter:blur(24px);}
-.plan-card h2{font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:4px;}
-.plan-card .sub{color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:24px;}
-.plan-generating{text-align:center;padding:32px 0;}
-.plan-generating .spinner{width:48px;height:48px;border:3px solid rgba(167,139,250,0.2);border-top-color:#a78bfa;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
-.plan-generating p{color:rgba(255,255,255,0.5);font-size:14px;}
-.day-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px 20px;margin-bottom:12px;cursor:pointer;transition:all .2s;}
-.day-card:hover{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.3);}
-.day-card.today{border-color:#a78bfa;background:rgba(124,58,237,0.15);}
-.day-card.done{opacity:0.5;}
-.day-card .day-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.day-card .day-num{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;}
-.day-card .day-title{font-weight:600;font-size:15px;color:#f3eeff;}
-.day-card .day-topics{display:flex;flex-wrap:wrap;gap:6px;}
-.topic-pill{background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.25);border-radius:20px;padding:3px 10px;font-size:12px;color:#c4b5fd;}
-.topic-pill.done-pill{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.3);color:#86efac;}
-.plan-footer{display:flex;gap:10px;margin-top:20px;}
-.plan-footer .btn-primary{margin-bottom:0;}
+/* ONBOARDING */
+#onboarding{align-items:center;justify-content:center;padding:24px;background:var(--bgd);overflow-y:auto;}
+.ob-card{max-width:500px;width:100%;}
+.ob-title{font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:4px;}
+.ob-sub{color:rgba(255,255,255,.4);font-size:14px;margin-bottom:28px;}
+.grid-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.gbtn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:8px 14px;font-size:14px;color:#e2d9fa;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.gbtn:hover{background:rgba(255,255,255,.12);}
+.gbtn.sel{background:linear-gradient(135deg,var(--ga),var(--gb));border-color:var(--gb);color:white;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.theme-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.tbtn{border-radius:14px;height:56px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;overflow:hidden;}
+.tbtn.sel{border-color:white;box-shadow:0 0 0 3px rgba(255,255,255,.35);}
+.tbtn-label{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:10px;font-weight:600;color:white;padding:3px 0;background:rgba(0,0,0,.35);}
+.voice-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
+.vbtn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .2s;text-align:left;}
+.vbtn:hover{background:rgba(255,255,255,.12);}
+.vbtn.sel{background:linear-gradient(135deg,var(--ga),var(--gb));border-color:var(--gb);box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.vbtn-name{font-size:14px;font-weight:600;color:#f3eeff;}
+.vbtn-desc{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+.vbtn.sel .vbtn-desc{color:rgba(255,255,255,.75);}
 
-/* ── MAIN APP ── */
+/* SETUP */
+#setup{align-items:center;justify-content:center;padding:24px;background:var(--bgd);}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px;}
+.dbtn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .2s;color:#e2d9fa;font-size:15px;font-weight:600;}
+.dbtn:hover{background:rgba(255,255,255,.12);}
+.dbtn.sel{background:linear-gradient(135deg,var(--ga),var(--gb));border-color:var(--gb);color:white;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.dbtn-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;}
+#days-hint{text-align:center;color:var(--acc);font-size:13px;margin-bottom:18px;min-height:18px;}
+
+/* MATERIAL */
+#material{align-items:center;justify-content:center;padding:24px;background:var(--bgd);}
+.upload-zone{border:2px dashed rgba(167,139,250,.4);border-radius:16px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;background:rgba(167,139,250,.05);}
+.upload-zone:hover{border-color:var(--ga);background:var(--cbg);}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.thumb{position:relative;width:70px;height:70px;}
+.thumb img{width:70px;height:70px;object-fit:cover;border-radius:10px;border:2px solid var(--cbr);}
+.thumb-del{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;font-weight:700;}
+
+/* PLAN */
+#planscreen{align-items:center;justify-content:center;padding:24px;background:var(--bgd);overflow-y:auto;}
+.spinner{width:44px;height:44px;border:3px solid rgba(167,139,250,.2);border-top-color:var(--ga);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px;}
+.day-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:all .2s;}
+.day-card:hover{background:rgba(167,139,250,.1);}
+.day-card.today{border-color:var(--ga);background:rgba(124,58,237,.15);}
+.day-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.day-num{background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border-radius:7px;padding:3px 10px;font-size:12px;font-weight:700;}
+.day-title{font-weight:600;font-size:15px;color:#f3eeff;}
+.topic-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.tpill{background:var(--cbg);border:1px solid var(--cbr);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--acc);}
+.tpill.done{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac;}
+
+/* APP */
 #app{background:linear-gradient(135deg,#f5f0ff,#fce4f0,#e8f4ff);}
-header{background:white;padding:12px 16px;box-shadow:0 2px 12px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.hdr-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(167,139,250,.4);flex-shrink:0;}
-.hdr-info h2{font-size:16px;color:#3b1f6e;font-weight:700;}
-.hdr-info p{font-size:12px;color:#9c6fc4;}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.voice-btn{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid;}
-.voice-on{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
-.voice-off{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
-.icon-btn-hdr{background:none;border:none;cursor:pointer;font-size:18px;padding:4px;opacity:0.55;}
-.icon-btn-hdr:hover{opacity:1;}
+header{background:white;padding:11px 16px;box-shadow:0 2px 12px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.hav{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hinfo h2{font-size:15px;color:#3b1f6e;font-weight:700;}
+.hinfo p{font-size:11px;color:#9c6fc4;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.hbtn{background:none;border:none;cursor:pointer;font-size:17px;opacity:.55;padding:4px;}
+.hbtn:hover{opacity:1;}
+.vbtn-toggle{border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid;}
+.von{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
+.voff{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
 
-/* Day progress bar */
-#progress-bar{background:white;padding:8px 16px;border-bottom:1px solid rgba(150,100,200,.1);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-#progress-bar .day-info{font-size:13px;font-weight:600;color:#3b1f6e;white-space:nowrap;}
-#progress-bar .bar-track{flex:1;height:6px;background:#e9d5ff;border-radius:99px;overflow:hidden;}
-#progress-bar .bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width .4s;}
-#progress-bar .pct{font-size:12px;color:#9c6fc4;white-space:nowrap;}
+#prog-bar{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.1);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prog-label{font-size:12px;font-weight:600;color:#3b1f6e;white-space:nowrap;}
+.bar-track{flex:1;height:6px;background:#e9d5ff;border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--ua),var(--gc));border-radius:99px;transition:width .4s;}
+.prog-pct{font-size:12px;color:#9c6fc4;white-space:nowrap;}
 
-/* Topic chips row */
-#topic-row{background:white;padding:8px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;gap:8px;overflow-x:auto;flex-shrink:0;}
+#topic-row{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;gap:7px;overflow-x:auto;flex-shrink:0;}
 #topic-row::-webkit-scrollbar{display:none;}
-.topic-chip{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:20px;padding:5px 12px;font-size:12px;color:#7c3aed;white-space:nowrap;cursor:pointer;transition:all .2s;flex-shrink:0;}
-.topic-chip:hover{background:#ede9fe;border-color:#a78bfa;}
-.topic-chip.active-chip{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-color:#7c3aed;}
-.topic-chip.done-chip{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
+.tchip{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--tc);white-space:nowrap;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.tchip:hover{background:#ede9fe;}
+.tchip.done{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
 
-#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
-.msg-row{display:flex;align-items:flex-end;gap:8px;}
-.msg-row.user{justify-content:flex-end;}
-.msg-avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.bubble{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.07);white-space:pre-wrap;}
-.bubble.stevie{background:white;color:#2d1b4e;border-bottom-left-radius:4px;}
-.bubble.user{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-bottom-right-radius:4px;}
-.bubble-meta{display:flex;gap:6px;margin-top:4px;}
-.bubble-tag{background:#f0e6ff;color:#7c3aed;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
-.replay-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:.4;padding:2px;flex-shrink:0;}
-.replay-btn:hover{opacity:.8;}
-.typing{display:flex;gap:5px;padding:12px 14px;}
-.dot{width:7px;height:7px;border-radius:50%;background:#a78bfa;animation:bounce 1.2s infinite;}
+#messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.mrow{display:flex;align-items:flex-end;gap:7px;}
+.mrow.user{justify-content:flex-end;}
+.mav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.bubble{max-width:76%;padding:10px 14px;border-radius:17px;font-size:14px;line-height:1.55;box-shadow:0 2px 7px rgba(0,0,0,.07);white-space:pre-wrap;}
+.bubble.s{background:white;color:#2d1b4e;border-bottom-left-radius:4px;}
+.bubble.u{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border-bottom-right-radius:4px;}
+.btag{background:#f0e6ff;color:#7c3aed;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;display:inline-block;margin-top:4px;}
+.rbtn{background:none;border:none;cursor:pointer;font-size:13px;opacity:.4;padding:2px;flex-shrink:0;}
+.rbtn:hover{opacity:.8;}
+.typing-dots{display:flex;gap:5px;padding:11px 14px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ga);animation:bounce 1.2s infinite;}
 .dot:nth-child(2){animation-delay:.2s;}
 .dot:nth-child(3){animation-delay:.4s;}
-.speaking-ind{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 12px;border-radius:20px;display:none;align-items:center;gap:6px;margin-left:38px;}
+.qr-row{display:flex;gap:6px;flex-wrap:wrap;margin-left:35px;}
+.qr{background:white;border:1.5px solid #e9d5ff;border-radius:20px;padding:5px 13px;font-size:12px;color:#7c3aed;cursor:pointer;transition:all .2s;}
+.qr:hover{background:#f5f3ff;}
+#speak-ind{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 12px;border-radius:20px;display:none;align-items:center;gap:6px;margin-left:35px;}
 
-/* Quick reply buttons */
-.quick-replies{display:flex;gap:6px;flex-wrap:wrap;margin-left:38px;}
-.qr-btn{background:white;border:1.5px solid #e9d5ff;border-radius:20px;padding:6px 14px;font-size:13px;color:#7c3aed;cursor:pointer;transition:all .2s;}
-.qr-btn:hover{background:#f5f3ff;border-color:#a78bfa;}
+#imgprev{padding:0 14px 7px;display:none;position:relative;width:fit-content;}
+#imgprev img{height:62px;border-radius:10px;border:2px solid var(--cbr);}
+.imgdel{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border:none;border-radius:50%;width:19px;height:19px;font-size:11px;cursor:pointer;font-weight:700;}
 
-/* Image preview */
-#img-preview{padding:0 16px 8px;display:none;}
-#img-thumb{height:64px;border-radius:10px;border:2px solid #a78bfa;}
-.remove-img{position:absolute;top:-7px;right:-7px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;font-weight:700;}
+footer{background:white;padding:10px 13px;box-shadow:0 -2px 12px rgba(150,100,200,.1);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;}
+.fbtn{border-radius:11px;padding:9px 10px;cursor:pointer;font-size:16px;flex-shrink:0;border:2px dashed #c4b5fd;background:#f5f3ff;transition:all .2s;}
+.fbtn.on{background:#ede9fe;border-color:var(--ga);box-shadow:0 0 0 3px rgba(124,58,237,.12);}
+#msginput{flex:1;border:2px solid #e9d5ff;border-radius:12px;padding:9px 13px;font-size:14px;resize:none;font-family:inherit;outline:none;line-height:1.4;background:#fafaf9;color:#2d1b4e;transition:border-color .2s;}
+#msginput:focus{border-color:var(--ga);}
+#sendbtn{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border:none;border-radius:12px;padding:9px 15px;cursor:pointer;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.25);transition:all .2s;}
+#sendbtn:disabled{background:#e9d5ff;color:#c4b5fd;box-shadow:none;cursor:default;}
 
-footer{background:white;padding:10px 14px;box-shadow:0 -2px 12px rgba(150,100,200,.1);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;}
-.foot-btn{border-radius:12px;padding:9px 11px;cursor:pointer;font-size:16px;flex-shrink:0;border:2px dashed #c4b5fd;background:#f5f3ff;transition:all .2s;}
-.foot-btn.active{background:#ede9fe;border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15);}
-#msg-input{flex:1;border:2px solid #e9d5ff;border-radius:13px;padding:9px 13px;font-size:14px;resize:none;font-family:inherit;outline:none;line-height:1.4;background:#fafaf9;color:#2d1b4e;transition:border-color .2s;}
-#msg-input:focus{border-color:#a78bfa;}
-#send-btn{background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;border-radius:13px;padding:9px 15px;cursor:pointer;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.3);transition:all .2s;}
-#send-btn:disabled{background:#e9d5ff;color:#c4b5fd;box-shadow:none;cursor:default;}
-
-/* ── MODAL (Settings) ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;padding:24px;}
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;padding:20px;}
 .modal-bg.open{display:flex;}
-.modal{background:white;border-radius:24px;padding:28px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;}
-.modal h3{font-size:17px;font-weight:700;color:#3b1f6e;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
-.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#9c6fc4;}
-.modal label{font-size:13px;font-weight:600;color:#7c6fa0;display:block;margin-bottom:6px;}
-.modal input{width:100%;border:2px solid #e9d5ff;border-radius:10px;padding:10px 14px;font-size:14px;outline:none;color:#2d1b4e;margin-bottom:16px;}
-.modal input:focus{border-color:#a78bfa;}
-.modal .btn-save{width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;}
+.modal{background:white;border-radius:22px;padding:26px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;color:#3b1f6e;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+.mclose{background:none;border:none;font-size:21px;cursor:pointer;color:#9c6fc4;}
+.minput{width:100%;border:2px solid #e9d5ff;border-radius:10px;padding:10px 13px;font-size:14px;outline:none;color:#2d1b4e;margin-bottom:14px;font-family:inherit;}
+.minput:focus{border-color:var(--ga);}
+.mlabel{font-size:12px;font-weight:600;color:#7c6fa0;display:block;margin-bottom:6px;}
+.msave{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border:none;border-radius:11px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;}
 
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-@keyframes pulse-ring{0%,100%{box-shadow:0 0 48px rgba(167,139,250,.5)}50%{box-shadow:0 0 72px rgba(244,114,182,.7)}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 48px rgba(167,139,250,.4)}50%{box-shadow:0 0 72px rgba(244,114,182,.6)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
-<!-- ══ SPLASH ══ -->
+<!-- SPLASH -->
 <div id="splash" class="screen active">
   <canvas id="stars"></canvas>
-  <div class="glass">
+  <div class="splash-inner dcard">
     <div class="logo-ring">🌟</div>
     <div class="splash-title">Stevie</div>
-    <p class="tagline">Deine <span>persönliche Lernbegleiterin</span><br>– die coole große Schwester für die Schule</p>
+    <p class="tagline">Deine <b>persönliche Lernbegleiterin</b><br>– die coole große Schwester für die Schule</p>
     <div class="chips">
       <div class="chip">📸 Material hochladen</div>
       <div class="chip">🗓️ Lernplan</div>
       <div class="chip">🧠 Quizfragen</div>
       <div class="chip">🎙️ Sprechen</div>
     </div>
-    <button class="btn-primary" onclick="splashNext()">Los geht's ✨</button>
+    <button class="btn" onclick="splashNext()">Los geht's ✨</button>
     <p class="sub-hint">Kein Account nötig · Läuft direkt im Browser</p>
   </div>
 </div>
 
-<!-- ══ KEY SETUP ══ -->
-<div id="keyscreen" class="screen" style="background:linear-gradient(160deg,#0d0d1a,#1a0d2e);align-items:center;justify-content:center;padding:24px;">
-  <div class="setup-card">
-    <div style="text-align:center;margin-bottom:24px;">
-      <div class="logo-ring" style="width:64px;height:64px;font-size:28px;margin-bottom:16px;">🌟</div>
-      <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:6px;">Fast da!</h2>
-      <p style="color:rgba(255,255,255,0.4);font-size:14px;">Gib deinen Anthropic API-Key ein.</p>
+<!-- KEYS -->
+<div id="keyscreen" class="screen">
+  <div class="dcard" style="max-width:420px;width:100%;margin:auto;">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div class="logo-ring" style="width:60px;height:60px;font-size:26px;margin-bottom:12px;">🌟</div>
+      <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Fast da!</h2>
+      <p style="color:rgba(255,255,255,.4);font-size:13px;">Gib einmalig deinen Anthropic API-Key ein.</p>
     </div>
-    <span class="field-label">Anthropic API-Key</span>
-    <input class="dark-input" type="password" id="api-key-input" placeholder="sk-ant-..."/>
-    <span class="field-label">ElevenLabs Key <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional, für echte Stimme)</span></span>
-    <input class="dark-input" type="password" id="eleven-key-input" placeholder="Dein ElevenLabs Key..."/>
-    <button class="btn-primary" onclick="saveKeys()">Stevie starten ✨</button>
-    <p class="sub-hint" style="text-align:center;margin-top:10px;">Keys bleiben nur in deinem Browser</p>
+    <label class="field-label">Anthropic API-Key</label>
+    <input class="dinput" type="password" id="k-anthropic" placeholder="sk-ant-…"/>
+    <label class="field-label">ElevenLabs Key <span style="font-weight:400;color:rgba(255,255,255,.3);">(optional, für echte Stimme)</span></label>
+    <input class="dinput" type="password" id="k-eleven" placeholder="Dein ElevenLabs Key…"/>
+    <button class="btn" onclick="saveKeys()">Weiter ✨</button>
+    <p class="sub-hint" style="text-align:center;margin-top:8px;">Keys bleiben nur in deinem Browser</p>
   </div>
 </div>
 
-<!-- ══ ONBOARDING: Name, Alter, Klasse, Theme ══ -->
-<div id="onboarding" class="screen" style="background:var(--bg-dark,#0d0d1a);align-items:center;justify-content:center;padding:24px;overflow-y:auto;">
-  <div class="setup-card" style="max-width:500px;">
-    <div style="text-align:center;margin-bottom:28px;">
-      <div class="logo-ring" style="width:64px;height:64px;font-size:28px;margin-bottom:12px;">🌟</div>
-      <h2 style="font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Wer bist du?</h2>
-      <p style="color:rgba(255,255,255,0.4);font-size:14px;">Stevie passt sich genau auf dich an.</p>
+<!-- ONBOARDING -->
+<div id="onboarding" class="screen">
+  <div class="dcard ob-card" style="margin:auto;">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div class="logo-ring" style="width:60px;height:60px;font-size:26px;margin-bottom:10px;">🌟</div>
+      <p class="ob-title">Wer bist du?</p>
+      <p class="ob-sub">Stevie passt sich genau auf dich an.</p>
     </div>
 
-    <span class="field-label">Dein Name</span>
-    <input class="dark-input" id="ob-name" placeholder="z.B. Lena, Max…"/>
+    <label class="field-label">Dein Name</label>
+    <input class="dinput" type="text" id="ob-name" placeholder="z.B. Lena, Max, Tim…"/>
 
-    <span class="field-label">Wie alt bist du?</span>
-    <div class="age-grid" id="age-grid"></div>
+    <label class="field-label">Wie alt bist du?</label>
+    <div class="grid-btns" id="age-grid"></div>
 
-    <span class="field-label" style="margin-top:4px;">In welcher Klasse bist du?</span>
-    <div class="age-grid" id="class-grid"></div>
+    <label class="field-label">In welcher Klasse bist du?</label>
+    <div class="grid-btns" id="class-grid"></div>
 
-    <span class="field-label" style="margin-top:8px;">Wähle dein Design</span>
-    <div class="theme-grid" id="theme-grid"></div>
+    <label class="field-label">Stevies Stimme wählen</label>
+    <div class="voice-row" id="voice-grid"></div>
 
-    <button class="btn-primary" style="margin-top:24px;" onclick="saveOnboarding()">Weiter ✨</button>
+    <label class="field-label">Dein Design</label>
+    <div class="theme-row" id="theme-grid"></div>
+
+    <button class="btn" onclick="saveOnboarding()">Weiter ✨</button>
   </div>
 </div>
 
-<!-- ══ SETUP: Fach & Tage ══ -->
-<div id="setup" class="screen" style="background:var(--bg-dark,#0d0d1a);align-items:center;justify-content:center;padding:24px;">
-  <div class="setup-card">
-    <h2>Neue Lernrunde 🎯</h2>
-    <p class="sub" id="setup-sub">Sag mir womit wir starten – ich baue dir einen Plan.</p>
-    <span class="field-label">Welches Fach?</span>
-    <input class="dark-input" id="subject-input" placeholder="z.B. Biologie, Mathe, Geschichte…"/>
-    <span class="field-label">Wie viele Tage hast du Zeit?</span>
+<!-- SETUP -->
+<div id="setup" class="screen">
+  <div class="dcard" style="max-width:480px;width:100%;margin:auto;">
+    <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;background:linear-gradient(90deg,var(--acc),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Neue Lernrunde 🎯</h2>
+    <p id="setup-sub" style="color:rgba(255,255,255,.45);font-size:14px;margin-bottom:24px;">Sag mir womit wir starten – ich baue dir einen Plan.</p>
+    <label class="field-label">Welches Fach?</label>
+    <input class="dinput" id="subject-input" placeholder="z.B. Biologie, Mathe, Geschichte…"/>
+    <label class="field-label">Wie viele Tage hast du Zeit?</label>
     <div class="days-grid" id="days-grid"></div>
-    <div id="days-display" style="text-align:center;color:var(--accent,#c4b5fd);font-size:14px;margin-bottom:20px;min-height:20px;"></div>
-    <button class="btn-primary" onclick="goToMaterial()">Weiter → Material hochladen</button>
+    <div id="days-hint"></div>
+    <button class="btn" onclick="goToMaterial()">Weiter → Material hochladen</button>
   </div>
 </div>
 
-<!-- ══ MATERIAL ══ -->
+<!-- MATERIAL -->
 <div id="material" class="screen">
-  <div class="material-card" style="margin:auto;">
-    <h2>📸 Dein Lernmaterial</h2>
-    <p class="sub">Lade Fotos von Schulbuchseiten, deiner Mappe oder der Checkliste hoch.<br>Stevie liest alles und baut daraus deinen Lernplan.</p>
-    <div class="upload-zone" onclick="document.getElementById('mat-upload').click()">
-      <div class="icon">📷</div>
-      <p><strong>Tippe hier</strong> um Fotos hinzuzufügen</p>
-      <p style="font-size:12px;margin-top:4px;">Schulbuch · Mappe · Checkliste · Notizen</p>
+  <div class="dcard" style="max-width:500px;width:100%;margin:auto;">
+    <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:6px;">📸 Dein Lernmaterial</h2>
+    <p style="color:rgba(255,255,255,.45);font-size:13px;margin-bottom:20px;">Lade Fotos von Schulbuchseiten, Mappe oder Checkliste hoch.<br>Stevie liest alles und baut daraus deinen Lernplan.</p>
+    <div class="upload-zone" onclick="document.getElementById('mat-file').click()">
+      <div style="font-size:32px;margin-bottom:10px;">📷</div>
+      <p style="color:rgba(255,255,255,.5);font-size:14px;"><b style="color:var(--acc);">Tippe hier</b> um Fotos hinzuzufügen</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.3);margin-top:4px;">Schulbuch · Mappe · Checkliste · Notizen</p>
     </div>
-    <input type="file" id="mat-upload" accept="image/*" multiple style="display:none" onchange="handleMatUpload(event)"/>
+    <input type="file" id="mat-file" accept="image/*" multiple style="display:none" onchange="handleMatUpload(event)"/>
     <div class="thumbs" id="mat-thumbs"></div>
-    <button class="btn-primary" id="mat-next-btn" onclick="generatePlan()" style="display:none">Lernplan erstellen 🧠</button>
-    <button class="skip-btn" onclick="generatePlan(true)">Ohne Material fortfahren →</button>
+    <button class="btn" id="mat-btn" style="display:none" onclick="generatePlan()">Lernplan erstellen 🧠</button>
+    <button class="btn-ghost" onclick="generatePlan(true)">Ohne Material fortfahren →</button>
   </div>
 </div>
 
-<!-- ══ PLAN ══ -->
+<!-- PLAN -->
 <div id="planscreen" class="screen">
-  <div class="plan-card" style="margin:auto;">
-    <h2 id="plan-title">Dein Lernplan ✨</h2>
-    <p class="sub" id="plan-sub"></p>
-    <div id="plan-content">
-      <div class="plan-generating">
+  <div class="dcard" style="max-width:540px;width:100%;margin:auto;">
+    <h2 id="plan-h" style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Dein Lernplan ✨</h2>
+    <p id="plan-sub" style="color:rgba(255,255,255,.45);font-size:13px;margin-bottom:20px;"></p>
+    <div id="plan-body">
+      <div style="text-align:center;padding:28px 0;">
         <div class="spinner"></div>
-        <p>Stevie liest dein Material und baut deinen Plan…</p>
+        <p style="color:rgba(255,255,255,.45);font-size:13px;">Stevie analysiert dein Material…</p>
       </div>
     </div>
-    <div class="plan-footer" id="plan-footer" style="display:none;">
-      <button class="btn-primary" onclick="startLearning()">Tag 1 starten 🚀</button>
+    <div id="plan-footer" style="display:none;margin-top:16px;">
+      <button class="btn" onclick="startLearning()">Tag 1 starten 🚀</button>
     </div>
   </div>
 </div>
 
-<!-- ══ MAIN APP ══ -->
+<!-- MAIN APP -->
 <div id="app" class="screen">
   <header>
-    <div class="hdr-avatar">🌟</div>
-    <div class="hdr-info">
+    <div class="hav">🌟</div>
+    <div class="hinfo">
       <h2>Stevie</h2>
-      <p id="hdr-subtitle">Lernbegleiterin</p>
+      <p id="hdr-sub">Lernbegleiterin</p>
     </div>
-    <div class="hdr-right">
-      <button id="voice-toggle" class="voice-btn voice-on" onclick="toggleVoice()">🔊</button>
-      <button class="icon-btn-hdr" onclick="showPlan()" title="Lernplan">🗓️</button>
-      <button class="icon-btn-hdr" onclick="openSettings()" title="Einstellungen">⚙️</button>
+    <div class="hright">
+      <button id="vtoggle" class="vbtn-toggle von" onclick="toggleVoice()">🔊</button>
+      <button class="hbtn" onclick="showPlanModal()" title="Lernplan">🗓️</button>
+      <button class="hbtn" onclick="openSettings()" title="Einstellungen">⚙️</button>
     </div>
   </header>
-  <div id="progress-bar">
-    <span class="day-info" id="progress-day">Tag 1</span>
+  <div id="prog-bar">
+    <span class="prog-label" id="prog-label">Tag 1</span>
     <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
-    <span class="pct" id="progress-pct">0%</span>
+    <span class="prog-pct" id="prog-pct">0%</span>
   </div>
   <div id="topic-row"></div>
   <div id="messages"></div>
-  <div id="img-preview" style="position:relative;">
-    <img id="img-thumb" src="" alt="preview"/>
-    <button class="remove-img" onclick="removeImage()">×</button>
+  <div id="speak-ind">🔊 Stevie spricht… <button onclick="stopSpeaking()" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button></div>
+  <div id="imgprev">
+    <img id="imgthumb" src="" alt=""/>
+    <button class="imgdel" onclick="removeImg()">×</button>
   </div>
-  <div id="speaking-ind" class="speaking-ind">🔊 Stevie spricht… <button onclick="stopSpeaking()" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button></div>
   <footer>
-    <button class="foot-btn" onclick="document.getElementById('chat-upload').click()" title="Foto">📷</button>
-    <input type="file" id="chat-upload" accept="image/*" style="display:none" onchange="handleChatImage(event)"/>
-    <textarea id="msg-input" rows="1" placeholder="Schreib oder sprich mit Stevie…" onkeydown="handleKey(event)"></textarea>
-    <button class="foot-btn" id="mic-btn" onclick="toggleListen()" title="Sprechen">🎙️</button>
-    <button id="send-btn" onclick="sendMessage()">➤</button>
+    <button class="fbtn" onclick="document.getElementById('chat-file').click()">📷</button>
+    <input type="file" id="chat-file" accept="image/*" style="display:none" onchange="handleChatImg(event)"/>
+    <textarea id="msginput" rows="1" placeholder="Schreib oder sprich mit Stevie…" onkeydown="handleKey(event)"></textarea>
+    <button class="fbtn" id="micbtn" onclick="toggleListen()">🎙️</button>
+    <button id="sendbtn" onclick="sendMsg()">➤</button>
   </footer>
 </div>
 
-<!-- ══ SETTINGS MODAL ══ -->
+<!-- SETTINGS MODAL -->
 <div class="modal-bg" id="settings-modal">
   <div class="modal">
-    <h3>⚙️ Einstellungen <button class="modal-close" onclick="closeSettings()">×</button></h3>
-    <label>Anthropic API-Key</label>
-    <input type="password" id="s-anthropic" placeholder="sk-ant-..."/>
-    <label>ElevenLabs Key <span style="font-weight:400;color:#b8a8d0;">(optional)</span></label>
-    <input type="password" id="s-eleven" placeholder="Für natürliche Stimme"/>
-    <p style="font-size:12px;color:#b8a8d0;margin:-8px 0 16px;">Key holen: <a href="https://elevenlabs.io" style="color:#a78bfa;">elevenlabs.io</a> → Profil</p>
-    <button class="btn-save" onclick="saveSettings()">Speichern ✓</button>
+    <div class="modal-title">⚙️ Einstellungen <button class="mclose" onclick="closeModal('settings-modal')">×</button></div>
+    <label class="mlabel">Anthropic API-Key</label>
+    <input class="minput" type="password" id="s-ant" placeholder="sk-ant-…"/>
+    <label class="mlabel">ElevenLabs Key</label>
+    <input class="minput" type="password" id="s-el" placeholder="Für natürliche Stimme"/>
+    <p style="font-size:12px;color:#b8a8d0;margin:-6px 0 16px;">Key holen: <a href="https://elevenlabs.io" style="color:#a78bfa;">elevenlabs.io</a> → Profil</p>
+    <label class="mlabel">Name</label>
+    <input class="minput" type="text" id="s-name" placeholder="Dein Name"/>
+    <button class="msave" onclick="saveSettings()">Speichern ✓</button>
   </div>
 </div>
 
-<!-- ══ PLAN MODAL ══ -->
+<!-- PLAN MODAL -->
 <div class="modal-bg" id="plan-modal">
   <div class="modal">
-    <h3>🗓️ Lernplan <button class="modal-close" onclick="document.getElementById('plan-modal').classList.remove('open')">×</button></h3>
-    <div id="plan-modal-content"></div>
+    <div class="modal-title">🗓️ Lernplan <button class="mclose" onclick="closeModal('plan-modal')">×</button></div>
+    <div id="plan-modal-body"></div>
   </div>
 </div>
 
 <script>
+// ══ CONFIG ══
+const THEMES = {
+  purple:{label:'Lila 💜',grad:'linear-gradient(135deg,#7c3aed,#ec4899)',cls:''},
+  ocean: {label:'Ozean 🌊',grad:'linear-gradient(135deg,#0369a1,#06b6d4)',cls:'t-ocean'},
+  forest:{label:'Natur 🌿',grad:'linear-gradient(135deg,#15803d,#4ade80)',cls:'t-forest'},
+  sunset:{label:'Feuer 🔥',grad:'linear-gradient(135deg,#c2410c,#f59e0b)',cls:'t-sunset'},
+  rose:  {label:'Pink 🌸', grad:'linear-gradient(135deg,#be185d,#f9a8d4)',cls:'t-rose'},
+};
+const VOICES = [
+  {id:'XrExE9yKIg1WjnnlVkGX', name:'Emilia', desc:'Jung & warm 🌸'},
+  {id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace',  desc:'Sanft & klar ✨'},
+  {id:'pFZP5JQG7iQjIQuC4Bku', name:'Lily',   desc:'Locker & cool 😎'},
+  {id:'z9fAnlkpzviPz146aGWa', name:'Glinda', desc:'Freundlich 💜'},
+];
+
 // ══ STATE ══
-let state = {
+const S = {
+  name:'', age:11, grade:5,
+  theme:'purple', voiceId: VOICES[0].id,
   subject:'', days:1, currentDay:1,
-  plan:[], // [{title, topics:[]}]
-  doneTopic:{}, // {day_topic: true}
-  messages:[],
-  matImages:[], // [{data, type}]
-  voiceEnabled:true,
-  listening:false
+  plan:[], doneTopic:{},
+  msgs:[], matImages:[],
+  voiceOn:true, listening:false,
+  chatImg:null,
 };
 
-// ══ STARS ══
-const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');
-let stars=[];
-function resizeC(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-function initS(){stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.3,a:Math.random(),sp:Math.random()*.008+.003}));}
-function animS(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.a})`;ctx.fill();});requestAnimationFrame(animS);}
-resizeC();initS();animS();
-window.addEventListener('resize',()=>{resizeC();initS();});
-
-// ══ SCREENS ══
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-
-// ══ SPLASH ══
-function splashNext(){
-  if(!getKey())show('keyscreen');
-  else{
-    const prof=localStorage.getItem('stevie_profile');
-    if(prof){const p=JSON.parse(prof);Object.assign(state,p);show('setup');}
-    else{buildOnboarding();show('onboarding');}
-  }
-}
-
-// ══ KEYS ══
-function getKey(){return localStorage.getItem('stevie_key');}
-function saveKeys(){
-  const k=document.getElementById('api-key-input').value.trim();
-  if(!k.startsWith('sk-'))return alert('Bitte einen gültigen Anthropic API-Key eingeben.');
-  localStorage.setItem('stevie_key',k);
-  const ek=document.getElementById('eleven-key-input').value.trim();
-  if(ek)localStorage.setItem('stevie_eleven_key',ek);
-  buildOnboarding();show('onboarding');
-}
-
-// ══ DAYS GRID ══
-window.onload=()=>{
-  // Load saved profile
-  const prof=localStorage.getItem('stevie_profile');
-  if(prof){const p=JSON.parse(prof);Object.assign(state,p);applyTheme(p.theme||'purple');if(p.voice)selectedVoice=p.voice;}
-  else{applyTheme('purple');}
+// ══ INIT ══
+window.onload = () => {
+  initStars();
   buildDaysGrid();
-  buildOnboarding();
+  loadProfile();
   show('splash');
 };
 
-function buildDaysGrid(){
-  const g=document.getElementById('days-grid');
-  g.innerHTML='';
-  for(let i=1;i<=14;i++){
-    const b=document.createElement('div');
-    b.className='day-btn';
-    b.innerHTML=`${i}<div class="day-label">${i===1?'Tag':'Tage'}</div>`;
-    b.onclick=()=>selectDays(i);
-    b.id=`db-${i}`;
+function loadProfile() {
+  const raw = localStorage.getItem('stevie_profile');
+  if (raw) { const p = JSON.parse(raw); Object.assign(S, p); applyTheme(S.theme); }
+  else applyTheme('purple');
+}
+
+// ══ SCREENS ══
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function splashNext() {
+  if (!getKey()) { show('keyscreen'); return; }
+  const prof = localStorage.getItem('stevie_profile');
+  if (prof) { const p=JSON.parse(prof); Object.assign(S,p); applyTheme(S.theme); show('setup'); }
+  else { buildOnboarding(); show('onboarding'); }
+}
+
+// ══ KEYS ══
+function getKey() { return localStorage.getItem('stevie_key'); }
+
+function saveKeys() {
+  const k = document.getElementById('k-anthropic').value.trim();
+  if (!k.startsWith('sk-')) { alert('Bitte einen gültigen Anthropic API-Key eingeben (beginnt mit sk-).'); return; }
+  localStorage.setItem('stevie_key', k);
+  const ek = document.getElementById('k-eleven').value.trim();
+  if (ek) localStorage.setItem('stevie_eleven', ek);
+  buildOnboarding(); show('onboarding');
+}
+
+// ══ ONBOARDING ══
+function buildOnboarding() {
+  // Age
+  const ag = document.getElementById('age-grid'); ag.innerHTML = '';
+  for (let a=8; a<=16; a++) {
+    const b = document.createElement('div'); b.className='gbtn'; b.textContent=a+' Jahre';
+    if (S.age===a) b.classList.add('sel');
+    b.onclick = () => { ag.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S.age=a; };
+    ag.appendChild(b);
+  }
+  // Class
+  const cg = document.getElementById('class-grid'); cg.innerHTML = '';
+  for (let c=1; c<=10; c++) {
+    const b = document.createElement('div'); b.className='gbtn'; b.textContent=c+'. Klasse';
+    if (S.grade===c) b.classList.add('sel');
+    b.onclick = () => { cg.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S.grade=c; };
+    cg.appendChild(b);
+  }
+  // Voices
+  const vg = document.getElementById('voice-grid'); vg.innerHTML = '';
+  VOICES.forEach(v => {
+    const b = document.createElement('div'); b.className='vbtn'; if(S.voiceId===v.id) b.classList.add('sel');
+    b.innerHTML = `<div class="vbtn-name">${v.name}</div><div class="vbtn-desc">${v.desc}</div>`;
+    b.onclick = () => { vg.querySelectorAll('.vbtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S.voiceId=v.id; };
+    vg.appendChild(b);
+  });
+  // Themes
+  const tg = document.getElementById('theme-grid'); tg.innerHTML = '';
+  Object.entries(THEMES).forEach(([key,t]) => {
+    const b = document.createElement('div'); b.className='tbtn'; if(S.theme===key) b.classList.add('sel');
+    b.style.background = t.grad;
+    b.innerHTML = `<span class="tbtn-label">${t.label}</span>`;
+    b.onclick = () => { tg.querySelectorAll('.tbtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); applyTheme(key); };
+    tg.appendChild(b);
+  });
+}
+
+function saveOnboarding() {
+  const name = document.getElementById('ob-name').value.trim();
+  if (!name) { alert('Wie heißt du? 😊'); return; }
+  if (!S.age) { alert('Bitte wähle dein Alter.'); return; }
+  if (!S.grade) { alert('Bitte wähle deine Klasse.'); return; }
+  S.name = name;
+  saveProfile();
+  document.getElementById('setup-sub').textContent = `Hey ${name}! Sag mir womit wir starten.`;
+  show('setup');
+}
+
+function saveProfile() {
+  localStorage.setItem('stevie_profile', JSON.stringify({
+    name:S.name, age:S.age, grade:S.grade, theme:S.theme, voiceId:S.voiceId
+  }));
+}
+
+function applyTheme(key) {
+  S.theme = key;
+  document.body.className = THEMES[key]?.cls || '';
+}
+
+// ══ SETUP ══
+function buildDaysGrid() {
+  const g = document.getElementById('days-grid'); g.innerHTML = '';
+  for (let i=1; i<=14; i++) {
+    const b = document.createElement('div'); b.className='dbtn'; b.id='db'+i;
+    b.innerHTML = `${i}<div class="dbtn-lbl">${i===1?'Tag':'Tage'}</div>`;
+    b.onclick = () => selectDays(i);
     g.appendChild(b);
   }
 }
 
-function selectDays(n){
-  state.days=n;
-  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById(`db-${n}`).classList.add('selected');
-  document.getElementById('days-display').textContent=
-    n===1?'Du hast 1 Tag – wir fokussieren uns aufs Wesentliche! 💪'
-    :n<=3?`${n} Tage – kompakter Intensivplan 🔥`
-    :n<=7?`${n} Tage – solider Lernplan mit Zeit zum Üben ✅`
-    :`${n} Tage – entspannter Durchstarter-Plan 🌱`;
+function selectDays(n) {
+  S.days = n;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('db'+n)?.classList.add('sel');
+  const hints = ['1 Tag – wir fokussieren uns aufs Wesentlichste! 💪','','','','','','','','','','','','',''];
+  document.getElementById('days-hint').textContent =
+    n===1 ? '1 Tag – wir fokussieren uns aufs Wesentlichste! 💪'
+    : n<=3 ? `${n} Tage – kompakter Intensivplan 🔥`
+    : n<=7 ? `${n} Tage – solider Plan mit Zeit zum Üben ✅`
+    : `${n} Tage – entspannter Durchstarter-Plan 🌱`;
 }
 
-function goToMaterial(){
-  const s=document.getElementById('subject-input').value.trim();
-  if(!s)return alert('Bitte gib ein Fach ein!');
-  if(!state.days)return alert('Bitte wähle die Anzahl der Tage!');
-  state.subject=s;
+function goToMaterial() {
+  const s = document.getElementById('subject-input').value.trim();
+  if (!s) { alert('Bitte gib ein Fach ein!'); return; }
+  if (!S.days) { alert('Bitte wähle die Anzahl der Tage!'); return; }
+  S.subject = s;
   show('material');
 }
 
-// ══ MATERIAL UPLOAD ══
-function handleMatUpload(e){
-  Array.from(e.target.files).forEach(file=>{
-    const r=new FileReader();
-    r.onload=ev=>{
-      state.matImages.push({data:ev.target.result.split(',')[1],type:file.type,src:ev.target.result});
-      renderThumbs();
-    };
+// ══ MATERIAL ══
+function handleMatUpload(e) {
+  Array.from(e.target.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = ev => { S.matImages.push({data:ev.target.result.split(',')[1],type:file.type,src:ev.target.result}); renderMatThumbs(); };
     r.readAsDataURL(file);
   });
+  e.target.value = '';
 }
 
-function renderThumbs(){
-  const c=document.getElementById('mat-thumbs');
-  c.innerHTML='';
-  state.matImages.forEach((img,i)=>{
-    const d=document.createElement('div');
-    d.className='thumb';
-    d.innerHTML=`<img src="${img.src}"/><button class="del" onclick="removeMat(${i})">×</button>`;
+function renderMatThumbs() {
+  const c = document.getElementById('mat-thumbs'); c.innerHTML = '';
+  S.matImages.forEach((img,i) => {
+    const d = document.createElement('div'); d.className='thumb';
+    d.innerHTML = `<img src="${img.src}"/><button class="thumb-del" onclick="removeMat(${i})">×</button>`;
     c.appendChild(d);
   });
-  document.getElementById('mat-next-btn').style.display=state.matImages.length?'block':'none';
+  document.getElementById('mat-btn').style.display = S.matImages.length ? 'block' : 'none';
 }
 
-function removeMat(i){state.matImages.splice(i,1);renderThumbs();}
+function removeMat(i) { S.matImages.splice(i,1); renderMatThumbs(); }
 
 // ══ GENERATE PLAN ══
-async function generatePlan(skip=false){
+async function generatePlan(skip=false) {
   show('planscreen');
-  document.getElementById('plan-title').textContent=`Lernplan für ${state.subject} ✨`;
-  document.getElementById('plan-sub').textContent=`${state.days} ${state.days===1?'Tag':'Tage'} · Stevie analysiert dein Material…`;
+  document.getElementById('plan-h').textContent = `Lernplan für ${S.subject} ✨`;
+  document.getElementById('plan-sub').textContent = `${S.days} ${S.days===1?'Tag':'Tage'} · ${S.subject} · Stevie denkt nach…`;
+  document.getElementById('plan-footer').style.display = 'none';
+  document.getElementById('plan-body').innerHTML = `<div style="text-align:center;padding:28px 0;"><div class="spinner"></div><p style="color:rgba(255,255,255,.45);font-size:13px;">Stevie analysiert dein Material…</p></div>`;
 
-  const SYSTEM=`Du bist Stevie, eine freundliche KI-Lernbegleiterin. Antworte NUR mit einem JSON-Array ohne Markdown-Backticks.
-Format: [{"day":1,"title":"Kurzer Tagesname","topics":["Thema 1","Thema 2","Thema 3"]}]
-Erstelle einen ${state.days}-Tage-Lernplan für das Fach "${state.subject}". Maximal 3-4 Themen pro Tag. Verteile den Stoff sinnvoll. Kein Markdown, kein Text außer dem JSON-Array.`;
+  const sysPrompt = `Erstelle einen ${S.days}-Tage-Lernplan für das Fach "${S.subject}" für einen Schüler der ${S.grade}. Klasse.
+Antworte NUR mit einem JSON-Array, kein Markdown, kein Text davor oder danach.
+Format: [{"day":1,"title":"Kurzer Tagesname","topics":["Thema A","Thema B","Thema C"]}]
+Maximal 3-4 Themen pro Tag. Verteile den Stoff sinnvoll auf ${S.days} Tage.`;
 
-  const userContent=[];
-  if(!skip && state.matImages.length){
-    state.matImages.forEach(img=>userContent.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}));
-    userContent.push({type:'text',text:`Analysiere diese ${state.matImages.length} Bilder und erstelle einen ${state.days}-Tage-Lernplan für ${state.subject}. Nur JSON-Array, kein anderer Text.`});
+  const userContent = [];
+  if (!skip && S.matImages.length) {
+    S.matImages.forEach(img => userContent.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}));
+    userContent.push({type:'text',text:`Analysiere diese Bilder und erstelle den ${S.days}-Tage-Lernplan für ${S.subject}. Nur JSON-Array.`});
   } else {
-    userContent.push({type:'text',text:`Erstelle einen ${state.days}-Tage-Lernplan für ${state.subject}. Nur JSON-Array, kein anderer Text.`});
+    userContent.push({type:'text',text:`Erstelle den ${S.days}-Tage-Lernplan für ${S.subject}. Nur JSON-Array.`});
   }
 
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:SYSTEM,messages:[{role:'user',content:userContent}]})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:sysPrompt,messages:[{role:'user',content:userContent}]})
     });
-    const d=await res.json();
-    const text=d.content?.find(b=>b.type==='text')?.text||'[]';
-    const clean=text.replace(/```json|```/g,'').trim();
-    state.plan=JSON.parse(clean);
-  }catch(e){
-    // fallback plan
-    state.plan=Array.from({length:state.days},(_,i)=>({day:i+1,title:`Tag ${i+1}`,topics:[`${state.subject} – Teil ${i+1}`]}));
+    const d = await res.json();
+    const txt = d.content?.find(b=>b.type==='text')?.text||'[]';
+    S.plan = JSON.parse(txt.replace(/```json|```/g,'').trim());
+  } catch {
+    S.plan = Array.from({length:S.days},(_,i)=>({day:i+1,title:`Tag ${i+1}`,topics:[`${S.subject} – Teil ${i+1}`]}));
   }
-
   renderPlanScreen();
 }
 
-function renderPlanScreen(){
-  const c=document.getElementById('plan-content');
-  c.innerHTML='';
-  document.getElementById('plan-sub').textContent=`${state.days} ${state.days===1?'Tag':'Tage'} · ${state.subject} · Alles bereit!`;
-  state.plan.forEach((day,i)=>{
-    const d=document.createElement('div');
-    d.className='day-card'+(i===0?' today':'');
-    d.innerHTML=`<div class="day-header"><span class="day-num">Tag ${day.day}</span><span class="day-title">${day.title}</span></div>
-    <div class="day-topics">${day.topics.map(t=>`<span class="topic-pill">${t}</span>`).join('')}</div>`;
-    c.appendChild(d);
+function renderPlanScreen() {
+  document.getElementById('plan-sub').textContent = `${S.days} ${S.days===1?'Tag':'Tage'} · ${S.subject} · Alles bereit!`;
+  const b = document.getElementById('plan-body'); b.innerHTML = '';
+  S.plan.forEach((day,i) => {
+    const d = document.createElement('div'); d.className='day-card'+(i===0?' today':'');
+    d.innerHTML = `<div class="day-hdr"><span class="day-num">Tag ${day.day}</span><span class="day-title">${day.title}</span></div>
+    <div class="topic-pills">${day.topics.map(t=>`<span class="tpill">${t}</span>`).join('')}</div>`;
+    b.appendChild(d);
   });
-  document.getElementById('plan-footer').style.display='flex';
+  document.getElementById('plan-footer').style.display = 'block';
 }
 
-// ══ START LEARNING ══
-function startLearning(){
-  state.currentDay=1;
+// ══ START ══
+function startLearning() {
+  S.currentDay = 1; S.msgs = [];
   show('app');
-  initAppUI();
-  const greeting=`Hey! 👋 Ich bin Stevie, deine Lernbegleiterin!\n\nWir haben ${state.days} ${state.days===1?'Tag':'Tage'} für ${state.subject}. Heute starten wir mit: ${state.plan[0]?.topics?.join(', ')||state.subject}.\n\nWomit möchtest du anfangen?`;
-  addMessage('assistant',greeting,'💬');
+  document.getElementById('hdr-sub').textContent = `${S.subject} · Tag 1/${S.days}`;
+  renderTopicRow(); updateProgress();
+  const first = S.plan[0]?.topics?.join(', ') || S.subject;
+  const greeting = `Hey ${S.name}! 👋 Ich bin Stevie, deine Lernbegleiterin!\n\nWir haben ${S.days} ${S.days===1?'Tag':'Tage'} für ${S.subject}. Heute fangen wir mit an: ${first}.\n\nWomit möchtest du starten?`;
+  addMsg('assistant', greeting, '💬');
   speak(greeting);
-  renderTopicRow();
-  updateProgress();
 }
 
-function initAppUI(){
-  document.getElementById('hdr-subtitle').textContent=`${state.subject} · Tag ${state.currentDay}/${state.days}`;
-}
-
-function renderTopicRow(){
-  const row=document.getElementById('topic-row');
-  row.innerHTML='';
-  const dayPlan=state.plan[state.currentDay-1];
-  if(!dayPlan)return;
-  dayPlan.topics.forEach(t=>{
-    const key=`${state.currentDay}_${t}`;
-    const done=state.doneTopic[key];
-    const chip=document.createElement('div');
-    chip.className='topic-chip'+(done?' done-chip':'');
-    chip.textContent=(done?'✅ ':'')+t;
-    chip.onclick=()=>focusTopic(t);
-    row.appendChild(chip);
+// ══ TOPIC ROW ══
+function renderTopicRow() {
+  const row = document.getElementById('topic-row'); row.innerHTML = '';
+  const day = S.plan[S.currentDay-1]; if (!day) return;
+  day.topics.forEach(t => {
+    const key = `${S.currentDay}_${t}`, done = S.doneTopic[key];
+    const c = document.createElement('div'); c.className='tchip'+(done?' done':'');
+    c.textContent = (done?'✅ ':'')+t;
+    c.onclick = () => autoSend(`Lass uns jetzt "${t}" durchgehen. Stell mir eine Frage dazu!`);
+    row.appendChild(c);
   });
 }
 
-function focusTopic(topic){
-  const msg=`Lass uns jetzt "${topic}" durchgehen. Ich stelle dir zuerst eine Frage dazu – bereit?`;
-  sendAutoMessage(msg);
+function updateProgress() {
+  const day = S.plan[S.currentDay-1]; if (!day) return;
+  const done = day.topics.filter(t=>S.doneTopic[`${S.currentDay}_${t}`]).length;
+  const pct = day.topics.length ? Math.round(done/day.topics.length*100) : 0;
+  document.getElementById('bar-fill').style.width = pct+'%';
+  document.getElementById('prog-pct').textContent = pct+'%';
+  document.getElementById('prog-label').textContent = `Tag ${S.currentDay}/${S.days}`;
 }
 
-function updateProgress(){
-  const dayPlan=state.plan[state.currentDay-1];
-  if(!dayPlan)return;
-  const total=dayPlan.topics.length;
-  const done=dayPlan.topics.filter(t=>state.doneTopic[`${state.currentDay}_${t}`]).length;
-  const pct=total?Math.round(done/total*100):0;
-  document.getElementById('bar-fill').style.width=pct+'%';
-  document.getElementById('progress-pct').textContent=pct+'%';
-  document.getElementById('progress-day').textContent=`Tag ${state.currentDay}/${state.days}`;
-}
+// ══ SYSTEM PROMPT ══
+function getSysPrompt() {
+  const lvl = S.grade<=4 ? 'Grundschule – sehr einfache Sprache, kurze Sätze, Alltagsbeispiele'
+    : S.grade<=6 ? 'Unterstufe – einfache klare Sprache, anschauliche Vergleiche'
+    : S.grade<=8 ? 'Mittelstufe – freundlicher Ton, etwas mehr Tiefe'
+    : 'Oberstufe – anspruchsvollere Sprache, abstrakte Konzepte ok';
+  const day = S.plan[S.currentDay-1];
+  const ctx = day ? `Aktuell: Tag ${S.currentDay}/${S.days}, Fach: ${S.subject}, Themen heute: ${day.topics.join(', ')}.` : '';
+  return `Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit ${S.name}, ${S.age} Jahre, ${S.grade}. Klasse (${lvl}).
 
-// ══ CHAT ══
-// ══ STEVIE SYSTEM PROMPT (altersangepasst) ══
-function buildSteviewSystem(){
-  const lvl = state.grade<=4 ? 'Grundschule (sehr einfache Sprache, kurze Sätze, viele Beispiele aus dem Alltag)'
-    : state.grade<=6 ? 'Unterstufe Gymnasium (einfache klare Sprache, anschauliche Vergleiche)'
-    : state.grade<=8 ? 'Mittelstufe (sachlicher aber freundlicher Ton, etwas mehr Tiefe)'
-    : 'Oberstufe (anspruchsvollere Sprache, abstrakte Konzepte ok)';
-  return `Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit ${state.name}, ${state.age} Jahre alt, ${state.grade}. Klasse (${lvl}).
-
-PERSÖNLICHKEIT: Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich. Passe Sprache und Komplexität EXAKT an das Alter und die Klasse an.
+PERSÖNLICHKEIT: Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich. Passe Sprache EXAKT ans Alter an. Sprich ${S.name} gelegentlich mit Namen an, aber nicht bei jeder Nachricht.
 
 METHODIK: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurzes Feedback (1-2 Sätze). Antworten kurz halten (2-4 Sätze).
 
-NACH JEDER ANTWORT: Markiere mit [TAG:Erklärung] oder [TAG:Frage] oder [TAG:Feedback] oder [TAG:Motivation].
-Wenn ein Thema vollständig besprochen wurde: [TOPIC_DONE:Themenname]
+Markiere jede Antwort mit einem Tag am Anfang: [TAG:Frage] [TAG:Erklärung] [TAG:Feedback] [TAG:Motivation]
+Wenn ein Thema abgeschlossen ist: [DONE:Themenname]
 
-Antworte auf Deutsch. Sprich ${state.name} direkt mit Namen an (aber nicht zu oft).`;
+${ctx}
+Antworte auf Deutsch.`;
 }
-const STEVIE_SYSTEM=''; // wird dynamisch per buildSteviewSystem() gesetzt
 
-let chatImage=null;
-
-function addMessage(role,content,tag,imgSrc){
-  state.messages.push({role,content});
-  const row=document.createElement('div');
-  row.className=`msg-row ${role}`;
-  row.style.animation='fadeIn .3s ease';
-
-  if(role==='assistant'){
-    row.innerHTML=`<div class="msg-avatar-sm">🌟</div>`;
+// ══ CHAT ══
+function addMsg(role, content, tag, imgSrc) {
+  S.msgs.push({role, content});
+  const row = document.createElement('div'); row.className=`mrow ${role}`; row.style.animation='fadeUp .3s ease';
+  if (role==='assistant') row.innerHTML = `<div class="mav">🌟</div>`;
+  const clean = content.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[DONE:[^\]]+\]/g,'').trim();
+  const bub = document.createElement('div'); bub.className=`bubble ${role==='assistant'?'s':'u'}`;
+  if (imgSrc) { const img=document.createElement('img');img.src=imgSrc;img.style.cssText='max-width:170px;border-radius:9px;margin-bottom:5px;display:block';bub.appendChild(img); }
+  bub.appendChild(document.createTextNode(clean));
+  row.appendChild(bub);
+  if (role==='assistant') {
+    if (tag) { const tEl=document.createElement('div');tEl.className='btag';tEl.textContent=tagIcon(tag)+' '+tag;row.appendChild(tEl); }
+    const rb=document.createElement('button');rb.className='rbtn';rb.textContent='🔁';rb.onclick=()=>speak(clean);row.appendChild(rb);
+    const dm=content.match(/\[DONE:([^\]]+)\]/); if(dm) markDone(dm[1]);
+    if (content.includes('[TAG:Frage]')) setTimeout(()=>addQuickReplies(row),150);
   }
-
-  const cleanContent=content.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[TOPIC_DONE:[^\]]+\]/g,'').trim();
-  const bubble=document.createElement('div');
-  bubble.className=`bubble ${role==='assistant'?'stevie':'user'}`;
-  if(imgSrc){const img=document.createElement('img');img.src=imgSrc;img.style.cssText='max-width:180px;border-radius:10px;margin-bottom:6px;display:block';bubble.appendChild(img);}
-  bubble.appendChild(document.createTextNode(cleanContent));
-  row.appendChild(bubble);
-
-  if(role==='assistant'){
-    if(tag){const m=document.createElement('div');m.className='bubble-meta';m.innerHTML=`<span class="bubble-tag">${tagEmoji(tag)} ${tag}</span>`;row.appendChild(m);}
-    const rb=document.createElement('button');rb.className='replay-btn';rb.textContent='🔁';rb.onclick=()=>speak(cleanContent);row.appendChild(rb);
-    // Check for TOPIC_DONE
-    const td=content.match(/\[TOPIC_DONE:([^\]]+)\]/);
-    if(td){markTopicDone(td[1]);}
-    // Show quick replies if it's a question
-    if(content.includes('[TAG:Frage]')){
-      setTimeout(()=>showQuickReplies(row),200);
-    }
-  }
-
   document.getElementById('messages').appendChild(row);
   document.getElementById('messages').scrollTop=999999;
 }
 
-function tagEmoji(tag){return{Frage:'❓',Erklärung:'📖',Feedback:'✅',Motivation:'💪',Lernplan:'🗓️'}[tag]||'💬';}
+function tagIcon(t){return{Frage:'❓',Erklärung:'📖',Feedback:'✅',Motivation:'💪'}[t]||'💬';}
 
-function showQuickReplies(afterRow){
-  const qr=document.createElement('div');
-  qr.className='quick-replies';
-  ['Ich weiß es! 🙋','Bin nicht sicher 🤔','Keine Ahnung 😅','Nächstes Thema →'].forEach(label=>{
-    const b=document.createElement('button');b.className='qr-btn';b.textContent=label;
-    b.onclick=()=>{qr.remove();sendAutoMessage(label);};
+function addQuickReplies(afterEl) {
+  const qr=document.createElement('div');qr.className='qr-row';
+  ['Ich weiß es! 🙋','Bin unsicher 🤔','Keine Ahnung 😅','Weiter →'].forEach(l=>{
+    const b=document.createElement('button');b.className='qr';b.textContent=l;
+    b.onclick=()=>{qr.remove();autoSend(l);};
     qr.appendChild(b);
   });
-  afterRow.after(qr);
+  afterEl.after(qr);
 }
 
-function markTopicDone(topicName){
-  const dayPlan=state.plan[state.currentDay-1];
-  if(!dayPlan)return;
-  const match=dayPlan.topics.find(t=>topicName.includes(t)||t.includes(topicName));
-  if(match){state.doneTopic[`${state.currentDay}_${match}`]=true;renderTopicRow();updateProgress();}
+function markDone(topicName) {
+  const day=S.plan[S.currentDay-1]; if(!day) return;
+  const m=day.topics.find(t=>topicName.includes(t)||t.includes(topicName));
+  if(m){S.doneTopic[`${S.currentDay}_${m}`]=true;renderTopicRow();updateProgress();}
 }
 
-function showTyping(){const d=document.createElement('div');d.className='msg-row';d.id='typing';d.innerHTML=`<div class="msg-avatar-sm">🌟</div><div class="bubble stevie"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;document.getElementById('messages').appendChild(d);document.getElementById('messages').scrollTop=999999;}
+function showTyping(){const d=document.createElement('div');d.className='mrow';d.id='typing';d.innerHTML=`<div class="mav">🌟</div><div class="bubble s"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;document.getElementById('messages').appendChild(d);document.getElementById('messages').scrollTop=999999;}
 function hideTyping(){document.getElementById('typing')?.remove();}
 
-async function sendMessage(){
-  const input=document.getElementById('msg-input');
-  const text=input.value.trim();
-  if(!text&&!chatImage)return;
+async function sendMsg() {
+  const inp=document.getElementById('msginput'), text=inp.value.trim();
+  if (!text && !S.chatImg) return;
   stopSpeaking();
-
-  const userContent=[];
-  let imgSrc=null;
-  if(chatImage){userContent.push({type:'image',source:{type:'base64',media_type:chatImage.type,data:chatImage.data}});imgSrc=document.getElementById('img-thumb').src;}
-  if(text)userContent.push({type:'text',text});
-
-  addMessage('user',text||'📷',null,imgSrc);
-  input.value='';removeImage();
-  document.getElementById('send-btn').disabled=true;
+  const uc=[];let imgSrc=null;
+  if(S.chatImg){uc.push({type:'image',source:{type:'base64',media_type:S.chatImg.type,data:S.chatImg.data}});imgSrc=document.getElementById('imgthumb').src;}
+  if(text)uc.push({type:'text',text});
+  addMsg('user',text||'📷',null,imgSrc);
+  inp.value='';removeImg();
+  document.getElementById('sendbtn').disabled=true;
   showTyping();
-
-  const dayPlan=state.plan[state.currentDay-1];
-  const context=dayPlan?`Aktueller Tag: ${state.currentDay}/${state.days}. Fach: ${state.subject}. Heutige Themen: ${dayPlan.topics.join(', ')}.`:'';
-  const systemWithContext=STEVIE_SYSTEM+'\n\n'+context;
-
-  const apiMsgs=state.messages.map(m=>({role:m.role,content:m.content}));
-
+  const apiMsgs=S.msgs.map(m=>({role:m.role,content:m.content}));
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:buildSteviewSystem(),messages:apiMsgs})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:getSysPrompt(),messages:apiMsgs})
     });
-    const d=await res.json();
-    hideTyping();
+    const d=await res.json();hideTyping();
     if(d.error)throw new Error(d.error.message);
     const reply=d.content?.find(b=>b.type==='text')?.text||'Hmm, kurzer Fehler 🙈';
-    const tagMatch=reply.match(/\[TAG:([^\]]+)\]/);
-    const tag=tagMatch?tagMatch[1]:null;
-    addMessage('assistant',reply,tag);
-    speak(reply.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[TOPIC_DONE:[^\]]+\]/g,'').trim());
-  }catch(e){
-    hideTyping();
-    addMessage('assistant',`Ups: ${e.message} 😅`,'');
-  }
-  document.getElementById('send-btn').disabled=false;
+    const tm=reply.match(/\[TAG:([^\]]+)\]/);
+    addMsg('assistant',reply,tm?tm[1]:null);
+    speak(reply.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[DONE:[^\]]+\]/g,'').trim());
+  }catch(e){hideTyping();addMsg('assistant',`Ups: ${e.message} 😅`,null);}
+  document.getElementById('sendbtn').disabled=false;
 }
 
-function sendAutoMessage(text){
-  document.getElementById('msg-input').value=text;
-  sendMessage();
-}
-
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoSend(text){document.getElementById('msginput').value=text;sendMsg();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
 
 // ══ CHAT IMAGE ══
-function handleChatImage(e){
+function handleChatImg(e){
   const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=ev=>{chatImage={data:ev.target.result.split(',')[1],type:file.type};document.getElementById('img-thumb').src=ev.target.result;document.getElementById('img-preview').style.display='block';};
-  r.readAsDataURL(file);
+  const r=new FileReader();r.onload=ev=>{S.chatImg={data:ev.target.result.split(',')[1],type:file.type};document.getElementById('imgthumb').src=ev.target.result;document.getElementById('imgprev').style.display='block';};r.readAsDataURL(file);
+  e.target.value='';
 }
-function removeImage(){chatImage=null;document.getElementById('img-preview').style.display='none';document.getElementById('chat-upload').value='';}
-
-// ══ PLAN MODAL ══
-function showPlan(){
-  const c=document.getElementById('plan-modal-content');
-  c.innerHTML='';
-  state.plan.forEach((day,i)=>{
-    const done=day.topics.filter(t=>state.doneTopic[`${day.day}_${t}`]).length;
-    const d=document.createElement('div');
-    d.style.cssText='background:#f9f5ff;border-radius:14px;padding:14px 16px;margin-bottom:10px;';
-    d.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-radius:7px;padding:3px 9px;font-size:11px;font-weight:700;">Tag ${day.day}</span>
-      <span style="font-weight:600;font-size:14px;color:#3b1f6e;">${day.title}</span>
-      <span style="margin-left:auto;font-size:12px;color:#9c6fc4;">${done}/${day.topics.length}</span>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;">${day.topics.map(t=>{const dk=state.doneTopic[`${day.day}_${t}`];return`<span style="background:${dk?'#f0fdf4':'#ede9fe'};border:1px solid ${dk?'#bbf7d0':'#c4b5fd'};border-radius:20px;padding:3px 10px;font-size:12px;color:${dk?'#16a34a':'#7c3aed'};">${dk?'✅ ':''} ${t}</span>`;}).join('')}</div>`;
-    c.appendChild(d);
-  });
-  document.getElementById('plan-modal').classList.add('open');
-}
+function removeImg(){S.chatImg=null;document.getElementById('imgprev').style.display='none';}
 
 // ══ VOICE OUTPUT ══
-let currentAudio=null;
+let curAudio=null;
 const synth=window.speechSynthesis;
-const ELEVEN_VOICE='EXAVITQu4vr4xnSDxMaL';
 
 async function speak(text){
-  if(!state.voiceEnabled)return;
+  if(!S.voiceOn)return;
   stopSpeaking();
   const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊]/g,'').trim();
-  const ek=localStorage.getItem('stevie_eleven_key');
-  const voiceId = localStorage.getItem('stevie_voice') || selectedVoice;
+  const ek=localStorage.getItem('stevie_eleven');
   if(ek){
     try{
-      const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,{
-        method:'POST',headers:{'xi-api-key':ek,'Content-Type':'application/json'},
+      const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.voiceId}`,{
+        method:'POST',
+        headers:{'xi-api-key':ek,'Content-Type':'application/json'},
         body:JSON.stringify({text:clean,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.8,style:.3,use_speaker_boost:true}})
       });
-      if(res.ok){const blob=await res.blob();const url=URL.createObjectURL(blob);currentAudio=new Audio(url);currentAudio.onended=()=>setSpeakInd(false);currentAudio.play();setSpeakInd(true);return;}
+      if(res.ok){const blob=await res.blob();const url=URL.createObjectURL(blob);curAudio=new Audio(url);curAudio.onended=()=>setSpeakInd(false);curAudio.play();setSpeakInd(true);return;}
     }catch{}
   }
   const utt=new SpeechSynthesisUtterance(clean);utt.lang='de-DE';utt.rate=.95;utt.pitch=1.1;
   const v=synth.getVoices().find(v=>v.lang.startsWith('de'));if(v)utt.voice=v;
   utt.onend=()=>setSpeakInd(false);synth.speak(utt);setSpeakInd(true);
 }
-function stopSpeaking(){if(currentAudio){currentAudio.pause();currentAudio=null;}synth.cancel();setSpeakInd(false);}
-function setSpeakInd(v){const el=document.getElementById('speaking-ind');if(el)el.style.display=v?'flex':'none';}
-function toggleVoice(){state.voiceEnabled=!state.voiceEnabled;stopSpeaking();const b=document.getElementById('voice-toggle');b.textContent=state.voiceEnabled?'🔊':'🔇';b.className='voice-btn '+(state.voiceEnabled?'voice-on':'voice-off');}
+
+function stopSpeaking(){if(curAudio){curAudio.pause();curAudio=null;}synth.cancel();setSpeakInd(false);}
+function setSpeakInd(v){const el=document.getElementById('speak-ind');if(el)el.style.display=v?'flex':'none';}
+function toggleVoice(){S.voiceOn=!S.voiceOn;stopSpeaking();const b=document.getElementById('vtoggle');b.textContent=S.voiceOn?'🔊':'🔇';b.className='vbtn-toggle '+(S.voiceOn?'von':'voff');}
 
 // ══ VOICE INPUT ══
+let recRef=null;
 function toggleListen(){
-  if(state.listening){recognitionRef?.stop();return;}
+  if(S.listening){recRef?.stop();return;}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){alert('Spracheingabe benötigt Chrome oder Edge.');return;}
-  const rec=new SR();rec.lang='de-DE';rec.continuous=false;rec.interimResults=false;
-  rec.onresult=e=>{document.getElementById('msg-input').value=e.results[0][0].transcript;setListening(false);};
-  rec.onerror=rec.onend=()=>setListening(false);
-  rec.start();setListening(true);var recognitionRef=rec;
+  recRef=new SR();recRef.lang='de-DE';recRef.continuous=false;recRef.interimResults=false;
+  recRef.onresult=e=>{document.getElementById('msginput').value=e.results[0][0].transcript;setListening(false);};
+  recRef.onerror=recRef.onend=()=>setListening(false);
+  recRef.start();setListening(true);
 }
-function setListening(v){state.listening=v;const b=document.getElementById('mic-btn');if(b){b.textContent=v?'⏹️':'🎙️';b.classList.toggle('active',v);}}
+function setListening(v){S.listening=v;const b=document.getElementById('micbtn');if(b){b.textContent=v?'⏹️':'🎙️';b.classList.toggle('on',v);}}
+
+// ══ PLAN MODAL ══
+function showPlanModal(){
+  const c=document.getElementById('plan-modal-body');c.innerHTML='';
+  S.plan.forEach(day=>{
+    const done=day.topics.filter(t=>S.doneTopic[`${day.day}_${t}`]).length;
+    const d=document.createElement('div');d.style.cssText='background:#f9f5ff;border-radius:12px;padding:12px 15px;margin-bottom:8px;';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><span style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;">Tag ${day.day}</span><span style="font-weight:600;font-size:14px;color:#3b1f6e;">${day.title}</span><span style="margin-left:auto;font-size:12px;color:#9c6fc4;">${done}/${day.topics.length}</span></div><div style="display:flex;flex-wrap:wrap;gap:5px;">${day.topics.map(t=>{const dk=S.doneTopic[`${day.day}_${t}`];return`<span style="background:${dk?'#f0fdf4':'#ede9fe'};border:1px solid ${dk?'#bbf7d0':'#c4b5fd'};border-radius:20px;padding:2px 9px;font-size:12px;color:${dk?'#16a34a':'#7c3aed'};">${dk?'✅ ':''}${t}</span>`;}).join('')}</div>`;
+    c.appendChild(d);
+  });
+  document.getElementById('plan-modal').classList.add('open');
+}
 
 // ══ SETTINGS ══
-function openSettings(){document.getElementById('s-anthropic').value=localStorage.getItem('stevie_key')||'';document.getElementById('s-eleven').value=localStorage.getItem('stevie_eleven_key')||'';document.getElementById('settings-modal').classList.add('open');}
-function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
-function saveSettings(){const ak=document.getElementById('s-anthropic').value.trim();const ek=document.getElementById('s-eleven').value.trim();if(ak)localStorage.setItem('stevie_key',ak);if(ek)localStorage.setItem('stevie_eleven_key',ek);closeSettings();}
+function openSettings(){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';document.getElementById('settings-modal').classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function saveSettings(){
+  const ak=document.getElementById('s-ant').value.trim(),ek=document.getElementById('s-el').value.trim(),nm=document.getElementById('s-name').value.trim();
+  if(ak)localStorage.setItem('stevie_key',ak);
+  if(ek)localStorage.setItem('stevie_eleven',ek);
+  if(nm){S.name=nm;saveProfile();}
+  closeModal('settings-modal');
+}
 
+// ══ STARS ══
+function initStars(){
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  let stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  function init(){stars=Array.from({length:120},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.3,a:Math.random(),sp:Math.random()*.008+.003}));}
+  function anim(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.a})`;ctx.fill();});requestAnimationFrame(anim);}
+  resize();init();anim();window.addEventListener('resize',()=>{resize();init();});
+}
 synth.onvoiceschanged=()=>synth.getVoices();
 </script>
 </body>
