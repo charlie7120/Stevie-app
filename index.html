@@ -13,6 +13,10 @@ body.t-forest{--ga:#15803d;--gb:#22c55e;--gc:#4ade80;--acc:#86efac;--cbg:rgba(34
 body.t-sunset{--ga:#c2410c;--gb:#ea580c;--gc:#f59e0b;--acc:#fcd34d;--cbg:rgba(234,88,12,.15);--cbr:rgba(234,88,12,.3);--tc:#c2410c;--ua:#c2410c;--ub:#ea580c;--bgd:#1a0800;}
 body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,72,153,.15);--cbr:rgba(236,72,153,.3);--tc:#be185d;--ua:#be185d;--ub:#db2777;--bgd:#1a0010;}
 
+/* SVG ICONS */
+.icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.icon svg{display:block;}
+
 .screen{display:none;min-height:100vh;flex-direction:column;}
 .screen.active{display:flex;}
 .dcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:32px 28px;backdrop-filter:blur(24px);}
@@ -42,20 +46,13 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .vbtn.sel .vbtn-desc{color:rgba(255,255,255,.75);}
 
 /* SPLASH */
-#splash{align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:var(--bgd);}
+#splash{align-items:center;justify-content:center;padding:32px 24px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,.3),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(236,72,153,.2),transparent 60%),#0d0d1a;}
 #stars{position:absolute;inset:0;pointer-events:none;}
-.splash-inner{position:relative;z-index:2;max-width:420px;width:100%;text-align:center;}
-.logo-ring{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 18px;box-shadow:0 0 48px rgba(167,139,250,.4);animation:pulse-ring 2.5s ease-in-out infinite;}
+.splash-inner{position:relative;z-index:2;width:100%;max-width:420px;text-align:center;}
 .splash-title{font-size:40px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,var(--acc),var(--gc),#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
-.tagline{font-size:15px;color:rgba(255,255,255,.55);margin-bottom:24px;line-height:1.6;}
-.tagline b{color:var(--acc);}
-.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
-.chip{background:var(--cbg);border:1px solid var(--cbr);border-radius:20px;padding:5px 13px;font-size:13px;color:#e2d9fa;}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 48px rgba(167,139,250,.4)}50%{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 72px rgba(236,72,153,.5)}}
 
-/* KEYS / ONBOARDING / SETUP share center layout */
 .center-screen{align-items:center;justify-content:center;padding:24px;overflow-y:auto;background:var(--bgd);}
-
-/* DAYS */
 .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px;}
 .dbtn{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 4px;text-align:center;cursor:pointer;color:#e2d9fa;font-size:15px;font-weight:600;transition:all .2s;}
 .dbtn:hover{background:rgba(255,255,255,.12);}
@@ -66,36 +63,34 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 /* APP SHELL */
 #app{background:#f4f0fb;}
 .app-header{background:white;padding:11px 16px;box-shadow:0 2px 10px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.hav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.hav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .hinfo h2{font-size:15px;color:#3b1f6e;font-weight:700;}
 .hinfo p{font-size:11px;color:#9c6fc4;}
 .hright{margin-left:auto;display:flex;align-items:center;gap:4px;}
-.hbtn{background:none;border:none;cursor:pointer;font-size:17px;opacity:.5;padding:5px;border-radius:8px;transition:all .2s;}
+.hbtn{background:none;border:none;cursor:pointer;padding:7px;border-radius:8px;transition:all .2s;opacity:.6;display:flex;align-items:center;justify-content:center;}
 .hbtn:hover{opacity:1;background:#f5f0ff;}
-.vbtn-toggle{border-radius:18px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid;}
+.vbtn-toggle{border-radius:18px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid;display:flex;align-items:center;gap:5px;}
 .von{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
 .voff{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
 
 /* BOTTOM NAV */
 .bottom-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px 18px;gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;transition:all .2s;border:none;background:none;gap:3px;border-radius:16px;}
-.nav-item span{font-size:22px;transition:transform .2s;}
-.nav-item p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.3px;transition:color .2s;}
-.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(168,85,247,.08));}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;border:none;background:none;gap:4px;border-radius:16px;transition:all .2s;}
+.nav-item p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.4px;transition:color .2s;}
+.nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(168,85,247,.07));}
 .nav-item.active p{color:var(--tc);}
-.nav-item.active span{transform:scale(1.15);filter:drop-shadow(0 2px 6px var(--cbr));}
 .nav-item:hover:not(.active){background:#faf5ff;}
 .nav-center{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;background:none;padding:0 8px;position:relative;top:-14px;}
-.nav-center-pill{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:all .2s;border:3px solid white;}
-.nav-center-pill:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(124,58,237,.55);}
-.nav-center-pill.active{box-shadow:0 6px 24px rgba(124,58,237,.6),0 0 0 4px rgba(167,139,250,.2);}
-.nav-center p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.3px;}
+.nav-center-pill{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:all .2s;border:3px solid white;}
+.nav-center-pill:hover{transform:scale(1.08);}
+.nav-center p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.4px;}
+.nav-center.active p{color:var(--tc);}
 
 /* APP TABS */
 .app-tab{display:none;flex:1;flex-direction:column;overflow:hidden;}
 .app-tab.active{display:flex;}
 
-/* CHAT TAB */
+/* PROGRESS */
 #prog-bar{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .prog-label{font-size:12px;font-weight:600;color:#3b1f6e;white-space:nowrap;}
 .bar-track{flex:1;height:5px;background:#e9d5ff;border-radius:99px;overflow:hidden;}
@@ -106,59 +101,58 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .tchip{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:20px;padding:4px 11px;font-size:12px;color:var(--tc);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .2s;}
 .tchip:hover{background:#ede9fe;}
 .tchip.done{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
+
+/* MESSAGES */
 #messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
 .mrow{display:flex;align-items:flex-end;gap:7px;animation:fadeUp .3s ease;}
 .mrow.user{justify-content:flex-end;}
-.mav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.mav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .bubble{max-width:76%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55;box-shadow:0 2px 6px rgba(0,0,0,.06);white-space:pre-wrap;}
 .bubble.s{background:white;color:#2d1b4e;border-bottom-left-radius:4px;}
 .bubble.u{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border-bottom-right-radius:4px;}
 .btag{background:#f0e6ff;color:#7c3aed;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;display:inline-block;margin-top:4px;}
-.rbtn{background:none;border:none;cursor:pointer;font-size:13px;opacity:.35;padding:2px;flex-shrink:0;}
+.rbtn{background:none;border:none;cursor:pointer;opacity:.35;padding:2px;flex-shrink:0;display:flex;align-items:center;}
 .rbtn:hover{opacity:.8;}
 .typing-dots{display:flex;gap:5px;padding:10px 13px;}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--ga);animation:bounce 1.2s infinite;}
 .dot:nth-child(2){animation-delay:.2s;}
 .dot:nth-child(3){animation-delay:.4s;}
-.qr-row{display:flex;gap:6px;flex-wrap:wrap;margin-left:35px;}
+.qr-row{display:flex;gap:6px;flex-wrap:wrap;margin-left:37px;}
 .qr{background:white;border:1.5px solid #e9d5ff;border-radius:20px;padding:5px 12px;font-size:12px;color:#7c3aed;cursor:pointer;transition:all .2s;}
 .qr:hover{background:#f5f3ff;}
-#speak-ind{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 12px;border-radius:20px;display:none;align-items:center;gap:6px;margin:0 14px 6px 14px;flex-shrink:0;}
+#speak-ind{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 12px;border-radius:20px;display:none;align-items:center;gap:6px;margin:0 14px 6px;flex-shrink:0;}
 #imgprev{padding:0 14px 7px;display:none;position:relative;width:fit-content;flex-shrink:0;}
 #imgprev img{height:60px;border-radius:10px;border:2px solid var(--cbr);}
 .imgdel{position:absolute;top:-6px;right:-6px;background:#ef4444;color:white;border:none;border-radius:50%;width:19px;height:19px;font-size:11px;cursor:pointer;font-weight:700;}
 .chat-footer{background:white;padding:10px 13px;box-shadow:0 -2px 10px rgba(150,100,200,.08);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;}
-.fbtn{border-radius:11px;padding:9px 10px;cursor:pointer;font-size:16px;flex-shrink:0;border:2px dashed #c4b5fd;background:#f5f3ff;transition:all .2s;}
+.fbtn{border-radius:11px;padding:9px 10px;cursor:pointer;flex-shrink:0;border:1.5px solid #e9d5ff;background:#f5f3ff;transition:all .2s;display:flex;align-items:center;justify-content:center;}
 .fbtn.on{background:#ede9fe;border-color:var(--ga);}
 #msginput{flex:1;border:2px solid #e9d5ff;border-radius:12px;padding:9px 13px;font-size:14px;resize:none;font-family:inherit;outline:none;line-height:1.4;background:#fafaf9;color:#2d1b4e;transition:border-color .2s;}
 #msginput:focus{border-color:var(--ga);}
-#sendbtn{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border:none;border-radius:12px;padding:9px 15px;cursor:pointer;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.2);}
+#sendbtn{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border:none;border-radius:12px;padding:9px 15px;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;}
 #sendbtn:disabled{background:#e9d5ff;color:#c4b5fd;box-shadow:none;cursor:default;}
 
-/* ── MAPPE TAB ── */
+/* MAPPE */
 #mappe-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 80px;}
-.mappe-header{background:white;padding:16px;border-bottom:1px solid #ede9fe;flex-shrink:0;}
-.mappe-header h2{font-size:18px;font-weight:700;color:#3b1f6e;margin-bottom:2px;}
-.mappe-header p{font-size:13px;color:#9c6fc4;}
+.mappe-header{background:white;padding:16px;border-bottom:1px solid #ede9fe;}
+.mappe-header h2{font-size:17px;font-weight:700;color:#3b1f6e;margin-bottom:2px;}
+.mappe-header p{font-size:12px;color:#9c6fc4;}
 .fach-card{background:white;border-radius:18px;margin:12px 14px 0;box-shadow:0 2px 12px rgba(150,100,200,.08);overflow:hidden;}
 .fach-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .2s;}
 .fach-head:hover{background:#faf5ff;}
-.fach-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--ga),var(--gb));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.fach-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--ga),var(--gb));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .fach-name{font-weight:700;font-size:15px;color:#3b1f6e;}
 .fach-meta{font-size:12px;color:#9c6fc4;margin-top:1px;}
-.fach-arrow{margin-left:auto;font-size:16px;color:#c4b5fd;transition:transform .2s;}
+.fach-arrow{margin-left:auto;color:#c4b5fd;transition:transform .2s;}
 .fach-arrow.open{transform:rotate(90deg);}
 .fach-body{display:none;padding:0 16px 16px;border-top:1px solid #f0ebff;}
 .fach-body.open{display:block;}
 .mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
-.mat-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;cursor:pointer;background:#f0ebff;}
+.mat-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:#f0ebff;}
 .mat-item img{width:100%;height:100%;object-fit:cover;}
-.mat-item .mat-del{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;}
-.mat-item .mat-overlay{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:flex-end;}
-.mat-item:hover .mat-overlay{background:rgba(0,0,0,.15);}
-.mat-add{border:2px dashed #c4b5fd;background:#faf5ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border-radius:10px;aspect-ratio:1;transition:all .2s;}
+.mat-item .mat-del{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;font-weight:700;}
+.mat-add{border:2px dashed #c4b5fd;background:#faf5ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:10px;aspect-ratio:1;transition:all .2s;}
 .mat-add:hover{background:#f0e9ff;border-color:var(--ga);}
-.mat-add span{font-size:22px;}
 .mat-add p{font-size:11px;color:#a78bfa;font-weight:600;}
 .topics-extracted{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;margin-top:8px;}
 .topics-extracted h4{font-size:12px;font-weight:700;color:#15803d;margin-bottom:8px;}
@@ -166,51 +160,44 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .topics-extracted .titem{background:white;border:1px solid #bbf7d0;border-radius:20px;padding:3px 10px;font-size:12px;color:#15803d;}
 .analyzing-badge{background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:10px 14px;margin-top:8px;font-size:12px;color:#854d0e;display:flex;align-items:center;gap:8px;}
 .fach-actions{display:flex;gap:8px;margin-top:12px;}
-.fach-btn{flex:1;background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
-.fach-btn:hover{opacity:.9;}
+.fach-btn{flex:1;background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;}
 .fach-btn.outline{background:none;border:1.5px solid var(--cbr);color:var(--tc);}
-.add-fach-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:white;border:2px dashed #c4b5fd;border-radius:18px;margin:12px 14px 0;padding:16px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;color:#a78bfa;}
+.add-fach-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:white;border:2px dashed #c4b5fd;border-radius:18px;margin:12px 14px 0;padding:16px;cursor:pointer;font-size:14px;font-weight:600;color:#a78bfa;transition:all .2s;}
 .add-fach-btn:hover{background:#faf5ff;border-color:var(--ga);color:var(--tc);}
 
-/* PROFIL TAB */
+/* PROFIL */
 #profil-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 80px;}
-.profil-hero{position:relative;padding:32px 20px 70px;text-align:center;overflow:hidden;background:linear-gradient(135deg,var(--ga) 0%,var(--gb) 50%,var(--gc) 100%);}
-.profil-hero-bg{position:absolute;inset:0;opacity:.15;}
-.profil-hero-bg circle{fill:white;}
+.profil-hero{position:relative;padding:32px 20px 70px;text-align:center;overflow:hidden;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));}
+.profil-hero-bg{position:absolute;inset:0;width:100%;height:100%;opacity:.12;}
 .profil-avatar-wrap{position:relative;display:inline-block;margin-bottom:14px;}
-.profil-avatar{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid rgba(255,255,255,.6);box-shadow:0 8px 32px rgba(0,0,0,.2);}
-.profil-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;}
-.profil-name{font-size:24px;font-weight:800;color:white;margin-bottom:4px;text-shadow:0 2px 8px rgba(0,0,0,.2);}
-.profil-sub{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;}
+.profil-avatar{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,.6);box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;}
+.profil-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:2px solid white;display:flex;align-items:center;justify-content:center;}
+.profil-name{font-size:24px;font-weight:800;color:white;margin-bottom:4px;}
+.profil-sub{font-size:13px;color:rgba(255,255,255,.8);}
 .profil-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-44px 14px 0;position:relative;z-index:2;}
 .stat-card{background:white;border-radius:18px;padding:16px 10px 14px;text-align:center;box-shadow:0 4px 20px rgba(150,100,200,.15);}
-.stat-icon{font-size:20px;margin-bottom:6px;}
-.stat-num{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--ga),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-.stat-lbl{font-size:10px;font-weight:700;color:#b8a8d0;letter-spacing:.5px;margin-top:4px;text-transform:uppercase;}
+.stat-icon{width:32px;height:32px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+.stat-num{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--ga),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-lbl{font-size:10px;font-weight:700;color:#b8a8d0;letter-spacing:.5px;text-transform:uppercase;}
 .profil-section{background:white;border-radius:20px;margin:12px 14px 0;padding:18px 16px;box-shadow:0 2px 16px rgba(150,100,200,.08);}
 .profil-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.profil-section-head h3{font-size:14px;font-weight:700;color:#3b1f6e;display:flex;align-items:center;gap:7px;}
-.profil-section-head .see-all{font-size:12px;color:var(--tc);font-weight:600;background:var(--cbg);border:none;border-radius:20px;padding:4px 10px;cursor:pointer;}
+.profil-section-head h3{font-size:14px;font-weight:700;color:#3b1f6e;display:flex;align-items:center;gap:8px;}
 .noten-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f8f4ff;}
 .noten-row:last-child{border-bottom:none;}
 .noten-info{flex:1;}
 .noten-fach{font-size:14px;font-weight:600;color:#3b1f6e;}
 .noten-datum{font-size:11px;color:#b8a8d0;margin-top:1px;}
-.noten-badge{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.1);}
-.n1{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;}
-.n2{background:linear-gradient(135deg,#4ade80,#22c55e);color:white;}
+.noten-badge{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;}
+.n1,.n2{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;}
 .n3{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:white;}
 .n4{background:linear-gradient(135deg,#fb923c,#ea580c);color:white;}
 .n5,.n6{background:linear-gradient(135deg,#f87171,#dc2626);color:white;}
-.add-note-btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;box-shadow:0 4px 16px rgba(124,58,237,.25);transition:transform .15s;}
-.add-note-btn:hover{transform:translateY(-1px);}
+.add-note-btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;box-shadow:0 4px 16px rgba(124,58,237,.2);}
 .session-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f8f4ff;}
 .session-row:last-child{border-bottom:none;}
-.session-icon{width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.session-icon{width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .session-text{font-size:13px;font-weight:600;color:#3b1f6e;flex:1;}
 .session-time{font-size:11px;color:#b8a8d0;}
-.trend-bar{height:4px;border-radius:99px;background:#f0ebff;margin-top:8px;overflow:hidden;}
-.trend-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ga),var(--gc));}
 
 /* MODALS */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;justify-content:center;}
@@ -228,129 +215,222 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .note-sel.picked{border-color:var(--ga);transform:scale(1.08);}
 
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-@keyframes pulse-ring{0%,100%{box-shadow:0 0 48px rgba(167,139,250,.35)}50%{box-shadow:0 0 72px rgba(244,114,182,.55)}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 48px rgba(167,139,250,.4)}50%{box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 72px rgba(236,72,153,.5)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
+<!-- SVG ICON DEFS (hidden, reusable) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Chat bubble -->
+    <symbol id="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </symbol>
+    <!-- Folder/Mappe -->
+    <symbol id="ic-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </symbol>
+    <!-- Person/Profil -->
+    <symbol id="ic-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <!-- Camera -->
+    <symbol id="ic-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </symbol>
+    <!-- Mic -->
+    <symbol id="ic-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </symbol>
+    <!-- Stop -->
+    <symbol id="ic-stop" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="4" y="4" width="16" height="16" rx="3"/>
+    </symbol>
+    <!-- Send -->
+    <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </symbol>
+    <!-- Volume -->
+    <symbol id="ic-volume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+    </symbol>
+    <!-- Volume off -->
+    <symbol id="ic-volume-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <line x1="23" y1="9" x2="17" y2="15"/>
+      <line x1="17" y1="9" x2="23" y2="15"/>
+    </symbol>
+    <!-- Settings -->
+    <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </symbol>
+    <!-- Calendar -->
+    <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </symbol>
+    <!-- Brain/learn -->
+    <symbol id="ic-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.66z"/>
+      <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.66z"/>
+    </symbol>
+    <!-- Star -->
+    <symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </symbol>
+    <!-- Replay -->
+    <symbol id="ic-replay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="1 4 1 10 7 10"/>
+      <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+    </symbol>
+    <!-- Plus -->
+    <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </symbol>
+    <!-- Chevron right -->
+    <symbol id="ic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </symbol>
+    <!-- Note/grade -->
+    <symbol id="ic-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </symbol>
+    <!-- Clock -->
+    <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- STEVIE AVATAR SVG (reusable) -->
+<svg style="display:none">
+  <defs>
+    <symbol id="stevie-avatar" viewBox="0 0 110 110">
+      <!-- Shoulders -->
+      <ellipse cx="55" cy="112" rx="46" ry="20" fill="#15803d"/>
+      <ellipse cx="55" cy="106" rx="36" ry="16" fill="#dcfce7"/>
+      <!-- Neck -->
+      <rect x="47" y="82" width="16" height="16" rx="7" fill="#FDDBB4"/>
+      <!-- Hair back -->
+      <ellipse cx="55" cy="50" rx="26" ry="20" fill="#7c2d12"/>
+      <!-- Hair sides long -->
+      <path d="M29 62 Q22 85 26 108 Q33 112 40 110 Q32 92 32 74 Q32 62 34 56Z" fill="#7c2d12"/>
+      <path d="M81 62 Q88 85 84 108 Q77 112 70 110 Q78 92 78 74 Q78 62 76 56Z" fill="#7c2d12"/>
+      <!-- Hair top -->
+      <path d="M30 56 Q31 35 55 33 Q79 35 80 56 Q73 43 55 42 Q37 43 30 56Z" fill="#7c2d12"/>
+      <!-- Hair highlight -->
+      <path d="M38 39 Q48 34 62 37" stroke="rgba(255,200,150,0.28)" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <!-- Face -->
+      <ellipse cx="55" cy="72" rx="23" ry="25" fill="#FDDBB4"/>
+      <!-- Ears -->
+      <ellipse cx="31" cy="70" rx="5" ry="6" fill="#FDDBB4"/>
+      <ellipse cx="79" cy="70" rx="5" ry="6" fill="#FDDBB4"/>
+      <!-- Stud earrings -->
+      <circle cx="31" cy="71" r="2.8" fill="#f9a8d4"/>
+      <circle cx="79" cy="71" r="2.8" fill="#f9a8d4"/>
+      <!-- Eyebrows -->
+      <path d="M40 61 Q47 57 54 59" stroke="#7c2d12" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M56 59 Q63 57 70 61" stroke="#7c2d12" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <!-- Eyes white -->
+      <ellipse cx="47" cy="68" rx="6" ry="5.5" fill="white"/>
+      <ellipse cx="63" cy="68" rx="6" ry="5.5" fill="white"/>
+      <!-- Iris -->
+      <circle cx="47" cy="69" r="3.8" fill="#1c1917"/>
+      <circle cx="63" cy="69" r="3.8" fill="#1c1917"/>
+      <circle cx="47" cy="69" r="2.4" fill="#15803d"/>
+      <circle cx="63" cy="69" r="2.4" fill="#15803d"/>
+      <!-- Pupil -->
+      <circle cx="47" cy="69" r="1.3" fill="#0c0c0c"/>
+      <circle cx="63" cy="69" r="1.3" fill="#0c0c0c"/>
+      <!-- Eye highlight -->
+      <circle cx="48.5" cy="67.5" r=".9" fill="white"/>
+      <circle cx="64.5" cy="67.5" r=".9" fill="white"/>
+      <!-- Lashes -->
+      <path d="M41 64 Q42 62 43 64" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M50 63 Q51 61 52 63" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M58 63 Q59 61 60 63" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M67 64 Q68 62 69 64" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <!-- Nose -->
+      <path d="M53 77 Q55 81 57 77" stroke="#d4956a" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      <!-- Smile -->
+      <path d="M45 84 Q55 92 65 84" stroke="#c0715a" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <!-- Blush -->
+      <ellipse cx="38" cy="78" rx="7" ry="3.5" fill="rgba(255,140,150,0.28)"/>
+      <ellipse cx="72" cy="78" rx="7" ry="3.5" fill="rgba(255,140,150,0.28)"/>
+    </symbol>
+  </defs>
+</svg>
+
 <!-- SPLASH -->
 <div id="splash" class="screen active">
   <canvas id="stars"></canvas>
-  <div class="splash-inner" style="max-width:420px;">
-
+  <div class="splash-inner">
     <!-- Avatar -->
     <div style="position:relative;display:inline-block;margin-bottom:20px;">
-      <div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 0 8px rgba(255,255,255,.06),0 0 48px rgba(167,139,250,.5);animation:pulse-ring 2.5s ease-in-out infinite;position:relative;z-index:1;overflow:hidden;">
-        <svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Background circle already provided by parent -->
-          <!-- Shoulders / body -->
-          <ellipse cx="55" cy="108" rx="38" ry="22" fill="rgba(255,255,255,0.18)"/>
-          <ellipse cx="55" cy="100" rx="28" ry="18" fill="rgba(255,255,255,0.22)"/>
-          <!-- Neck -->
-          <rect x="47" y="72" width="16" height="14" rx="6" fill="#FDDBB4"/>
-          <!-- Head -->
-          <ellipse cx="55" cy="58" rx="24" ry="26" fill="#FDDBB4"/>
-          <!-- Hair back layer -->
-          <ellipse cx="55" cy="44" rx="24" ry="18" fill="#3d1f0a"/>
-          <!-- Hair sides flowing down -->
-          <path d="M31 55 Q26 72 30 88 Q36 96 44 98 Q38 88 36 75 Q34 62 36 54Z" fill="#3d1f0a"/>
-          <path d="M79 55 Q84 72 80 88 Q74 96 66 98 Q72 88 74 75 Q76 62 74 54Z" fill="#3d1f0a"/>
-          <!-- Hair top with natural parting -->
-          <path d="M32 50 Q33 28 55 26 Q77 28 78 50 Q72 38 55 37 Q38 38 32 50Z" fill="#3d1f0a"/>
-          <!-- Hair highlight -->
-          <path d="M42 30 Q50 26 58 28" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <!-- Ears -->
-          <ellipse cx="31" cy="59" rx="5" ry="6" fill="#FDDBB4"/>
-          <ellipse cx="79" cy="59" rx="5" ry="6" fill="#FDDBB4"/>
-          <!-- Ear inner -->
-          <ellipse cx="31" cy="59" rx="3" ry="4" fill="#F0C49A"/>
-          <ellipse cx="79" cy="59" rx="3" ry="4" fill="#F0C49A"/>
-          <!-- Earring left -->
-          <circle cx="31" cy="65" r="2.5" fill="rgba(255,220,100,0.9)"/>
-          <!-- Earring right -->
-          <circle cx="79" cy="65" r="2.5" fill="rgba(255,220,100,0.9)"/>
-          <!-- Face details: eyebrows -->
-          <path d="M43 47 Q47 44 51 46" stroke="#5a3010" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <path d="M59 46 Q63 44 67 47" stroke="#5a3010" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <!-- Eyes white -->
-          <ellipse cx="47" cy="53" rx="6" ry="5.5" fill="white"/>
-          <ellipse cx="63" cy="53" rx="6" ry="5.5" fill="white"/>
-          <!-- Iris -->
-          <circle cx="47" cy="54" r="3.8" fill="#3d1f0a"/>
-          <circle cx="63" cy="54" r="3.8" fill="#3d1f0a"/>
-          <!-- Iris color -->
-          <circle cx="47" cy="54" r="2.8" fill="#6b3fa0"/>
-          <circle cx="63" cy="54" r="2.8" fill="#6b3fa0"/>
-          <!-- Pupil -->
-          <circle cx="47" cy="54" r="1.5" fill="#1a0a30"/>
-          <circle cx="63" cy="54" r="1.5" fill="#1a0a30"/>
-          <!-- Eye highlight -->
-          <circle cx="48.5" cy="52.5" r=".9" fill="white"/>
-          <circle cx="64.5" cy="52.5" r=".9" fill="white"/>
-          <!-- Lashes top left -->
-          <path d="M41 49 Q42 47 43 48" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <path d="M43 48 Q44 46 45 47" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <path d="M52 48 Q53 46 54 47" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <!-- Lashes top right -->
-          <path d="M57 47 Q58 45 59 47" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <path d="M65 48 Q67 46 68 48" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <path d="M69 49 Q71 47 72 49" stroke="#3d1f0a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          <!-- Nose -->
-          <path d="M53 60 Q55 65 57 60" stroke="#d4956a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="52" cy="62" rx="2" ry="1.2" fill="rgba(180,100,60,0.2)"/>
-          <ellipse cx="58" cy="62" rx="2" ry="1.2" fill="rgba(180,100,60,0.2)"/>
-          <!-- Mouth -->
-          <path d="M47 69 Q55 75 63 69" stroke="#c0715a" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <path d="M48 69 Q55 72 62 69" fill="rgba(220,100,90,0.3)"/>
-          <!-- Upper lip -->
-          <path d="M49 68 Q52 66 55 68 Q58 66 61 68" stroke="#c0715a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <!-- Cheeks blush -->
-          <ellipse cx="38" cy="63" rx="7" ry="4" fill="rgba(255,140,150,0.25)"/>
-          <ellipse cx="72" cy="63" rx="7" ry="4" fill="rgba(255,140,150,0.25)"/>
-          <!-- Hair accessory – small star -->
-          <text x="64" y="36" font-size="10" fill="rgba(255,220,80,1)">✦</text>
-        </svg>
+      <div style="width:114px;height:114px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto;animation:pulse-ring 2.5s ease-in-out infinite;position:relative;z-index:1;overflow:hidden;">
+        <svg width="114" height="114" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg>
       </div>
-      <!-- Online dot -->
       <div style="position:absolute;bottom:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#22c55e;border:3px solid #0d0d1a;z-index:2;"></div>
     </div>
 
-    <!-- Name -->
-    <div class="splash-title" style="font-size:44px;margin-bottom:6px;">Stevie</div>
-
-    <!-- Tagline -->
+    <div class="splash-title">Stevie</div>
     <p style="font-size:15px;color:rgba(255,255,255,.6);margin-bottom:28px;line-height:1.6;">
       Deine <b style="color:var(--acc);">persönliche Lernbegleiterin</b><br>
       Lern smarter. Fühl dich sicher. Schreib bessere Noten.
     </p>
 
-    <!-- Feature rows -->
+    <!-- Feature cards -->
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
       <div style="display:flex;gap:10px;">
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:22px;">📁</span>
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" style="color:var(--acc);"><use href="#ic-folder"/></svg>
+          </div>
           <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Meine Mappe</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Material hochladen</div></div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:22px;">🧠</span>
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" style="color:var(--acc);"><use href="#ic-brain"/></svg>
+          </div>
           <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Lernplan</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Individuell & smart</div></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;">
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:22px;">🎙️</span>
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" style="color:var(--acc);"><use href="#ic-mic"/></svg>
+          </div>
           <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Sprechen</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Frag einfach nach</div></div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:22px;">📝</span>
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" style="color:var(--acc);"><use href="#ic-note"/></svg>
+          </div>
           <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Noten tracken</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Fortschritt sehen</div></div>
         </div>
       </div>
     </div>
-
-    <button class="btn" style="font-size:17px;padding:16px;" onclick="splashNext()">Los geht's ✨</button>
+    <button class="btn" style="font-size:17px;padding:16px;" onclick="splashNext()">Los geht's</button>
     <p style="font-size:12px;color:rgba(255,255,255,.22);margin-top:8px;">Kein Account nötig · Läuft direkt im Browser</p>
   </div>
 </div>
@@ -359,7 +439,9 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 <div id="keyscreen" class="screen center-screen">
   <div class="dcard" style="max-width:420px;width:100%;">
     <div style="text-align:center;margin-bottom:22px;">
-      <div class="logo-ring" style="width:58px;height:58px;font-size:25px;margin-bottom:12px;">🌟</div>
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;">
+        <svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg>
+      </div>
       <h2 style="font-size:19px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Fast da!</h2>
       <p style="color:rgba(255,255,255,.4);font-size:13px;">Gib einmalig deinen Anthropic API-Key ein.</p>
     </div>
@@ -367,7 +449,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <input class="dinput" type="password" id="k-ant" placeholder="sk-ant-…"/>
     <label class="field-label">ElevenLabs Key <span style="font-weight:400;opacity:.5;">(optional)</span></label>
     <input class="dinput" type="password" id="k-el" placeholder="Für natürliche Stimme…"/>
-    <button class="btn" onclick="saveKeys()">Weiter ✨</button>
+    <button class="btn" onclick="saveKeys()">Weiter</button>
   </div>
 </div>
 
@@ -375,7 +457,9 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 <div id="onboarding" class="screen center-screen">
   <div class="dcard" style="max-width:500px;width:100%;">
     <div style="text-align:center;margin-bottom:22px;">
-      <div class="logo-ring" style="width:58px;height:58px;font-size:25px;margin-bottom:10px;">🌟</div>
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 10px;overflow:hidden;">
+        <svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg>
+      </div>
       <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Wer bist du?</h2>
       <p style="color:rgba(255,255,255,.4);font-size:13px;">Stevie passt sich genau auf dich an.</p>
     </div>
@@ -389,36 +473,42 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <div class="voice-row" id="voice-grid"></div>
     <label class="field-label">Dein Design</label>
     <div class="theme-row" id="theme-grid"></div>
-    <button class="btn" onclick="saveOnboarding()">Weiter ✨</button>
+    <button class="btn" onclick="saveOnboarding()">Weiter</button>
   </div>
 </div>
 
 <!-- SETUP -->
 <div id="setup" class="screen center-screen">
   <div class="dcard" style="max-width:460px;width:100%;">
-    <h2 style="font-size:21px;font-weight:700;margin-bottom:4px;background:linear-gradient(90deg,var(--acc),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Neue Lernrunde 🎯</h2>
+    <h2 style="font-size:21px;font-weight:700;margin-bottom:4px;background:linear-gradient(90deg,var(--acc),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Neue Lernrunde</h2>
     <p id="setup-sub" style="color:rgba(255,255,255,.4);font-size:13px;margin-bottom:22px;">Sag mir womit wir starten.</p>
     <label class="field-label">Welches Fach?</label>
     <input class="dinput" id="subject-input" placeholder="z.B. Biologie, Mathe…"/>
     <label class="field-label">Wie viele Tage hast du Zeit?</label>
     <div class="days-grid" id="days-grid"></div>
     <div id="days-hint"></div>
-    <button class="btn" onclick="startFromSetup()">Lernplan erstellen 🧠</button>
-    <button class="btn-ghost" onclick="startFromSetup(true)">Direkt zum Chat →</button>
+    <button class="btn" onclick="startFromSetup()">Lernplan erstellen</button>
+    <button class="btn-ghost" onclick="startFromSetup(true)">Direkt zum Chat</button>
   </div>
 </div>
 
 <!-- MAIN APP -->
 <div id="app" class="screen">
   <div class="app-header">
-    <div class="hav">🌟</div>
+    <div class="hav">
+      <svg width="38" height="38" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg>
+    </div>
     <div class="hinfo">
       <h2>Stevie</h2>
       <p id="hdr-sub">Lernbegleiterin</p>
     </div>
     <div class="hright">
-      <button id="vtoggle" class="vbtn-toggle von" onclick="toggleVoice()">🔊</button>
-      <button class="hbtn" onclick="openModal('settings-modal')" title="Einstellungen">⚙️</button>
+      <button id="vtoggle" class="vbtn-toggle von" onclick="toggleVoice()">
+        <svg width="14" height="14"><use href="#ic-volume"/></svg> An
+      </button>
+      <button class="hbtn" onclick="openModal('settings-modal')">
+        <svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-settings"/></svg>
+      </button>
     </div>
   </div>
 
@@ -431,56 +521,82 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     </div>
     <div id="topic-row"></div>
     <div id="messages"></div>
-    <div id="speak-ind">🔊 Stevie spricht… <button onclick="stopSpeaking()" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button></div>
+    <div id="speak-ind">
+      <svg width="14" height="14" style="color:#7c3aed;"><use href="#ic-volume"/></svg>
+      Stevie spricht…
+      <button onclick="stopSpeaking()" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button>
+    </div>
     <div id="imgprev"><img id="imgthumb" src="" alt=""/><button class="imgdel" onclick="removeImg()">×</button></div>
     <div class="chat-footer">
-      <button class="fbtn" onclick="document.getElementById('chat-file').click()">📷</button>
+      <button class="fbtn" onclick="document.getElementById('chat-file').click()">
+        <svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-camera"/></svg>
+      </button>
       <input type="file" id="chat-file" accept="image/*" style="display:none" onchange="handleChatImg(event)"/>
       <textarea id="msginput" rows="1" placeholder="Schreib oder sprich mit Stevie…" onkeydown="handleKey(event)"></textarea>
-      <button class="fbtn" id="micbtn" onclick="toggleListen()">🎙️</button>
-      <button id="sendbtn" onclick="sendMsg()">➤</button>
+      <button class="fbtn" id="micbtn" onclick="toggleListen()">
+        <svg width="18" height="18" style="color:#7c3aed;" id="mic-icon"><use href="#ic-mic"/></svg>
+      </button>
+      <button id="sendbtn" onclick="sendMsg()">
+        <svg width="18" height="18" style="color:white;"><use href="#ic-send"/></svg>
+      </button>
     </div>
   </div>
 
   <!-- MAPPE TAB -->
   <div id="mappe-tab" class="app-tab">
     <div class="mappe-header">
-      <h2>📁 Meine Mappe</h2>
+      <h2>Meine Mappe</h2>
       <p>Lade dein Lernmaterial hoch – Stevie liest alles.</p>
     </div>
     <div id="faecher-list"></div>
-    <div class="add-fach-btn" onclick="openAddFach()">＋ Neues Fach hinzufügen</div>
+    <div class="add-fach-btn" onclick="openAddFach()">
+      <svg width="18" height="18" style="color:#a78bfa;"><use href="#ic-plus"/></svg>
+      Neues Fach hinzufügen
+    </div>
     <input type="file" id="fach-file-input" accept="image/*" multiple style="display:none" onchange="handleFachUpload(event)"/>
   </div>
 
   <!-- PROFIL TAB -->
   <div id="profil-tab" class="app-tab">
     <div class="profil-hero">
-      <svg class="profil-hero-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;">
-        <circle cx="350" cy="30" r="120"/><circle cx="50" cy="160" r="90"/><circle cx="200" cy="100" r="60"/>
+      <svg class="profil-hero-bg" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <circle cx="350" cy="30" r="120" fill="white"/><circle cx="50" cy="160" r="90" fill="white"/><circle cx="200" cy="100" r="60" fill="white"/>
       </svg>
       <div class="profil-avatar-wrap">
-        <div class="profil-avatar">🧑‍🎓</div>
-        <div class="profil-badge">⭐</div>
+        <div class="profil-avatar">
+          <svg width="84" height="84" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg>
+        </div>
+        <div class="profil-badge">
+          <svg width="12" height="12" style="color:#92400e;"><use href="#ic-star"/></svg>
+        </div>
       </div>
       <div class="profil-name" id="p-name">–</div>
       <div class="profil-sub" id="p-sub">–</div>
     </div>
     <div class="profil-cards">
-      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-num" id="stat-faecher">0</div><div class="stat-lbl">Fächer</div></div>
-      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">Sessions</div></div>
-      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-num" id="stat-noten">–</div><div class="stat-lbl">Ø Note</div></div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-folder"/></svg></div>
+        <div class="stat-num" id="stat-faecher">0</div><div class="stat-lbl">Fächer</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-clock"/></svg></div>
+        <div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-star"/></svg></div>
+        <div class="stat-num" id="stat-noten">–</div><div class="stat-lbl">Ø Note</div>
+      </div>
     </div>
     <div class="profil-section" style="margin-top:16px;">
       <div class="profil-section-head">
-        <h3>📝 Meine Noten</h3>
+        <h3><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-note"/></svg> Meine Noten</h3>
       </div>
       <div id="noten-list"><p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Noten eingetragen.</p></div>
-      <button class="add-note-btn" onclick="openModal('note-modal')">＋ Note eintragen</button>
+      <button class="add-note-btn" onclick="openModal('note-modal')">Note eintragen</button>
     </div>
     <div class="profil-section">
       <div class="profil-section-head">
-        <h3>🕐 Letzte Sessions</h3>
+        <h3><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-clock"/></svg> Letzte Sessions</h3>
       </div>
       <div id="sessions-list"><p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p></div>
     </div>
@@ -488,14 +604,18 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 
   <div class="bottom-nav">
     <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')">
-      <span>💬</span><p>CHAT</p>
+      <svg width="22" height="22" style="color:#7c3aed;"><use href="#ic-chat"/></svg>
+      <p>CHAT</p>
     </button>
     <button class="nav-center" id="nav-mappe" onclick="switchTab('mappe')">
-      <div class="nav-center-pill">📁</div>
+      <div class="nav-center-pill">
+        <svg width="26" height="26" style="color:white;"><use href="#ic-folder"/></svg>
+      </div>
       <p>MAPPE</p>
     </button>
     <button class="nav-item" id="nav-profil" onclick="switchTab('profil')">
-      <span>👤</span><p>PROFIL</p>
+      <svg width="22" height="22" style="color:#c4b5fd;"><use href="#ic-person"/></svg>
+      <p>PROFIL</p>
     </button>
   </div>
 </div>
@@ -507,9 +627,9 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <div class="modal-title">Neues Fach <button class="mclose" onclick="closeModal('addfach-modal')">×</button></div>
     <label class="mlabel">Fachname</label>
     <input class="minput" type="text" id="new-fach-name" placeholder="z.B. Biologie, Mathe, Deutsch…"/>
-    <label class="mlabel">Emoji (optional)</label>
+    <label class="mlabel">Symbol</label>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;" id="emoji-grid"></div>
-    <button class="msave" onclick="addFach()">Fach anlegen ✓</button>
+    <button class="msave" onclick="addFach()">Fach anlegen</button>
   </div>
 </div>
 
@@ -517,14 +637,14 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 <div class="modal-bg" id="note-modal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Note eintragen 📝 <button class="mclose" onclick="closeModal('note-modal')">×</button></div>
+    <div class="modal-title">Note eintragen <button class="mclose" onclick="closeModal('note-modal')">×</button></div>
     <label class="mlabel">Fach</label>
     <input class="minput" type="text" id="note-fach" placeholder="z.B. Biologie"/>
     <label class="mlabel">Thema / Klassenarbeit</label>
     <input class="minput" type="text" id="note-thema" placeholder="z.B. Zellteilung KA 2"/>
     <label class="mlabel">Note</label>
     <div class="note-grid" id="note-grid"></div>
-    <button class="msave" onclick="saveNote()">Speichern ✓</button>
+    <button class="msave" onclick="saveNote()">Speichern</button>
   </div>
 </div>
 
@@ -532,36 +652,32 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 <div class="modal-bg" id="settings-modal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">⚙️ Einstellungen <button class="mclose" onclick="closeModal('settings-modal')">×</button></div>
+    <div class="modal-title">Einstellungen <button class="mclose" onclick="closeModal('settings-modal')">×</button></div>
     <label class="mlabel">Anthropic API-Key</label>
     <input class="minput" type="password" id="s-ant" placeholder="sk-ant-…"/>
     <label class="mlabel">ElevenLabs Key</label>
     <input class="minput" type="password" id="s-el" placeholder="Für natürliche Stimme"/>
     <label class="mlabel">Name</label>
     <input class="minput" type="text" id="s-name" placeholder="Dein Name"/>
-    <button class="msave" onclick="saveSettings()">Speichern ✓</button>
+    <button class="msave" onclick="saveSettings()">Speichern</button>
   </div>
 </div>
 
 <script>
-// ══ CONFIG ══
-const THEMES={purple:{label:'Lila 💜',grad:'linear-gradient(135deg,#7c3aed,#ec4899)',cls:''},ocean:{label:'Ozean 🌊',grad:'linear-gradient(135deg,#0369a1,#06b6d4)',cls:'t-ocean'},forest:{label:'Natur 🌿',grad:'linear-gradient(135deg,#15803d,#4ade80)',cls:'t-forest'},sunset:{label:'Feuer 🔥',grad:'linear-gradient(135deg,#c2410c,#f59e0b)',cls:'t-sunset'},rose:{label:'Pink 🌸',grad:'linear-gradient(135deg,#be185d,#f9a8d4)',cls:'t-rose'}};
-const VOICES=[{id:'XrExE9yKIg1WjnnlVkGX',name:'Emilia',desc:'Jung & warm 🌸'},{id:'oWAxZDx7w5VEj9dCyTzz',name:'Grace',desc:'Sanft & klar ✨'},{id:'pFZP5JQG7iQjIQuC4Bku',name:'Lily',desc:'Locker & cool 😎'},{id:'z9fAnlkpzviPz146aGWa',name:'Glinda',desc:'Freundlich 💜'}];
-const FACH_EMOJIS=['📚','🔬','🧮','🌍','⚗️','🎨','🏃','🎵','💻','📖','🗺️','🧬','⚡','🌱'];
+const THEMES={purple:{label:'Lila',grad:'linear-gradient(135deg,#7c3aed,#ec4899)',cls:''},ocean:{label:'Ozean',grad:'linear-gradient(135deg,#0369a1,#06b6d4)',cls:'t-ocean'},forest:{label:'Natur',grad:'linear-gradient(135deg,#15803d,#4ade80)',cls:'t-forest'},sunset:{label:'Feuer',grad:'linear-gradient(135deg,#c2410c,#f59e0b)',cls:'t-sunset'},rose:{label:'Pink',grad:'linear-gradient(135deg,#be185d,#f9a8d4)',cls:'t-rose'}};
+const VOICES=[{id:'XrExE9yKIg1WjnnlVkGX',name:'Emilia',desc:'Jung & warm'},{id:'oWAxZDx7w5VEj9dCyTzz',name:'Grace',desc:'Sanft & klar'},{id:'pFZP5JQG7iQjIQuC4Bku',name:'Lily',desc:'Locker & cool'},{id:'z9fAnlkpzviPz146aGWa',name:'Glinda',desc:'Freundlich'}];
+const FACH_ICONS=['book','flask','calculator','globe','music','palette','laptop','star'];
+const FACH_COLORS=['#7c3aed','#0369a1','#15803d','#c2410c','#be185d','#92400e','#0e7490','#4338ca'];
 
-// ══ STATE ══
-const S={name:'',age:11,grade:5,theme:'purple',voiceId:VOICES[0].id,subject:'',days:1,currentDay:1,plan:[],doneTopic:{},msgs:[],voiceOn:true,listening:false,chatImg:null,sessions:0};
+const S={name:'',age:11,grade:5,theme:'purple',voiceId:VOICES[0].id,subject:'',days:1,currentDay:1,plan:[],doneTopic:{},msgs:[],voiceOn:true,listening:false,chatImg:null};
 
-// localStorage helpers
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch{return null;}}
 function lsSet(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
-// ══ INIT ══
 window.onload=()=>{
   initStars();buildDaysGrid();
   const prof=lsGet('stevie_profile');
-  if(prof){Object.assign(S,prof);applyTheme(S.theme);}
-  else applyTheme('purple');
+  if(prof){Object.assign(S,prof);applyTheme(S.theme);}else applyTheme('purple');
   show('splash');
 };
 
@@ -585,7 +701,6 @@ function saveKeys(){
   buildOnboarding();show('onboarding');
 }
 
-// ══ ONBOARDING ══
 function buildOnboarding(){
   const ag=document.getElementById('age-grid');ag.innerHTML='';
   for(let a=8;a<=16;a++){const b=mkGbtn(a+' Jahre',S.age===a,()=>{ag.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');S.age=a;});ag.appendChild(b);}
@@ -601,7 +716,7 @@ function mkGbtn(txt,sel,fn){const b=document.createElement('div');b.className='g
 
 function saveOnboarding(){
   const name=document.getElementById('ob-name').value.trim();
-  if(!name){alert('Wie heißt du? 😊');return;}
+  if(!name){alert('Wie heißt du?');return;}
   if(!S.age){alert('Bitte wähle dein Alter.');return;}
   if(!S.grade){alert('Bitte wähle deine Klasse.');return;}
   S.name=name;saveProfile();
@@ -612,12 +727,11 @@ function saveOnboarding(){
 function saveProfile(){lsSet('stevie_profile',{name:S.name,age:S.age,grade:S.grade,theme:S.theme,voiceId:S.voiceId});}
 function applyTheme(key){S.theme=key;document.body.className=THEMES[key]?.cls||'';}
 
-// ══ SETUP ══
 function buildDaysGrid(){
   const g=document.getElementById('days-grid');if(!g)return;g.innerHTML='';
   for(let i=1;i<=14;i++){const b=document.createElement('div');b.className='dbtn';b.id='db'+i;b.innerHTML=`${i}<div class="dbtn-lbl">${i===1?'Tag':'Tage'}</div>`;b.onclick=()=>selectDays(i);g.appendChild(b);}
 }
-function selectDays(n){S.days=n;document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('sel'));document.getElementById('db'+n)?.classList.add('sel');document.getElementById('days-hint').textContent=n===1?'1 Tag – wir fokussieren uns! 💪':n<=3?`${n} Tage – Intensivplan 🔥`:n<=7?`${n} Tage – solider Plan ✅`:`${n} Tage – entspannt durchstarten 🌱`;}
+function selectDays(n){S.days=n;document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('sel'));document.getElementById('db'+n)?.classList.add('sel');document.getElementById('days-hint').textContent=n===1?'1 Tag – wir fokussieren uns!':n<=3?`${n} Tage – Intensivplan`:n<=7?`${n} Tage – solider Plan`:`${n} Tage – entspannt durchstarten`;}
 
 async function startFromSetup(skipPlan=false){
   const s=document.getElementById('subject-input').value.trim();
@@ -626,37 +740,29 @@ async function startFromSetup(skipPlan=false){
   S.subject=s;S.msgs=[];S.doneTopic={};S.currentDay=1;
   show('app');switchTab('chat');
   document.getElementById('hdr-sub').textContent=`${S.subject} · Klasse ${S.grade}`;
-  // Check if mappe has material for this subject
   const faecher=lsGet('stevie_faecher')||[];
   const fach=faecher.find(f=>f.name.toLowerCase()===s.toLowerCase()||s.toLowerCase().includes(f.name.toLowerCase()));
-  if(skipPlan){
-    startChat(fach);
-  } else {
-    await generatePlan(fach);
-  }
-  logSession(s);
-  renderProfilTab();
+  if(skipPlan)startChat(fach);else await generatePlan(fach);
+  logSession(s);renderProfilTab();
 }
 
 function logSession(subj){
   const sessions=lsGet('stevie_sessions')||[];
   sessions.unshift({subj,date:new Date().toLocaleDateString('de-DE'),time:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
   lsSet('stevie_sessions',sessions.slice(0,20));
-  S.sessions=(lsGet('stevie_sessions')||[]).length;
 }
 
 function startChat(fach){
   renderTopicRow();updateProgress();
   let matCtx='';
-  if(fach&&fach.topics&&fach.topics.length) matCtx=`\n\nIn der Mappe für dieses Fach habe ich folgende Themen gefunden: ${fach.topics.join(', ')}.`;
+  if(fach?.topics?.length)matCtx=`\n\nIn deiner Mappe habe ich folgende Themen gefunden: ${fach.topics.join(', ')}.`;
   const matCount=fach?.images?.length||0;
-  const greeting=`Hey ${S.name}! 👋 Ich bin Stevie!\n\nWir lernen heute${S.subject?' '+S.subject:''}${matCtx}\n${matCount>0?`Du hast ${matCount} Seite${matCount>1?'n':''} in deiner Mappe – ich kenne deinen Stoff bereits! `:''}Womit möchtest du anfangen?`;
-  addMsg('assistant',greeting,'💬');speak(greeting);
+  const greeting=`Hey ${S.name}! Ich bin Stevie, deine Lernbegleiterin.\n\nHeute lernen wir${S.subject?' '+S.subject:''} zusammen.${matCtx}\n${matCount>0?`Du hast ${matCount} Seite${matCount>1?'n':''} in deiner Mappe – ich kenne deinen Stoff bereits. `:''}Womit möchtest du anfangen?`;
+  addMsg('assistant',greeting,'Motivation');speak(greeting);
 }
 
-// ══ PLAN ══
 async function generatePlan(fach){
-  const matCtx=fach?.topics?.length?`Bekannte Themen aus der Mappe: ${fach.topics.join(', ')}.`:'';
+  const matCtx=fach?.topics?.length?`Bekannte Themen: ${fach.topics.join(', ')}.`:'';
   document.getElementById('prog-label').textContent='Stevie plant…';
   const sysP=`Erstelle einen ${S.days}-Tage-Lernplan für "${S.subject}", Klasse ${S.grade}. ${matCtx} Antworte NUR mit JSON-Array ohne Markdown. Format: [{"day":1,"title":"Name","topics":["Thema A","Thema B"]}]. Max 3-4 Themen/Tag.`;
   try{
@@ -668,119 +774,77 @@ async function generatePlan(fach){
   startChat(fach);
 }
 
-// ══ MAPPE ══
+// MAPPE
 let currentFachIdx=null;
-
 function renderMappe(){
   const list=document.getElementById('faecher-list');list.innerHTML='';
   const faecher=lsGet('stevie_faecher')||[];
   faecher.forEach((fach,idx)=>{
     const card=document.createElement('div');card.className='fach-card';
-    const topicsHtml=fach.topics&&fach.topics.length?`<div class="topics-extracted"><h4>📌 Erkannte Themen</h4><div class="tlist">${fach.topics.map(t=>`<span class="titem">${t}</span>`).join('')}</div></div>`:'';
-    const imgsHtml=fach.images&&fach.images.length?fach.images.map((img,i)=>`<div class="mat-item"><img src="${img.src}" loading="lazy"/><button class="mat-del" onclick="delMatImg(${idx},${i},event)">×</button></div>`).join(''):'';
+    const topicsHtml=fach.topics?.length?`<div class="topics-extracted"><h4>Erkannte Themen</h4><div class="tlist">${fach.topics.map(t=>`<span class="titem">${t}</span>`).join('')}</div></div>`:'';
+    const imgsHtml=fach.images?.map((img,i)=>`<div class="mat-item"><img src="${img.src}" loading="lazy"/><button class="mat-del" onclick="delMatImg(${idx},${i},event)">×</button></div>`).join('')||'';
     card.innerHTML=`<div class="fach-head" onclick="toggleFach(this)">
-      <div class="fach-icon">${fach.emoji||'📚'}</div>
+      <div class="fach-icon"><svg width="20" height="20" style="color:white;"><use href="#ic-folder"/></svg></div>
       <div><div class="fach-name">${fach.name}</div><div class="fach-meta">${(fach.images||[]).length} Seiten · ${(fach.topics||[]).length} Themen</div></div>
-      <span class="fach-arrow">›</span>
+      <span class="fach-arrow"><svg width="18" height="18" style="color:#c4b5fd;"><use href="#ic-chevron"/></svg></span>
     </div>
     <div class="fach-body">
-      <div class="mat-grid">
-        ${imgsHtml}
-        <div class="mat-add" onclick="triggerFachUpload(${idx})"><span>＋</span><p>Seite hinzufügen</p></div>
-      </div>
-      ${fach.analyzing?'<div class="analyzing-badge"><span>⏳</span> Stevie analysiert dein Material…</div>':topicsHtml}
+      <div class="mat-grid">${imgsHtml}<div class="mat-add" onclick="triggerFachUpload(${idx})"><svg width="22" height="22" style="color:#a78bfa;"><use href="#ic-plus"/></svg><p>Hinzufügen</p></div></div>
+      ${fach.analyzing?'<div class="analyzing-badge">Stevie analysiert dein Material…</div>':topicsHtml}
       <div class="fach-actions">
-        <button class="fach-btn" onclick="learnFach('${fach.name}')">Mit Stevie lernen →</button>
-        <button class="fach-btn outline" onclick="delFach(${idx},event)">🗑️</button>
+        <button class="fach-btn" onclick="learnFach('${fach.name}')">Mit Stevie lernen</button>
+        <button class="fach-btn outline" onclick="delFach(${idx},event)">Löschen</button>
       </div>
     </div>`;
     list.appendChild(card);
   });
 }
 
-function toggleFach(head){
-  const body=head.nextElementSibling,arrow=head.querySelector('.fach-arrow');
-  body.classList.toggle('open');arrow.classList.toggle('open');
-}
-
+function toggleFach(head){const body=head.nextElementSibling,arrow=head.querySelector('.fach-arrow');body.classList.toggle('open');arrow.classList.toggle('open');}
 function triggerFachUpload(idx){currentFachIdx=idx;document.getElementById('fach-file-input').click();}
 
 function handleFachUpload(e){
   const idx=currentFachIdx;if(idx===null)return;
-  const faecher=lsGet('stevie_faecher')||[];
-  const files=Array.from(e.target.files);
-  let loaded=0;
-  files.forEach(file=>{
-    const r=new FileReader();
-    r.onload=ev=>{
-      if(!faecher[idx].images)faecher[idx].images=[];
-      faecher[idx].images.push({src:ev.target.result,data:ev.target.result.split(',')[1],type:file.type});
-      loaded++;
-      if(loaded===files.length){faecher[idx].analyzing=true;lsSet('stevie_faecher',faecher);renderMappe();analyzeImages(idx);}
-    };
-    r.readAsDataURL(file);
-  });
+  const faecher=lsGet('stevie_faecher')||[];const files=Array.from(e.target.files);let loaded=0;
+  files.forEach(file=>{const r=new FileReader();r.onload=ev=>{if(!faecher[idx].images)faecher[idx].images=[];faecher[idx].images.push({src:ev.target.result,data:ev.target.result.split(',')[1],type:file.type});loaded++;if(loaded===files.length){faecher[idx].analyzing=true;lsSet('stevie_faecher',faecher);renderMappe();analyzeImages(idx);}};r.readAsDataURL(file);});
   e.target.value='';
 }
 
 async function analyzeImages(idx){
-  const faecher=lsGet('stevie_faecher')||[];
-  const fach=faecher[idx];if(!fach||!fach.images||!fach.images.length)return;
+  const faecher=lsGet('stevie_faecher')||[];const fach=faecher[idx];if(!fach?.images?.length)return;
   const content=fach.images.map(img=>({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}));
-  content.push({type:'text',text:`Analysiere diese Schulunterlagen für das Fach "${fach.name}" (Klasse ${S.grade}). Extrahiere alle Themen, Begriffe und Lernziele als kompakte Liste. Antworte NUR mit einem JSON-Array von Strings, z.B. ["Thema 1","Begriff 2"]. Kein anderer Text.`});
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,messages:[{role:'user',content}]})});
-    const d=await res.json();
-    const txt=d.content?.find(b=>b.type==='text')?.text||'[]';
-    const topics=JSON.parse(txt.replace(/```json|```/g,'').trim());
-    const f2=lsGet('stevie_faecher')||[];
-    f2[idx].topics=topics;f2[idx].analyzing=false;
-    lsSet('stevie_faecher',f2);renderMappe();
-  }catch{
-    const f2=lsGet('stevie_faecher')||[];
-    f2[idx].analyzing=false;lsSet('stevie_faecher',f2);renderMappe();
-  }
+  content.push({type:'text',text:`Analysiere diese Schulunterlagen für "${fach.name}" (Klasse ${S.grade}). Extrahiere alle Themen als JSON-Array von Strings. Nur JSON, kein anderer Text.`});
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,messages:[{role:'user',content}]})});const d=await res.json();const txt=d.content?.find(b=>b.type==='text')?.text||'[]';const topics=JSON.parse(txt.replace(/```json|```/g,'').trim());const f2=lsGet('stevie_faecher')||[];f2[idx].topics=topics;f2[idx].analyzing=false;lsSet('stevie_faecher',f2);renderMappe();}
+  catch{const f2=lsGet('stevie_faecher')||[];f2[idx].analyzing=false;lsSet('stevie_faecher',f2);renderMappe();}
 }
 
-function delMatImg(fachIdx,imgIdx,e){
-  e.stopPropagation();
-  const faecher=lsGet('stevie_faecher')||[];
-  faecher[fachIdx].images.splice(imgIdx,1);
-  lsSet('stevie_faecher',faecher);renderMappe();
-}
-
-function delFach(idx,e){
-  e.stopPropagation();
-  if(!confirm('Fach und alle Materialien löschen?'))return;
-  const faecher=lsGet('stevie_faecher')||[];
-  faecher.splice(idx,1);lsSet('stevie_faecher',faecher);renderMappe();
-}
-
-function learnFach(name){
-  document.getElementById('subject-input').value=name;
-  selectDays(S.days||3);
-  show('setup');
-}
+function delMatImg(fachIdx,imgIdx,e){e.stopPropagation();const faecher=lsGet('stevie_faecher')||[];faecher[fachIdx].images.splice(imgIdx,1);lsSet('stevie_faecher',faecher);renderMappe();}
+function delFach(idx,e){e.stopPropagation();if(!confirm('Fach löschen?'))return;const faecher=lsGet('stevie_faecher')||[];faecher.splice(idx,1);lsSet('stevie_faecher',faecher);renderMappe();}
+function learnFach(name){document.getElementById('subject-input').value=name;selectDays(S.days||3);show('setup');}
 
 function openAddFach(){
   document.getElementById('new-fach-name').value='';
   const eg=document.getElementById('emoji-grid');eg.innerHTML='';
-  FACH_EMOJIS.forEach(em=>{const b=document.createElement('div');b.style.cssText='font-size:24px;cursor:pointer;padding:6px;border-radius:8px;transition:background .2s;';b.textContent=em;b.onmouseenter=()=>b.style.background='#f5f0ff';b.onmouseleave=()=>b.style.background='';b.onclick=()=>{eg.querySelectorAll('.emo-sel').forEach(x=>{x.classList.remove('emo-sel');x.style.background='';});b.classList.add('emo-sel');b.style.background='#ede9fe';};eg.appendChild(b);});
+  ['Biologie','Mathe','Deutsch','Englisch','Geschichte','Physik','Chemie','Erdkunde','Sport','Musik','Kunst','Informatik'].forEach(name=>{
+    const b=document.createElement('div');
+    b.style.cssText='padding:6px 12px;background:#f5f3ff;border-radius:8px;font-size:13px;cursor:pointer;color:#7c3aed;font-weight:500;transition:background .2s;';
+    b.textContent=name;
+    b.onmouseenter=()=>b.style.background='#ede9fe';b.onmouseleave=()=>b.style.background='#f5f3ff';
+    b.onclick=()=>{document.getElementById('new-fach-name').value=name;};
+    eg.appendChild(b);
+  });
   openModal('addfach-modal');
 }
 
 function addFach(){
   const name=document.getElementById('new-fach-name').value.trim();
   if(!name){alert('Bitte einen Namen eingeben!');return;}
-  const selEmo=document.querySelector('#emoji-grid .emo-sel');
-  const emoji=selEmo?selEmo.textContent:'📚';
   const faecher=lsGet('stevie_faecher')||[];
-  faecher.push({name,emoji,images:[],topics:[]});
-  lsSet('stevie_faecher',faecher);
-  closeModal('addfach-modal');renderMappe();
+  faecher.push({name,images:[],topics:[]});
+  lsSet('stevie_faecher',faecher);closeModal('addfach-modal');renderMappe();
 }
 
-// ══ PROFIL ══
+// PROFIL
 function renderProfilTab(){
   document.getElementById('p-name').textContent=S.name||'–';
   document.getElementById('p-sub').textContent=`${S.grade}. Klasse · ${S.age} Jahre`;
@@ -788,34 +852,23 @@ function renderProfilTab(){
   document.getElementById('stat-faecher').textContent=faecher.length;
   const sessions=lsGet('stevie_sessions')||[];
   document.getElementById('stat-sessions').textContent=sessions.length;
-  // Noten
   const noten=lsGet('stevie_noten')||[];
   const nl=document.getElementById('noten-list');
-  if(!noten.length){nl.innerHTML='<p style="font-size:13px;color:#b8a8d0;">Noch keine Noten eingetragen.</p>';}
+  if(!noten.length){nl.innerHTML='<p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Noten eingetragen.</p>';}
   else{
-    nl.innerHTML='';
     const avg=noten.reduce((a,n)=>a+n.note,0)/noten.length;
     document.getElementById('stat-noten').textContent=avg.toFixed(1);
-    noten.slice(0,8).forEach(n=>{
-      const row=document.createElement('div');row.className='noten-row';
-      row.innerHTML=`<div class="noten-badge n${n.note}">${n.note}</div><div style="flex:1"><div class="noten-fach">${n.fach}</div><div class="noten-datum">${n.thema} · ${n.date}</div></div>`;
-      nl.appendChild(row);
-    });
+    nl.innerHTML='';
+    noten.slice(0,6).forEach(n=>{const row=document.createElement('div');row.className='noten-row';row.innerHTML=`<div class="noten-badge n${n.note}">${n.note}</div><div class="noten-info"><div class="noten-fach">${n.fach}</div><div class="noten-datum">${n.thema?n.thema+' · ':''}${n.date}</div></div>`;nl.appendChild(row);});
   }
-  // Sessions
   const sl=document.getElementById('sessions-list');
-  if(!sessions.length){sl.innerHTML='<p style="font-size:13px;color:#b8a8d0;">Noch keine Sessions.</p>';}
-  else{sl.innerHTML='';sessions.slice(0,5).forEach(s=>{const row=document.createElement('div');row.className='session-row';row.innerHTML=`<div class="session-dot"></div><div class="session-text">${s.subj}</div><div class="session-time">${s.date} ${s.time}</div>`;sl.appendChild(row);});}
+  if(!sessions.length){sl.innerHTML='<p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p>';}
+  else{sl.innerHTML='';sessions.slice(0,5).forEach(s=>{const row=document.createElement('div');row.className='session-row';row.innerHTML=`<div class="session-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-brain"/></svg></div><div class="session-text">${s.subj}</div><div class="session-time">${s.date} ${s.time}</div>`;sl.appendChild(row);});}
 }
 
-// Note modal
 function buildNoteGrid(){
   const g=document.getElementById('note-grid');g.innerHTML='';
-  [[1,'n1'],[2,'n2'],[3,'n3'],[4,'n4'],[5,'n5'],[6,'n6']].forEach(([n,cls])=>{
-    const b=document.createElement('div');b.className=`note-sel ${cls}`;b.textContent=n;
-    b.onclick=()=>{g.querySelectorAll('.note-sel').forEach(x=>x.classList.remove('picked'));b.classList.add('picked');};
-    g.appendChild(b);
-  });
+  [[1,'n1'],[2,'n2'],[3,'n3'],[4,'n4'],[5,'n5'],[6,'n6']].forEach(([n,cls])=>{const b=document.createElement('div');b.className=`note-sel ${cls}`;b.textContent=n;b.onclick=()=>{g.querySelectorAll('.note-sel').forEach(x=>x.classList.remove('picked'));b.classList.add('picked');};g.appendChild(b);});
 }
 
 function saveNote(){
@@ -824,33 +877,25 @@ function saveNote(){
   const picked=document.querySelector('#note-grid .picked');
   if(!fach||!picked){alert('Bitte Fach und Note auswählen.');return;}
   const noten=lsGet('stevie_noten')||[];
-  noten.unshift({fach,thema:thema||fach,note:parseInt(picked.textContent),date:new Date().toLocaleDateString('de-DE')});
-  lsSet('stevie_noten',noten);
-  closeModal('note-modal');renderProfilTab();
+  noten.unshift({fach,thema,note:parseInt(picked.textContent),date:new Date().toLocaleDateString('de-DE')});
+  lsSet('stevie_noten',noten);closeModal('note-modal');renderProfilTab();
 }
 
-// ══ TABS ══
+// TABS
 function switchTab(tab){
   document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-item,.nav-center').forEach(n=>n.classList.remove('active'));
   document.getElementById(tab+'-tab').classList.add('active');
   document.getElementById('nav-'+tab).classList.add('active');
-  if(tab==='mappe'){document.querySelector('.nav-center-pill')?.classList.add('active');}
-  else{document.querySelector('.nav-center-pill')?.classList.remove('active');}
   if(tab==='mappe')renderMappe();
   if(tab==='profil')renderProfilTab();
 }
 
-// ══ CHAT ══
+// CHAT
 function renderTopicRow(){
   const row=document.getElementById('topic-row');row.innerHTML='';
   const day=S.plan[S.currentDay-1];if(!day)return;
-  day.topics.forEach(t=>{
-    const key=`${S.currentDay}_${t}`,done=S.doneTopic[key];
-    const c=document.createElement('div');c.className='tchip'+(done?' done':'');c.textContent=(done?'✅ ':'')+t;
-    c.onclick=()=>autoSend(`Frag mich etwas über "${t}"!`);
-    row.appendChild(c);
-  });
+  day.topics.forEach(t=>{const key=`${S.currentDay}_${t}`,done=S.doneTopic[key];const c=document.createElement('div');c.className='tchip'+(done?' done':'');c.textContent=(done?'✓ ':'')+t;c.onclick=()=>autoSend(`Frag mich etwas über "${t}"!`);row.appendChild(c);});
 }
 
 function updateProgress(){
@@ -863,16 +908,16 @@ function updateProgress(){
 }
 
 function getSysPrompt(){
-  const lvl=S.grade<=4?'Grundschule – sehr einfach, Alltagsbeispiele':S.grade<=6?'Unterstufe – klar und anschaulich':S.grade<=8?'Mittelstufe – freundlich, etwas mehr Tiefe':'Oberstufe – anspruchsvoller';
+  const lvl=S.grade<=4?'Grundschule – sehr einfach':S.grade<=6?'Unterstufe – klar und anschaulich':S.grade<=8?'Mittelstufe – freundlich, etwas mehr Tiefe':'Oberstufe – anspruchsvoller';
   const day=S.plan[S.currentDay-1];
   const faecher=lsGet('stevie_faecher')||[];
   const fach=faecher.find(f=>f.name.toLowerCase()===S.subject?.toLowerCase()||S.subject?.toLowerCase().includes(f.name.toLowerCase()));
-  const matCtx=fach?.topics?.length?`\nBekannte Themen aus der Mappe des Kindes: ${fach.topics.join(', ')}.`:'';
-  const planCtx=day?`\nAktueller Lernplan: Tag ${S.currentDay}, Themen: ${day.topics.join(', ')}.`:'';
+  const matCtx=fach?.topics?.length?`\nThemen aus der Mappe: ${fach.topics.join(', ')}.`:'';
+  const planCtx=day?`\nLernplan heute – Tag ${S.currentDay}: ${day.topics.join(', ')}.`:'';
   return `Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit ${S.name}, ${S.age} Jahre, ${S.grade}. Klasse (${lvl}).
-Persönlichkeit: Wie eine coole ältere Schwester – warm, locker, nie schulmeisterlich. Sprich ${S.name} gelegentlich mit Namen an.
+Persönlichkeit: Warmherzig, klar, ermutigend – niemals schulmeisterlich. Sprich ${S.name} gelegentlich mit Namen an.
 Methodik: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurze Antworten (2-4 Sätze).
-Markiere mit: [TAG:Frage] [TAG:Erklärung] [TAG:Feedback] [TAG:Motivation]
+Markiere jede Antwort: [TAG:Frage] [TAG:Erklärung] [TAG:Feedback] [TAG:Motivation]
 Wenn Thema abgeschlossen: [DONE:Themenname]
 Fach: ${S.subject||'unbekannt'}.${matCtx}${planCtx}
 Antworte auf Deutsch.`;
@@ -881,14 +926,14 @@ Antworte auf Deutsch.`;
 function addMsg(role,content,tag,imgSrc){
   S.msgs.push({role,content});
   const row=document.createElement('div');row.className=`mrow ${role}`;
-  if(role==='assistant')row.innerHTML=`<div class="mav">🌟</div>`;
+  if(role==='assistant')row.innerHTML=`<div class="mav"><svg width="30" height="30" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg></div>`;
   const clean=content.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[DONE:[^\]]+\]/g,'').trim();
   const bub=document.createElement('div');bub.className=`bubble ${role==='assistant'?'s':'u'}`;
   if(imgSrc){const img=document.createElement('img');img.src=imgSrc;img.style.cssText='max-width:160px;border-radius:9px;margin-bottom:5px;display:block';bub.appendChild(img);}
   bub.appendChild(document.createTextNode(clean));row.appendChild(bub);
   if(role==='assistant'){
-    if(tag){const tEl=document.createElement('div');tEl.className='btag';tEl.textContent=({Frage:'❓',Erklärung:'📖',Feedback:'✅',Motivation:'💪'}[tag]||'💬')+' '+tag;row.appendChild(tEl);}
-    const rb=document.createElement('button');rb.className='rbtn';rb.textContent='🔁';rb.onclick=()=>speak(clean);row.appendChild(rb);
+    if(tag){const tEl=document.createElement('div');tEl.className='btag';tEl.textContent=({'Frage':'Frage','Erklärung':'Erklärung','Feedback':'Feedback','Motivation':'Motivation'}[tag]||tag);row.appendChild(tEl);}
+    const rb=document.createElement('button');rb.className='rbtn';rb.innerHTML=`<svg width="14" height="14" style="color:#9c6fc4;"><use href="#ic-replay"/></svg>`;rb.onclick=()=>speak(clean);row.appendChild(rb);
     const dm=content.match(/\[DONE:([^\]]+)\]/);if(dm)markDone(dm[1]);
     if(content.includes('[TAG:Frage]'))setTimeout(()=>addQR(row),150);
   }
@@ -898,7 +943,7 @@ function addMsg(role,content,tag,imgSrc){
 
 function addQR(afterEl){
   const qr=document.createElement('div');qr.className='qr-row';
-  ['Ich weiß es! 🙋','Bin unsicher 🤔','Keine Ahnung 😅','Weiter →'].forEach(l=>{const b=document.createElement('button');b.className='qr';b.textContent=l;b.onclick=()=>{qr.remove();autoSend(l);};qr.appendChild(b);});
+  ['Ich weiß es!','Bin unsicher','Keine Ahnung','Weiter'].forEach(l=>{const b=document.createElement('button');b.className='qr';b.textContent=l;b.onclick=()=>{qr.remove();autoSend(l);};qr.appendChild(b);});
   afterEl.after(qr);
 }
 
@@ -908,7 +953,7 @@ function markDone(topicName){
   if(m){S.doneTopic[`${S.currentDay}_${m}`]=true;renderTopicRow();updateProgress();}
 }
 
-function showTyping(){const d=document.createElement('div');d.className='mrow';d.id='typing';d.innerHTML=`<div class="mav">🌟</div><div class="bubble s"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;document.getElementById('messages').appendChild(d);document.getElementById('messages').scrollTop=999999;}
+function showTyping(){const d=document.createElement('div');d.className='mrow';d.id='typing';d.innerHTML=`<div class="mav"><svg width="30" height="30" viewBox="0 0 110 110"><use href="#stevie-avatar"/></svg></div><div class="bubble s"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;document.getElementById('messages').appendChild(d);document.getElementById('messages').scrollTop=999999;}
 function hideTyping(){document.getElementById('typing')?.remove();}
 
 async function sendMsg(){
@@ -917,39 +962,43 @@ async function sendMsg(){
   const uc=[];let imgSrc=null;
   if(S.chatImg){uc.push({type:'image',source:{type:'base64',media_type:S.chatImg.type,data:S.chatImg.data}});imgSrc=document.getElementById('imgthumb').src;}
   if(text)uc.push({type:'text',text});
-  addMsg('user',text||'📷',null,imgSrc);inp.value='';removeImg();
+  addMsg('user',text||'[Bild]',null,imgSrc);inp.value='';removeImg();
   document.getElementById('sendbtn').disabled=true;showTyping();
   const apiMsgs=S.msgs.map(m=>({role:m.role,content:m.content}));
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:getSysPrompt(),messages:apiMsgs})});
     const d=await res.json();hideTyping();
     if(d.error)throw new Error(d.error.message);
-    const reply=d.content?.find(b=>b.type==='text')?.text||'Hmm 🙈';
+    const reply=d.content?.find(b=>b.type==='text')?.text||'Hmm, kurzer Fehler.';
     const tm=reply.match(/\[TAG:([^\]]+)\]/);
     addMsg('assistant',reply,tm?tm[1]:null);
     speak(reply.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[DONE:[^\]]+\]/g,'').trim());
-  }catch(e){hideTyping();addMsg('assistant',`Ups: ${e.message} 😅`,null);}
+  }catch(e){hideTyping();addMsg('assistant',`Ups: ${e.message}`,null);}
   document.getElementById('sendbtn').disabled=false;
 }
 
 function autoSend(text){document.getElementById('msginput').value=text;sendMsg();}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-
 function handleChatImg(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{S.chatImg={data:ev.target.result.split(',')[1],type:file.type};document.getElementById('imgthumb').src=ev.target.result;document.getElementById('imgprev').style.display='block';};r.readAsDataURL(file);e.target.value='';}
 function removeImg(){S.chatImg=null;document.getElementById('imgprev').style.display='none';}
 
-// ══ VOICE ══
+// VOICE
 let curAudio=null;const synth=window.speechSynthesis;
 async function speak(text){
   if(!S.voiceOn)return;stopSpeaking();
-  const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').replace(/[📚🌟👋📷✅❌🎙️🔊📁👤]/g,'').trim();
+  const clean=text.replace(/[\u{1F300}-\u{1FFFF}]/gu,'').trim();
   const ek=localStorage.getItem('stevie_eleven');
   if(ek){try{const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.voiceId}`,{method:'POST',headers:{'xi-api-key':ek,'Content-Type':'application/json'},body:JSON.stringify({text:clean,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.8,style:.3,use_speaker_boost:true}})});if(res.ok){const blob=await res.blob();const url=URL.createObjectURL(blob);curAudio=new Audio(url);curAudio.onended=()=>setSI(false);curAudio.play();setSI(true);return;}}catch{}}
   const utt=new SpeechSynthesisUtterance(clean);utt.lang='de-DE';utt.rate=.95;utt.pitch=1.1;const v=synth.getVoices().find(v=>v.lang.startsWith('de'));if(v)utt.voice=v;utt.onend=()=>setSI(false);synth.speak(utt);setSI(true);
 }
 function stopSpeaking(){if(curAudio){curAudio.pause();curAudio=null;}synth.cancel();setSI(false);}
 function setSI(v){const el=document.getElementById('speak-ind');if(el)el.style.display=v?'flex':'none';}
-function toggleVoice(){S.voiceOn=!S.voiceOn;stopSpeaking();const b=document.getElementById('vtoggle');b.textContent=S.voiceOn?'🔊':'🔇';b.className='vbtn-toggle '+(S.voiceOn?'von':'voff');}
+function toggleVoice(){
+  S.voiceOn=!S.voiceOn;stopSpeaking();
+  const b=document.getElementById('vtoggle');
+  if(S.voiceOn){b.innerHTML=`<svg width="14" height="14"><use href="#ic-volume"/></svg> An`;b.className='vbtn-toggle von';}
+  else{b.innerHTML=`<svg width="14" height="14"><use href="#ic-volume-off"/></svg> Aus`;b.className='vbtn-toggle voff';}
+}
 
 let recRef=null;
 function toggleListen(){
@@ -960,18 +1009,17 @@ function toggleListen(){
   recRef.onresult=e=>{document.getElementById('msginput').value=e.results[0][0].transcript;setL(false);};
   recRef.onerror=recRef.onend=()=>setL(false);recRef.start();setL(true);
 }
-function setL(v){S.listening=v;const b=document.getElementById('micbtn');if(b){b.textContent=v?'⏹️':'🎙️';b.classList.toggle('on',v);}}
-
-// ══ MODALS ══
-function openModal(id){
-  if(id==='note-modal')buildNoteGrid();
-  if(id==='settings-modal'){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';}
-  document.getElementById(id).classList.add('open');
+function setL(v){
+  S.listening=v;const b=document.getElementById('micbtn');
+  if(b){b.classList.toggle('on',v);b.innerHTML=v?`<svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-stop"/></svg>`:`<svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-mic"/></svg>`;}
 }
+
+// MODALS
+function openModal(id){if(id==='note-modal')buildNoteGrid();if(id==='settings-modal'){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';}document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function saveSettings(){const ak=document.getElementById('s-ant').value.trim(),ek=document.getElementById('s-el').value.trim(),nm=document.getElementById('s-name').value.trim();if(ak)localStorage.setItem('stevie_key',ak);if(ek)localStorage.setItem('stevie_eleven',ek);if(nm){S.name=nm;saveProfile();}closeModal('settings-modal');}
 
-// ══ STARS ══
+// STARS
 function initStars(){const c=document.getElementById('stars');if(!c)return;const ctx=c.getContext('2d');let stars=[];function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}function init(){stars=Array.from({length:100},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+.3,a:Math.random(),sp:Math.random()*.007+.003}));}function anim(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.a})`;ctx.fill();});requestAnimationFrame(anim);}resize();init();anim();window.addEventListener('resize',()=>{resize();init();});}
 synth.onvoiceschanged=()=>synth.getVoices();
 </script>
