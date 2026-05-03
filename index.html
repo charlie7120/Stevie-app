@@ -74,7 +74,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .voff{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
 
 /* BOTTOM NAV */
-.bottom-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px 18px;gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);}
+.bottom-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px 18px;gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);position:sticky;bottom:0;z-index:50;}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;border:none;background:none;gap:4px;border-radius:16px;transition:all .2s;}
 .nav-item p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.4px;transition:color .2s;}
 .nav-item.active{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(168,85,247,.07));}
@@ -906,8 +906,21 @@ function renderProfilTab(){
 }
 
 function deleteSession(idx){
+  if(!confirm('Session wirklich löschen?')) return;
   const sessions=lsGet('stevie_sessions')||[];
   sessions.splice(idx,1);lsSet('stevie_sessions',sessions);renderProfilTab();
+}
+
+function delFach(idx,e){
+  e.stopPropagation();
+  if(!confirm('Fach und alle Materialien wirklich löschen?')) return;
+  const faecher=lsGet('stevie_faecher')||[];faecher.splice(idx,1);lsSet('stevie_faecher',faecher);renderMappe();
+}
+
+function delMatImg(fachIdx,imgIdx,e){
+  e.stopPropagation();
+  if(!confirm('Seite wirklich löschen?')) return;
+  const faecher=lsGet('stevie_faecher')||[];faecher[fachIdx].images.splice(imgIdx,1);lsSet('stevie_faecher',faecher);renderMappe();
 }
 
 function buildNoteGrid(){
@@ -1064,12 +1077,16 @@ function setL(v){
 function openModal(id){
   if(id==='note-modal') buildNoteGrid();
   if(id==='settings-modal'){
-    document.getElementById('s-ant').value=getKey()||'';
-    document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';
-    document.getElementById('s-name').value=S.name||'';
+    const ant=document.getElementById('s-ant');
+    const el=document.getElementById('s-el');
+    const nm=document.getElementById('s-name');
+    if(ant) ant.value=getKey()||'';
+    if(el) el.value=localStorage.getItem('stevie_eleven')||'';
+    if(nm) nm.value=S.name||'';
     buildSettingsAvatarGrid();
   }
-  document.getElementById(id).classList.add('open');
+  const modal=document.getElementById(id);
+  if(modal) modal.classList.add('open');
 }
 
 function buildSettingsAvatarGrid(){
