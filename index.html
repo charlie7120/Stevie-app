@@ -685,6 +685,8 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <input class="minput" type="password" id="s-el" placeholder="Für natürliche Stimme"/>
     <label class="mlabel">Name</label>
     <input class="minput" type="text" id="s-name" placeholder="Dein Name"/>
+    <label class="mlabel">Dein Avatar</label>
+    <div id="settings-avatar-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;"></div>
     <button class="msave" onclick="saveSettings()">Speichern</button>
   </div>
 </div>
@@ -784,7 +786,7 @@ function startChat(fach){
   if(fach?.topics?.length)matCtx=`\n\nIn deiner Mappe habe ich folgende Themen gefunden: ${fach.topics.join(', ')}.`;
   const matCount=fach?.images?.length||0;
   const greeting=`Hey ${S.name}! Ich bin Stevie, deine Lernbegleiterin.\n\nHeute lernen wir${S.subject?' '+S.subject:''} zusammen.${matCtx}\n${matCount>0?`Du hast ${matCount} Seite${matCount>1?'n':''} in deiner Mappe – ich kenne deinen Stoff bereits. `:''}Womit möchtest du anfangen?`;
-  addMsg('assistant',greeting,'Motivation');speak(greeting);
+  addMsg('assistant',greeting,'Motivation');
 }
 
 async function generatePlan(fach){
@@ -1060,12 +1062,45 @@ function setL(v){
 
 // MODALS
 function openModal(id){
-  if(id==='note-modal')buildNoteGrid();
-  if(id==='settings-modal'){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';}
+  if(id==='note-modal') buildNoteGrid();
+  if(id==='settings-modal'){
+    document.getElementById('s-ant').value=getKey()||'';
+    document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';
+    document.getElementById('s-name').value=S.name||'';
+    buildSettingsAvatarGrid();
+  }
   document.getElementById(id).classList.add('open');
 }
+
+function buildSettingsAvatarGrid(){
+  const g=document.getElementById('settings-avatar-grid');
+  g.innerHTML='';
+  AVATARS.forEach(av=>{
+    const isSelected=(S.avatarId||'stevie')===av.id;
+    const b=document.createElement('div');
+    b.style.cssText=`cursor:pointer;text-align:center;padding:6px;border-radius:14px;border:2px solid ${isSelected?'var(--ga)':'#e9d5ff'};background:${isSelected?'#f5f0ff':'white'};transition:all .2s;`;
+    b.innerHTML=getAvatarSvg(av.id,56)+`<div style="font-size:10px;font-weight:600;color:#7c6fa0;margin-top:4px;">${av.label}</div>`;
+    b.onclick=()=>{
+      S.avatarId=av.id;
+      g.querySelectorAll('div').forEach(x=>{x.style.borderColor='#e9d5ff';x.style.background='white';});
+      b.style.borderColor='var(--ga)';b.style.background='#f5f0ff';
+    };
+    g.appendChild(b);
+  });
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-function saveSettings(){const ak=document.getElementById('s-ant').value.trim(),ek=document.getElementById('s-el').value.trim(),nm=document.getElementById('s-name').value.trim();if(ak)localStorage.setItem('stevie_key',ak);if(ek)localStorage.setItem('stevie_eleven',ek);if(nm){S.name=nm;saveProfile();}closeModal('settings-modal');}
+function saveSettings(){
+  const ak=document.getElementById('s-ant').value.trim();
+  const ek=document.getElementById('s-el').value.trim();
+  const nm=document.getElementById('s-name').value.trim();
+  if(ak)localStorage.setItem('stevie_key',ak);
+  if(ek)localStorage.setItem('stevie_eleven',ek);
+  if(nm)S.name=nm;
+  saveProfile();
+  updateAllAvatars();
+  renderProfilTab();
+  closeModal('settings-modal');
+}
 
 // STARS
 function initStars(){const c=document.getElementById('stars');if(!c)return;const ctx=c.getContext('2d');let stars=[];function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}function init(){stars=Array.from({length:100},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+.3,a:Math.random(),sp:Math.random()*.007+.003}));}function anim(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,180,255,${s.a})`;ctx.fill();});requestAnimationFrame(anim);}resize();init();anim();window.addEventListener('resize',()=>{resize();init();});}
