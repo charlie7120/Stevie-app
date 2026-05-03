@@ -517,7 +517,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
       <button id="vtoggle" class="vbtn-toggle von" onclick="toggleVoice()">
         <svg width="14" height="14"><use href="#ic-volume"/></svg> An
       </button>
-      <button class="hbtn" onclick="openModal('settings-modal')">
+      <button class="hbtn" onclick="document.getElementById('settings-modal').classList.add('open');document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';buildSettingsAvatarGrid();">
         <svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-settings"/></svg>
       </button>
     </div>
