@@ -750,7 +750,7 @@ function saveOnboarding(){
   show('setup');
 }
 
-function saveProfile(){lsSet('stevie_profile',{name:S.name,age:S.age,grade:S.grade,theme:S.theme,voiceId:S.voiceId});}
+function saveProfile(){lsSet('stevie_profile',{name:S.name,age:S.age,grade:S.grade,theme:S.theme,voiceId:S.voiceId,avatarId:S.avatarId||'stevie'});}
 function applyTheme(key){S.theme=key;document.body.className=THEMES[key]?.cls||'';}
 
 function buildDaysGrid(){
@@ -1016,7 +1016,7 @@ async function sendMsg(){
     const reply=d.content?.find(b=>b.type==='text')?.text||'Hmm, kurzer Fehler.';
     const tm=reply.match(/\[TAG:([^\]]+)\]/);
     addMsg('assistant',reply,tm?tm[1]:null);
-    speak(reply.replace(/\[TAG:[^\]]+\]/g,'').replace(/\[DONE:[^\]]+\]/g,'').trim());
+    // speak() is called inside addMsg for assistant messages
   }catch(e){hideTyping();addMsg('assistant',`Ups: ${e.message}`,null);}
   document.getElementById('sendbtn').disabled=false;
 }
@@ -1059,7 +1059,11 @@ function setL(v){
 }
 
 // MODALS
-function openModal(id){if(id==='note-modal')buildNoteGrid();if(id==='settings-modal'){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';}document.getElementById(id).classList.add('open');}
+function openModal(id){
+  if(id==='note-modal')buildNoteGrid();
+  if(id==='settings-modal'){document.getElementById('s-ant').value=getKey()||'';document.getElementById('s-el').value=localStorage.getItem('stevie_eleven')||'';document.getElementById('s-name').value=S.name||'';}
+  document.getElementById(id).classList.add('open');
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function saveSettings(){const ak=document.getElementById('s-ant').value.trim(),ek=document.getElementById('s-el').value.trim(),nm=document.getElementById('s-name').value.trim();if(ak)localStorage.setItem('stevie_key',ak);if(ek)localStorage.setItem('stevie_eleven',ek);if(nm){S.name=nm;saveProfile();}closeModal('settings-modal');}
 
