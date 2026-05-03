@@ -132,12 +132,23 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 #sendbtn{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border:none;border-radius:12px;padding:9px 15px;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;}
 #sendbtn:disabled{background:#e9d5ff;color:#c4b5fd;box-shadow:none;cursor:default;}
 
-/* MAPPE */
-#mappe-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 80px;}
+/* Mat grid – kleinere Thumbs */
+.mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0;}
+.mat-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#f0ebff;cursor:pointer;}
+.mat-item img{width:100%;height:100%;object-fit:cover;transition:transform .2s;}
+.mat-item:hover img{transform:scale(1.04);}
+.mat-item .mat-del{position:absolute;top:3px;right:3px;background:rgba(239,68,68,.88);color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2;}
+.mat-item .mat-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:white;font-size:9px;padding:2px 4px;text-align:center;}
+/* Lightbox */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;cursor:pointer;}
+#lightbox.open{display:flex;}
+#lightbox img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 8px 48px rgba(0,0,0,.6);}
+#lightbox-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .mappe-header{background:white;padding:16px;border-bottom:1px solid #ede9fe;}
 .mappe-header h2{font-size:17px;font-weight:700;color:#3b1f6e;margin-bottom:2px;}
 .mappe-header p{font-size:12px;color:#9c6fc4;}
-.fach-card{background:white;border-radius:18px;margin:12px 14px 0;box-shadow:0 2px 12px rgba(150,100,200,.08);overflow:hidden;}
+/* MAPPE */
+#mappe-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 80px;}box-shadow:0 2px 12px rgba(150,100,200,.08);overflow:hidden;}
 .fach-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .2s;}
 .fach-head:hover{background:#faf5ff;}
 .fach-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--ga),var(--gb));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -620,6 +631,21 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
   </div>
 </div>
 
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt=""/>
+</div>
+
+<!-- AVATAR MODAL -->
+<div class="modal-bg" id="avatar-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Deinen Avatar wählen <button class="mclose" onclick="closeModal('avatar-modal')">×</button></div>
+    <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;"></div>
+  </div>
+</div>
+
 <!-- ADD FACH MODAL -->
 <div class="modal-bg" id="addfach-modal">
   <div class="modal">
@@ -782,7 +808,7 @@ function renderMappe(){
   faecher.forEach((fach,idx)=>{
     const card=document.createElement('div');card.className='fach-card';
     const topicsHtml=fach.topics?.length?`<div class="topics-extracted"><h4>Erkannte Themen</h4><div class="tlist">${fach.topics.map(t=>`<span class="titem">${t}</span>`).join('')}</div></div>`:'';
-    const imgsHtml=fach.images?.map((img,i)=>`<div class="mat-item"><img src="${img.src}" loading="lazy"/><button class="mat-del" onclick="delMatImg(${idx},${i},event)">×</button></div>`).join('')||'';
+    const imgsHtml=fach.images?.map((img,i)=>`<div class="mat-item" onclick="openLightbox('${img.src}')"><img src="${img.src}" loading="lazy"/><button class="mat-del" onclick="delMatImg(${idx},${i},event)">×</button><div class="mat-date">${img.date||''}</div></div>`).join('')||'';
     card.innerHTML=`<div class="fach-head" onclick="toggleFach(this)">
       <div class="fach-icon"><svg width="20" height="20" style="color:white;"><use href="#ic-folder"/></svg></div>
       <div><div class="fach-name">${fach.name}</div><div class="fach-meta">${(fach.images||[]).length} Seiten · ${(fach.topics||[]).length} Themen</div></div>
@@ -806,7 +832,8 @@ function triggerFachUpload(idx){currentFachIdx=idx;document.getElementById('fach
 function handleFachUpload(e){
   const idx=currentFachIdx;if(idx===null)return;
   const faecher=lsGet('stevie_faecher')||[];const files=Array.from(e.target.files);let loaded=0;
-  files.forEach(file=>{const r=new FileReader();r.onload=ev=>{if(!faecher[idx].images)faecher[idx].images=[];faecher[idx].images.push({src:ev.target.result,data:ev.target.result.split(',')[1],type:file.type});loaded++;if(loaded===files.length){faecher[idx].analyzing=true;lsSet('stevie_faecher',faecher);renderMappe();analyzeImages(idx);}};r.readAsDataURL(file);});
+  const today=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});
+  files.forEach(file=>{const r=new FileReader();r.onload=ev=>{if(!faecher[idx].images)faecher[idx].images=[];faecher[idx].images.push({src:ev.target.result,data:ev.target.result.split(',')[1],type:file.type,date:today});loaded++;if(loaded===files.length){faecher[idx].analyzing=true;lsSet('stevie_faecher',faecher);renderMappe();analyzeImages(idx);}};r.readAsDataURL(file);});
   e.target.value='';
 }
 
@@ -848,6 +875,9 @@ function addFach(){
 function renderProfilTab(){
   document.getElementById('p-name').textContent=S.name||'–';
   document.getElementById('p-sub').textContent=`${S.grade}. Klasse · ${S.age} Jahre`;
+  // Avatar
+  const avatarWrap=document.getElementById('profil-avatar-wrap');
+  if(avatarWrap)avatarWrap.innerHTML=getAvatarSvg(S.avatarId||'stevie',84)+`<div class="profil-badge" style="cursor:pointer;" onclick="openAvatarModal()"><svg width="12" height="12" style="color:#92400e;"><use href="#ic-star"/></svg></div>`;
   const faecher=lsGet('stevie_faecher')||[];
   document.getElementById('stat-faecher').textContent=faecher.length;
   const sessions=lsGet('stevie_sessions')||[];
@@ -863,7 +893,19 @@ function renderProfilTab(){
   }
   const sl=document.getElementById('sessions-list');
   if(!sessions.length){sl.innerHTML='<p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p>';}
-  else{sl.innerHTML='';sessions.slice(0,5).forEach(s=>{const row=document.createElement('div');row.className='session-row';row.innerHTML=`<div class="session-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-brain"/></svg></div><div class="session-text">${s.subj}</div><div class="session-time">${s.date} ${s.time}</div>`;sl.appendChild(row);});}
+  else{
+    sl.innerHTML='';
+    sessions.slice(0,8).forEach((s,i)=>{
+      const row=document.createElement('div');row.className='session-row';
+      row.innerHTML=`<div class="session-icon"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-brain"/></svg></div><div class="session-text">${s.subj}</div><div class="session-time">${s.date} ${s.time}</div><button onclick="deleteSession(${i})" style="background:none;border:none;cursor:pointer;padding:4px;opacity:.4;display:flex;" title="Löschen"><svg width="14" height="14" style="color:#dc2626;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>`;
+      sl.appendChild(row);
+    });
+  }
+}
+
+function deleteSession(idx){
+  const sessions=lsGet('stevie_sessions')||[];
+  sessions.splice(idx,1);lsSet('stevie_sessions',sessions);renderProfilTab();
 }
 
 function buildNoteGrid(){
@@ -936,6 +978,8 @@ function addMsg(role,content,tag,imgSrc){
     const rb=document.createElement('button');rb.className='rbtn';rb.innerHTML=`<svg width="14" height="14" style="color:#9c6fc4;"><use href="#ic-replay"/></svg>`;rb.onclick=()=>speak(clean);row.appendChild(rb);
     const dm=content.match(/\[DONE:([^\]]+)\]/);if(dm)markDone(dm[1]);
     if(content.includes('[TAG:Frage]'))setTimeout(()=>addQR(row),150);
+    // Speak immediately, parallel to render
+    speak(clean);
   }
   document.getElementById('messages').appendChild(row);
   document.getElementById('messages').scrollTop=999999;
