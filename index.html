@@ -488,7 +488,27 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
   </div>
 </div>
 
-<!-- SETUP -->
+<!-- MATERIAL SCREEN -->
+<div id="material" class="screen center-screen">
+  <div class="dcard" style="max-width:480px;width:100%;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--ga),var(--gb));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <svg width="26" height="26" style="color:white;"><use href="#ic-folder"/></svg>
+      </div>
+      <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:6px;">Lernmaterial hochladen</h2>
+      <p style="color:rgba(255,255,255,.4);font-size:13px;">Fotos von Schulbuchseiten, Mappe oder Checkliste.<br>Stevie liest alles und baut deinen Plan.</p>
+    </div>
+    <div id="mat-upload-zone" style="border:2px dashed rgba(167,139,250,.4);border-radius:16px;padding:28px;text-align:center;cursor:pointer;background:rgba(167,139,250,.05);transition:all .2s;margin-bottom:14px;" onclick="document.getElementById('mat-file').click()">
+      <svg width="36" height="36" style="color:var(--acc);margin-bottom:10px;"><use href="#ic-camera"/></svg>
+      <p style="color:rgba(255,255,255,.5);font-size:14px;"><b style="color:var(--acc);">Tippe hier</b> um Fotos hinzuzufügen</p>
+      <p style="font-size:11px;color:rgba(255,255,255,.3);margin-top:4px;">Schulbuch · Mappe · Checkliste · Notizen</p>
+    </div>
+    <input type="file" id="mat-file" accept="image/*" multiple style="display:none" onchange="handleMatFileUpload(event)"/>
+    <div class="thumbs" id="mat-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+    <button class="btn" id="mat-next-btn" style="display:none;" onclick="proceedFromMaterial()">Lernplan erstellen</button>
+    <button class="btn-ghost" onclick="proceedFromMaterial(true)">Ohne Material direkt starten</button>
+  </div>
+</div>
 <div id="setup" class="screen center-screen">
   <div class="dcard" style="max-width:460px;width:100%;">
     <h2 style="font-size:21px;font-weight:700;margin-bottom:4px;background:linear-gradient(90deg,var(--acc),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Neue Lernrunde</h2>
@@ -793,12 +813,28 @@ async function generatePlan(fach){
   const matCtx=fach?.topics?.length?`Bekannte Themen: ${fach.topics.join(', ')}.`:'';
   document.getElementById('prog-label').textContent='Stevie plant…';
   const sysP=`Erstelle einen ${S.days}-Tage-Lernplan für "${S.subject}", Klasse ${S.grade}. ${matCtx} Antworte NUR mit JSON-Array ohne Markdown. Format: [{"day":1,"title":"Name","topics":["Thema A","Thema B"]}]. Max 3-4 Themen/Tag.`;
+
+  // Build user content – include uploaded material images if any
+  const userContent=[];
+  if(S.matImages&&S.matImages.length){
+    S.matImages.forEach(img=>userContent.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}));
+    userContent.push({type:'text',text:`Analysiere dieses Material und erstelle den ${S.days}-Tage-Lernplan für ${S.subject}. Nur JSON-Array.`});
+  } else {
+    userContent.push({type:'text',text:'Erstelle den Lernplan. Nur JSON.'});
+  }
+
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:sysP,messages:[{role:'user',content:'Erstelle den Lernplan. Nur JSON.'}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:sysP,messages:[{role:'user',content:userContent}]})
+    });
     const d=await res.json();
     const txt=d.content?.find(b=>b.type==='text')?.text||'[]';
     S.plan=JSON.parse(txt.replace(/```json|```/g,'').trim());
-  }catch{S.plan=Array.from({length:S.days},(_,i)=>({day:i+1,title:`Tag ${i+1}`,topics:[S.subject]}));}
+  }catch{
+    S.plan=Array.from({length:S.days},(_,i)=>({day:i+1,title:`Tag ${i+1}`,topics:[S.subject]}));
+  }
   startChat(fach);
 }
 
@@ -974,6 +1010,8 @@ function getSysPrompt(){
   return `Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit ${S.name}, ${S.age} Jahre, ${S.grade}. Klasse (${lvl}).
 Persönlichkeit: Warmherzig, klar, ermutigend – niemals schulmeisterlich. Sprich ${S.name} gelegentlich mit Namen an.
 Methodik: Fragen stellen statt erklären. Immer nur EINE Frage auf einmal. Kurze Antworten (2-4 Sätze).
+WICHTIG: Verwende KEIN Markdown. Kein **fett**, kein *kursiv*, keine Sternchen. Nur normalen Text.
+Wenn du ein Bild bekommst, analysiere es direkt und stelle eine Frage dazu.
 Markiere jede Antwort: [TAG:Frage] [TAG:Erklärung] [TAG:Feedback] [TAG:Motivation]
 Wenn Thema abgeschlossen: [DONE:Themenname]
 Fach: ${S.subject||'unbekannt'}.${matCtx}${planCtx}
@@ -1038,7 +1076,26 @@ async function sendMsg(){
 
 function autoSend(text){document.getElementById('msginput').value=text;sendMsg();}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function handleChatImg(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{S.chatImg={data:ev.target.result.split(',')[1],type:file.type};document.getElementById('imgthumb').src=ev.target.result;document.getElementById('imgprev').style.display='block';};r.readAsDataURL(file);e.target.value='';}
+function handleChatImg(e){
+  const file=e.target.files[0];if(!file)return;
+  const canvas=document.createElement('canvas');
+  const ctx2=canvas.getContext('2d');
+  const img=new Image();
+  img.onload=()=>{
+    // Resize to max 1024px for Safari compatibility
+    const max=1024;
+    let w=img.width,h=img.height;
+    if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
+    canvas.width=w;canvas.height=h;
+    ctx2.drawImage(img,0,0,w,h);
+    const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+    S.chatImg={data:dataUrl.split(',')[1],type:'image/jpeg'};
+    document.getElementById('imgthumb').src=dataUrl;
+    document.getElementById('imgprev').style.display='block';
+  };
+  img.src=URL.createObjectURL(file);
+  e.target.value='';
+}
 function removeImg(){S.chatImg=null;document.getElementById('imgprev').style.display='none';}
 
 // VOICE
