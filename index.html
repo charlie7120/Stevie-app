@@ -763,13 +763,21 @@ window.addEventListener('DOMContentLoaded',async function(){
   // Auth state listener
   sb.auth.onAuthStateChange(async function(event,session){
     if(event==='SIGNED_IN'&&session){await initAfterLogin(session.user);}
-    else if(event==='SIGNED_OUT'){showScreen('splash');}
+    else if(event==='SIGNED_OUT'){document.getElementById('loading-screen').style.display='none';showScreen('splash');}
   });
 
-  // Check existing session
-  var{data:{session}}=await sb.auth.getSession();
-  if(session){await initAfterLogin(session.user);}
-  else{document.getElementById('loading-screen').style.display='none';showScreen('splash');}
+  // Check existing session – with fallback so loading screen never hangs
+  var hideLoader=function(){document.getElementById('loading-screen').style.display='none';};
+  var loaderTimeout=setTimeout(function(){hideLoader();showScreen('splash');},5000);
+  try{
+    var{data,error}=await sb.auth.getSession();
+    clearTimeout(loaderTimeout);
+    if(data&&data.session){await initAfterLogin(data.session.user);}
+    else{hideLoader();showScreen('splash');}
+  }catch(e){
+    clearTimeout(loaderTimeout);
+    hideLoader();showScreen('splash');
+  }
 
   // Splash
   document.getElementById('splash-btn').addEventListener('click',function(){
