@@ -794,20 +794,25 @@ window.addEventListener('DOMContentLoaded',async function(){
 
   // Onboarding
   document.getElementById('ob-btn').addEventListener('click',async function(){
+    var btn=document.getElementById('ob-btn');
     var name=document.getElementById('ob-name').value.trim();
     var antKey=document.getElementById('ob-ant-key').value.trim();
     var elKey=document.getElementById('ob-el-key').value.trim();
     if(!name){toast('Wie heißt du?','err');return;}
-    if(!S.age){toast('Bitte wähle dein Alter.','err');return;}
-    if(!S.grade){toast('Bitte wähle deine Klasse.','err');return;}
-    if(!antKey||!antKey.startsWith('sk-')){toast('Bitte einen gültigen Anthropic API-Key eingeben.','err');return;}
+    if(!antKey||!antKey.startsWith('sk-')){toast('Bitte einen gültigen Anthropic API-Key eingeben (beginnt mit sk-).','err');return;}
     S.name=name;
     localStorage.setItem('stevie_key',antKey);
     if(elKey)localStorage.setItem('stevie_eleven',elKey);
-    await saveKeys(antKey,elKey||null);
-    await saveProfile();
-    document.getElementById('setup-sub').textContent='Hey '+name+'! Sag mir womit wir starten.';
-    showScreen('setup');
+    btn.disabled=true;btn.textContent='Speichert…';
+    try{
+      await saveKeys(antKey,elKey||null);
+      await saveProfile();
+      document.getElementById('setup-sub').textContent='Hey '+name+'! Sag mir womit wir starten.';
+      showScreen('setup');
+    }catch(e){
+      toast('Fehler: '+e.message,'err');
+    }
+    btn.disabled=false;btn.textContent="Los geht's mit Stevie!";
   });
 
   // Setup
