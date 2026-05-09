@@ -2,12 +2,13 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Stevie</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0d1a;min-height:100vh;color:#f3eeff;}
-:root{--ga:#7c3aed;--gb:#a855f7;--gc:#ec4899;--acc:#c4b5fd;--cbg:rgba(167,139,250,.15);--cbr:rgba(167,139,250,.3);--tc:#7c3aed;--ua:#7c3aed;--ub:#a855f7;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0d1a;min-height:100vh;color:#f3eeff;padding-bottom:env(safe-area-inset-bottom);}
+:root{--safe-bottom:env(safe-area-inset-bottom,0px);--ga:#7c3aed;--gb:#a855f7;--gc:#ec4899;--acc:#c4b5fd;--cbg:rgba(167,139,250,.15);--cbr:rgba(167,139,250,.3);--tc:#7c3aed;--ua:#7c3aed;--ub:#a855f7;}
 body.t-ocean{--ga:#0369a1;--gb:#0ea5e9;--gc:#06b6d4;--acc:#7dd3fc;--cbg:rgba(14,165,233,.15);--cbr:rgba(14,165,233,.3);--tc:#0369a1;--ua:#0369a1;--ub:#0ea5e9;}
 body.t-forest{--ga:#15803d;--gb:#22c55e;--gc:#4ade80;--acc:#86efac;--cbg:rgba(34,197,94,.15);--cbr:rgba(34,197,94,.3);--tc:#15803d;--ua:#15803d;--ub:#16a34a;}
 body.t-sunset{--ga:#c2410c;--gb:#ea580c;--gc:#f59e0b;--acc:#fcd34d;--cbg:rgba(234,88,12,.15);--cbr:rgba(234,88,12,.3);--tc:#c2410c;--ua:#c2410c;--ub:#ea580c;}
@@ -52,13 +53,12 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes popIn{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.07)}100%{transform:scale(1);opacity:1}}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-@keyframes starFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(10deg)}}
+.sync-dot-syncing{animation:pulse-sync 1s infinite;background:#f59e0b!important;}
+@keyframes pulse-sync{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* APP */
 #app{background:#f4f0fb;}
-.app-hdr{background:white;padding:11px 16px;box-shadow:0 2px 10px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.app-hdr{background:white;padding:11px 16px;padding-top:calc(11px + env(safe-area-inset-top,0px));box-shadow:0 2px 10px rgba(150,100,200,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .hav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .hinfo h2{font-size:15px;color:#3b1f6e;font-weight:700;}
 .hinfo p{font-size:11px;color:#9c6fc4;}
@@ -70,7 +70,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .voff{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
 
 /* BOTTOM NAV */
-.bot-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px 18px;gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);position:sticky;bottom:0;z-index:50;}
+.bot-nav{background:white;border-top:1px solid #ede9fe;display:flex;align-items:center;flex-shrink:0;padding:8px 16px calc(18px + var(--safe-bottom));gap:8px;box-shadow:0 -4px 24px rgba(150,100,200,.12);position:sticky;bottom:0;z-index:50;}
 .nav-i{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;border:none;background:none;gap:4px;border-radius:16px;}
 .nav-i p{font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.4px;}
 .nav-i.active{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(168,85,247,.07));}
@@ -85,17 +85,11 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 .app-tab.active{display:flex;}
 
 /* CHAT */
-#chat-top-bar{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+#prog-bar{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.08);display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .prog-lbl{font-size:12px;font-weight:600;color:#3b1f6e;white-space:nowrap;}
 .bar-track{flex:1;height:5px;background:#e9d5ff;border-radius:99px;overflow:hidden;}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--ua),var(--gc));border-radius:99px;transition:width .4s;}
 .prog-pct{font-size:12px;color:#9c6fc4;white-space:nowrap;}
-
-/* POMODORO BUTTON in top bar */
-.pom-btn{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:10px;padding:5px 10px;font-size:12px;font-weight:700;color:#7c3aed;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap;}
-.pom-btn.running{background:#fef9c3;border-color:#fde047;color:#854d0e;}
-.pom-btn.break{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;}
-
 #topic-row{background:white;padding:7px 16px;border-bottom:1px solid rgba(150,100,200,.06);display:flex;gap:7px;overflow-x:auto;flex-shrink:0;}
 #topic-row::-webkit-scrollbar{display:none;}
 .tchip{background:#f5f3ff;border:1.5px solid #e9d5ff;border-radius:20px;padding:4px 11px;font-size:12px;color:var(--tc);white-space:nowrap;cursor:pointer;flex-shrink:0;}
@@ -128,48 +122,6 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 #msginput:focus{border-color:var(--ga);}
 #sendbtn{background:linear-gradient(135deg,var(--ua),var(--ub));color:white;border:none;border-radius:12px;padding:9px 15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 #sendbtn:disabled{background:#e9d5ff;cursor:default;}
-
-/* NEW SESSION BUTTON */
-.new-session-bar{background:#fff9f0;border-top:1px solid #fde68a;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.new-session-bar p{font-size:12px;color:#92400e;font-weight:600;}
-.new-session-bar button{background:linear-gradient(135deg,var(--ga),var(--gb));color:white;border:none;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;}
-
-/* POMODORO OVERLAY */
-#pom-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-#pom-overlay.open{display:flex;}
-.pom-card{background:white;border-radius:28px;padding:32px 28px;width:90%;max-width:340px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.3);}
-.pom-ring-wrap{position:relative;width:160px;height:160px;margin:0 auto 20px;}
-.pom-ring-svg{transform:rotate(-90deg);}
-.pom-ring-bg{fill:none;stroke:#f0e7ff;stroke-width:10;}
-.pom-ring-fill{fill:none;stroke:url(#pom-grad);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s linear;}
-.pom-time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.pom-time-num{font-size:36px;font-weight:800;color:#2d1b4e;line-height:1;}
-.pom-time-lbl{font-size:11px;font-weight:600;color:#9c6fc4;margin-top:3px;letter-spacing:.5px;text-transform:uppercase;}
-.pom-title{font-size:17px;font-weight:700;color:#2d1b4e;margin-bottom:4px;}
-.pom-sub{font-size:13px;color:#9c6fc4;margin-bottom:22px;}
-.pom-btns{display:flex;gap:10px;}
-.pom-btns button{flex:1;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;}
-.pom-start{background:linear-gradient(135deg,var(--ga),var(--gb));color:white;}
-.pom-close-btn{background:#f5f3ff;color:#7c3aed;}
-
-/* DAY END RITUAL */
-#dayend-overlay{display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a0533,#0d1a33);z-index:500;align-items:center;justify-content:center;padding:24px;}
-#dayend-overlay.open{display:flex;flex-direction:column;}
-.de-stars{position:absolute;inset:0;pointer-events:none;}
-.de-inner{position:relative;z-index:2;text-align:center;max-width:380px;width:100%;}
-.de-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 20px;overflow:hidden;box-shadow:0 0 60px rgba(124,58,237,.5);animation:pulse-ring 2.5s infinite;}
-.de-stars-row{display:flex;justify-content:center;gap:8px;margin-bottom:20px;}
-.de-star{font-size:32px;animation:starFloat 2s ease-in-out infinite;}
-.de-star:nth-child(2){animation-delay:.3s;}
-.de-star:nth-child(3){animation-delay:.6s;}
-.de-title{font-size:28px;font-weight:800;color:white;margin-bottom:8px;animation:popIn .5s ease;}
-.de-msg{font-size:15px;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:28px;}
-.de-stats{display:flex;gap:12px;justify-content:center;margin-bottom:28px;}
-.de-stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px 20px;text-align:center;}
-.de-stat-n{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--gc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.de-stat-l{font-size:11px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
-.de-next-btn{width:100%;background:linear-gradient(135deg,var(--ga),var(--gb),var(--gc));color:white;border:none;border-radius:16px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 8px 32px rgba(124,58,237,.4);}
-.de-done-btn{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:16px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
 
 /* MAPPE */
 #mappe-tab{overflow-y:auto;background:#f4f0fb;padding:0 0 16px;}
@@ -264,6 +216,86 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loading-screen" style="position:fixed;inset:0;background:#0d0d1a;z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <div style="width:40px;height:40px;border:3px solid rgba(167,139,250,.2);border-top-color:#c4b5fd;border-radius:50%;animation:spin 1s linear infinite;"></div>
+  <p style="color:rgba(255,255,255,.4);font-size:14px;">Stevie lädt…</p>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e1433;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:12px 20px;font-size:14px;color:#f3eeff;z-index:1000;opacity:0;transition:all .3s;pointer-events:none;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
+<style>
+#toast.show{opacity:1!important;transform:translateX(-50%) translateY(0)!important;}
+#toast.err{border-color:rgba(239,68,68,.4)!important;background:#2d0f0f!important;}
+#toast.ok{border-color:rgba(34,197,94,.4)!important;background:#0f2d1a!important;}
+</style>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:white;border-radius:20px;padding:24px 20px;width:100%;max-width:320px;text-align:center;">
+    <div id="confirm-msg" style="font-size:15px;color:#2d1b4e;font-weight:600;margin-bottom:6px;">Sicher?</div>
+    <div id="confirm-sub" style="font-size:13px;color:#9c6fc4;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button id="confirm-cancel" style="flex:1;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:#f5f3ff;color:#7c3aed;">Abbrechen</button>
+      <button id="confirm-ok" style="flex:1;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authscreen" class="screen center-screen">
+  <div class="dcard" style="max-width:420px;width:100%;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;"><svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+      <h2 style="font-size:19px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Willkommen bei Stevie</h2>
+      <p style="color:rgba(255,255,255,.4);font-size:13px;">Erstelle ein Konto oder melde dich an.</p>
+    </div>
+    <div style="display:flex;background:rgba(255,255,255,.06);border-radius:14px;padding:4px;margin-bottom:24px;">
+      <button class="auth-tab active" id="tab-register" style="flex:1;padding:9px;text-align:center;font-size:14px;font-weight:600;color:rgba(255,255,255,.4);cursor:pointer;border-radius:10px;border:none;background:none;transition:all .2s;">Registrieren</button>
+      <button class="auth-tab" id="tab-login" style="flex:1;padding:9px;text-align:center;font-size:14px;font-weight:600;color:rgba(255,255,255,.4);cursor:pointer;border-radius:10px;border:none;background:none;transition:all .2s;">Anmelden</button>
+    </div>
+    <style>.auth-tab.active{background:linear-gradient(135deg,var(--ga),var(--gb))!important;color:white!important;}.auth-form{display:none;}.auth-form.active{display:block;}</style>
+    <!-- REGISTER -->
+    <div class="auth-form active" id="form-register">
+      <label class="fl">E-Mail-Adresse</label>
+      <input class="di" type="email" id="reg-email" placeholder="deine@email.de" autocomplete="email"/>
+      <label class="fl">Passwort</label>
+      <input class="di" type="password" id="reg-pass" placeholder="Mindestens 6 Zeichen" autocomplete="new-password"/>
+      <label class="fl">Passwort wiederholen</label>
+      <input class="di" type="password" id="reg-pass2" placeholder="Passwort bestätigen" autocomplete="new-password"/>
+      <button class="btn" id="reg-btn">Konto erstellen</button>
+      <p style="text-align:center;font-size:13px;color:rgba(255,255,255,.4);">Schon ein Konto? <button id="switch-to-login" style="background:none;border:none;color:var(--acc);cursor:pointer;text-decoration:underline;font-size:13px;">Anmelden</button></p>
+    </div>
+    <!-- LOGIN -->
+    <div class="auth-form" id="form-login">
+      <label class="fl">E-Mail-Adresse</label>
+      <input class="di" type="email" id="login-email" placeholder="deine@email.de" autocomplete="email"/>
+      <label class="fl">Passwort</label>
+      <input class="di" type="password" id="login-pass" placeholder="Dein Passwort" autocomplete="current-password"/>
+      <button class="btn" id="login-btn">Anmelden</button>
+      <p style="text-align:center;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:8px;"><button id="forgot-btn" style="background:none;border:none;color:var(--acc);cursor:pointer;text-decoration:underline;font-size:13px;">Passwort vergessen?</button></p>
+      <p style="text-align:center;font-size:13px;color:rgba(255,255,255,.4);">Noch kein Konto? <button id="switch-to-register" style="background:none;border:none;color:var(--acc);cursor:pointer;text-decoration:underline;font-size:13px;">Registrieren</button></p>
+    </div>
+    <!-- VERIFY -->
+    <div class="auth-form" id="form-verify">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;text-align:center;margin-bottom:18px;">
+        <div style="font-size:36px;margin-bottom:10px;">✉️</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Wir haben eine Bestätigungs-E-Mail an<br><b id="verify-email-shown" style="color:var(--acc);">–</b><br>geschickt. Bitte bestätige deine Adresse.</p>
+      </div>
+      <button class="btn" id="resend-btn">E-Mail erneut senden</button>
+      <button class="btn-ghost" id="back-to-login">Zurück zur Anmeldung</button>
+    </div>
+    <!-- RESET -->
+    <div class="auth-form" id="form-reset">
+      <label class="fl">Deine E-Mail-Adresse</label>
+      <input class="di" type="email" id="reset-email" placeholder="deine@email.de"/>
+      <button class="btn" id="reset-btn">Link senden</button>
+      <button class="btn-ghost" id="back-from-reset">Zurück</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- SVG ICONS -->
 <svg style="display:none">
   <defs>
@@ -285,7 +317,6 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
     <symbol id="ic-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
     <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></symbol>
-    <symbol id="ic-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3l4 2"/><path d="M19 3l-4 2"/></symbol>
   </defs>
 </svg>
 
@@ -318,6 +349,10 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
       <circle cx="63" cy="69" r="1.3" fill="#0c0c0c"/>
       <circle cx="48.5" cy="67.5" r=".9" fill="white"/>
       <circle cx="64.5" cy="67.5" r=".9" fill="white"/>
+      <path d="M41 64 Q42 62 43 64" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M50 63 Q51 61 52 63" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M58 63 Q59 61 60 63" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M67 64 Q68 62 69 64" stroke="#1c1917" stroke-width="1.2" stroke-linecap="round" fill="none"/>
       <path d="M53 77 Q55 81 57 77" stroke="#d4956a" stroke-width="1.3" stroke-linecap="round" fill="none"/>
       <path d="M45 84 Q55 92 65 84" stroke="#c0715a" stroke-width="2.2" stroke-linecap="round" fill="none"/>
       <ellipse cx="38" cy="78" rx="7" ry="3.5" fill="rgba(255,140,150,0.28)"/>
@@ -365,8 +400,8 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
   </div>
 </div>
 
-<!-- KEYS -->
-<div id="keyscreen" class="screen center-screen">
+<!-- KEYS (replaced by authscreen) -->
+<div id="keyscreen" class="screen center-screen" style="display:none!important;">
   <div class="dcard" style="max-width:420px;width:100%;">
     <div style="text-align:center;margin-bottom:22px;">
       <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;"><svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
@@ -399,7 +434,11 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <div class="vbtn-row" id="voice-grid"></div>
     <label class="fl">Dein Design</label>
     <div class="theme-row" id="theme-grid"></div>
-    <button class="btn" id="ob-btn">Weiter</button>
+    <label class="fl">Anthropic API-Key</label>
+    <input class="di" type="password" id="ob-ant-key" placeholder="sk-ant-… (wird sicher gespeichert)"/>
+    <label class="fl">ElevenLabs Key <span style="font-weight:400;opacity:.5;">(optional)</span></label>
+    <input class="di" type="password" id="ob-el-key" placeholder="Für natürliche Stimme"/>
+    <button class="btn" id="ob-btn">Los geht's mit Stevie!</button>
   </div>
 </div>
 
@@ -444,35 +483,21 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
     <div class="hinfo"><h2>Stevie</h2><p id="hdr-sub">Lernbegleiterin</p></div>
     <div class="hright">
       <button class="vtgl von" id="vtgl"><svg width="14" height="14"><use href="#ic-vol"/></svg> An</button>
-      <button class="hbtn" id="settings-btn"><svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-gear"/></svg></button>
+      <div id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;" title="Gespeichert"></div><button class="hbtn" id="settings-btn"><svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-gear"/></svg></button>
     </div>
   </div>
 
   <div id="chat-tab" class="app-tab active">
-    <!-- TOP BAR: Progress + Pomodoro -->
-    <div id="chat-top-bar">
-      <span class="prog-lbl" id="prog-lbl">Bereit</span>
-      <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
-      <span class="prog-pct" id="prog-pct">0%</span>
-      <button class="pom-btn" id="pom-btn">
-        <svg width="13" height="13"><use href="#ic-timer"/></svg>
-        <span id="pom-btn-lbl">25:00</span>
-      </button>
-    </div>
+    <div id="prog-bar"><span class="prog-lbl" id="prog-lbl">Bereit</span><div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div><span class="prog-pct" id="prog-pct">0%</span></div>
     <div id="topic-row"></div>
     <div id="messages"></div>
     <div id="speak-ind"><svg width="14" height="14" style="color:#7c3aed;"><use href="#ic-vol"/></svg> Stevie spricht… <button id="stop-btn" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:11px;text-decoration:underline;">Stop</button></div>
     <div id="imgprev"><img id="imgthumb" src="" alt=""/><button class="imgdel" id="img-del-btn">×</button></div>
-    <!-- NEW SESSION BAR (hidden by default) -->
-    <div class="new-session-bar" id="new-session-bar" style="display:none;">
-      <p>Neues Fach lernen?</p>
-      <button id="new-session-btn">Neue Runde starten</button>
-    </div>
     <div class="chat-footer">
       <button class="fbtn" id="cam-btn"><svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-camera"/></svg></button>
       <input type="file" id="chat-file" accept="image/*" style="display:none"/>
       <textarea id="msginput" rows="1" placeholder="Schreib oder sprich mit Stevie…"></textarea>
-      <button class="fbtn" id="micbtn"><svg width="18" height="18" style="color:#7c3aed;"><use href="#ic-mic"/></svg></button>
+      <button class="fbtn" id="micbtn"><svg width="18" height="18" style="color:#7c3aed;" id="mic-ic"><use href="#ic-mic"/></svg></button>
       <button id="sendbtn"><svg width="18" height="18" style="color:white;"><use href="#ic-send"/></svg></button>
     </div>
   </div>
@@ -492,6 +517,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
       </div>
       <div class="p-name" id="p-name">–</div>
       <div class="p-sub" id="p-sub">–</div>
+      <div id="p-email" style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">–</div>
     </div>
     <div class="p-cards">
       <div class="p-card"><div class="p-card-ico"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-folder"/></svg></div><div class="p-num" id="stat-f">0</div><div class="p-lbl">Fächer</div></div>
@@ -508,6 +534,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
       <div id="sessions-list"><p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p></div>
     </div>
   </div>
+  <div style="padding:0 14px;margin-top:12px;"><button id="logout-btn" style="width:100%;background:none;border:1.5px solid #fecaca;border-radius:14px;padding:13px;font-size:14px;font-weight:600;color:#dc2626;cursor:pointer;">Abmelden</button></div>
 
   <div class="bot-nav">
     <button class="nav-i active" id="nav-chat"><svg width="22" height="22" style="color:var(--tc);"><use href="#ic-chat"/></svg><p>CHAT</p></button>
@@ -550,52 +577,7 @@ body.t-rose{--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(236,
   </div>
 </div>
 
-<div id="lightbox"><button id="lb-close">×</button><img id="lb-img" src="" alt=""/></div>
-
-<!-- POMODORO OVERLAY -->
-<div id="pom-overlay">
-  <div class="pom-card">
-    <svg width="0" height="0"><defs><linearGradient id="pom-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--ga)"/><stop offset="100%" style="stop-color:var(--gc)"/></linearGradient></defs></svg>
-    <div class="pom-ring-wrap">
-      <svg class="pom-ring-svg" width="160" height="160" viewBox="0 0 160 160">
-        <circle class="pom-ring-bg" cx="80" cy="80" r="70"/>
-        <circle class="pom-ring-fill" id="pom-ring" cx="80" cy="80" r="70" stroke-dasharray="439.8" stroke-dashoffset="0"/>
-      </svg>
-      <div class="pom-time">
-        <div class="pom-time-num" id="pom-display">25:00</div>
-        <div class="pom-time-lbl" id="pom-phase-lbl">Lernzeit</div>
-      </div>
-    </div>
-    <div class="pom-title" id="pom-modal-title">Pomodoro-Timer</div>
-    <div class="pom-sub" id="pom-modal-sub">25 Minuten konzentriert lernen, dann 5 Minuten Pause.</div>
-    <div class="pom-btns">
-      <button class="pom-start" id="pom-action-btn">Starten</button>
-      <button class="pom-close-btn" id="pom-close-btn">Schließen</button>
-    </div>
-  </div>
-</div>
-
-<!-- DAY END RITUAL -->
-<div id="dayend-overlay">
-  <canvas class="de-stars" id="de-stars"></canvas>
-  <div class="de-inner">
-    <div class="de-avatar" id="de-avatar"></div>
-    <div class="de-stars-row">
-      <span class="de-star">⭐</span>
-      <span class="de-star">⭐</span>
-      <span class="de-star">⭐</span>
-    </div>
-    <div class="de-title" id="de-title">Super gemacht!</div>
-    <div class="de-msg" id="de-msg">Du hast heute richtig hart gearbeitet. Stevie ist stolz auf dich!</div>
-    <div class="de-stats">
-      <div class="de-stat"><div class="de-stat-n" id="de-topics">0</div><div class="de-stat-l">Themen</div></div>
-      <div class="de-stat"><div class="de-stat-n" id="de-day-num">1</div><div class="de-stat-l">Tag</div></div>
-      <div class="de-stat"><div class="de-stat-n" id="de-streak">1</div><div class="de-stat-l">Tage-Serie</div></div>
-    </div>
-    <button class="de-next-btn" id="de-next-btn">Weiter zu Tag 2</button>
-    <button class="de-done-btn" id="de-done-btn">Für heute fertig</button>
-  </div>
-</div>
+<div id="lightbox" id="lightbox"><button id="lb-close">×</button><img id="lb-img" src="" alt=""/></div>
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
@@ -617,18 +599,135 @@ const AVATARS=[
 // ─── STATE ────────────────────────────────────────────────
 const S={name:'',age:11,grade:5,theme:'purple',voiceId:VOICES[0].id,avatarId:'stevie',subject:'',days:1,currentDay:1,plan:[],doneTopic:{},msgs:[],voiceOn:true,listening:false,chatImg:null,matImages:[]};
 
-// ─── POMODORO STATE ───────────────────────────────────────
-const POM={
-  WORK:25*60, BREAK:5*60,
-  remaining:25*60, total:25*60,
-  phase:'work', // 'work' | 'break'
-  running:false, interval:null,
-  rounds:0
-};
 
+// ─── SUPABASE ─────────────────────────────────────────────
+const SUPA_URL='https://vltfdbpvksvfvrwenasv.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+var currentUser=null;
+
+// ─── TOAST (replaces alert()) ──────────────────────────────
+var _toastTimer=null;
+function toast(msg,type){
+  var el=document.getElementById('toast');if(!el)return;
+  el.textContent=msg;el.className='show '+(type||'');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){el.className='';},3200);
+}
+
+// ─── CONFIRM (replaces confirm()) ─────────────────────────
+function showConfirm(msg,sub,okLabel,cb){
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-sub').textContent=sub||'';
+  document.getElementById('confirm-ok').textContent=okLabel||'Löschen';
+  document.getElementById('confirm-overlay').classList.add('open');
+  function cleanup(){document.getElementById('confirm-overlay').classList.remove('open');}
+  document.getElementById('confirm-ok').onclick=function(){cleanup();cb(true);};
+  document.getElementById('confirm-cancel').onclick=function(){cleanup();cb(false);};
+}
+
+// ─── SYNC DOT ─────────────────────────────────────────────
+function setSyncState(state){
+  var dot=document.getElementById('sync-dot');if(!dot)return;
+  dot.className='sync-dot'+(state==='syncing'?' syncing':state==='error'?' error':'');
+}
+
+// ─── SUPABASE DATA HELPERS ────────────────────────────────
+async function dbGet(table){
+  if(!currentUser)return null;
+  var{data}=await sb.from(table).select('data').eq('user_id',currentUser.id).single();
+  return data?data.data:null;
+}
+async function dbSet(table,value){
+  if(!currentUser)return;
+  setSyncState('syncing');
+  var{error}=await sb.from(table).upsert({user_id:currentUser.id,data:value,updated_at:new Date().toISOString()});
+  setSyncState(error?'error':'saved');
+}
+
+// ─── PROFILE SYNC ─────────────────────────────────────────
+async function loadProfile(){
+  if(!currentUser)return false;
+  var{data,error}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(error||!data)return false;
+  S.name=data.name||'';S.age=data.age||11;S.grade=data.grade||5;
+  S.theme=data.theme||'purple';S.voiceId=data.voice_id||VOICES[0].id;S.avatarId=data.avatar_id||'stevie';
+  applyTheme(S.theme);return true;
+}
+async function saveProfile(){
+  if(!currentUser)return;setSyncState('syncing');
+  var{error}=await sb.from('profiles').upsert({id:currentUser.id,name:S.name,age:S.age,grade:S.grade,theme:S.theme,voice_id:S.voiceId,avatar_id:S.avatarId,updated_at:new Date().toISOString()});
+  setSyncState(error?'error':'saved');
+}
+async function loadKeys(){
+  if(!currentUser)return;
+  var{data}=await sb.from('user_keys').select('*').eq('user_id',currentUser.id).single();
+  if(data){if(data.anthropic_key)localStorage.setItem('stevie_key',data.anthropic_key);if(data.eleven_key)localStorage.setItem('stevie_eleven',data.eleven_key);}
+}
+async function saveKeys(antKey,elKey){
+  if(!currentUser)return;
+  var p={user_id:currentUser.id};if(antKey)p.anthropic_key=antKey;if(elKey)p.eleven_key=elKey;
+  await sb.from('user_keys').upsert(p);
+}
+
+// ─── AUTH HELPERS ─────────────────────────────────────────
+function showAuthForm(name){document.querySelectorAll('.auth-form').forEach(function(f){f.classList.remove('active');});document.getElementById('form-'+name).classList.add('active');}
+function showAuthTab(name){document.querySelectorAll('.auth-tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');showAuthForm(name);}
+
+async function doRegister(){
+  var email=document.getElementById('reg-email').value.trim(),pass=document.getElementById('reg-pass').value,pass2=document.getElementById('reg-pass2').value;
+  if(!email||!pass){toast('Bitte alle Felder ausfüllen.','err');return;}
+  if(pass.length<6){toast('Passwort: mindestens 6 Zeichen.','err');return;}
+  if(pass!==pass2){toast('Passwörter stimmen nicht überein.','err');return;}
+  var btn=document.getElementById('reg-btn');btn.disabled=true;btn.textContent='Konto wird erstellt…';
+  var{error}=await sb.auth.signUp({email:email,password:pass});
+  btn.disabled=false;btn.textContent='Konto erstellen';
+  if(error){toast(error.message,'err');return;}
+  document.getElementById('verify-email-shown').textContent=email;showAuthForm('verify');
+}
+
+async function doLogin(){
+  var email=document.getElementById('login-email').value.trim(),pass=document.getElementById('login-pass').value;
+  if(!email||!pass){toast('Bitte E-Mail und Passwort eingeben.','err');return;}
+  var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Anmelden…';
+  var{error}=await sb.auth.signInWithPassword({email:email,password:pass});
+  btn.disabled=false;btn.textContent='Anmelden';
+  if(error){toast(error.message==='Invalid login credentials'?'E-Mail oder Passwort falsch.':error.message,'err');return;}
+}
+
+async function doReset(){
+  var email=document.getElementById('reset-email').value.trim();
+  if(!email){toast('Bitte E-Mail eingeben.','err');return;}
+  var{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
+  if(error){toast(error.message,'err');return;}
+  toast('Link gesendet! Schau in dein Postfach.','ok');showAuthForm('login');
+}
+
+async function doResend(){
+  var email=document.getElementById('verify-email-shown').textContent;if(!email||email==='–')return;
+  await sb.auth.resend({type:'signup',email:email});toast('E-Mail erneut gesendet!','ok');
+}
+
+async function doLogout(){
+  showConfirm('Wirklich abmelden?','Dein Lernstand bleibt gespeichert.','Abmelden',async function(ok){
+    if(!ok)return;await sb.auth.signOut();currentUser=null;showScreen('splash');
+  });
+}
+
+async function initAfterLogin(user){
+  currentUser=user;await loadKeys();
+  var hasProfile=await loadProfile();
+  document.getElementById('loading-screen').style.display='none';
+  if(!hasProfile){buildOnboarding();showScreen('onboarding');}
+  else{document.getElementById('setup-sub').textContent='Hey '+S.name+'! Sag mir womit wir starten.';showScreen('setup');}
+}
+
+
+// localStorage only used for API keys (security boundary)
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch{return null;}}
 function lsSet(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function getKey(){return localStorage.getItem('stevie_key')||'';}
+
 
 function avSvg(id,size){
   const av=AVATARS.find(a=>a.id===id)||AVATARS[0];
@@ -640,7 +739,9 @@ function applyTheme(key){
   document.body.className=THEMES[S.theme]?.cls||'';
 }
 
-function saveProfile(){
+// saveProfile is now async via Supabase (defined above in Supabase section)
+// legacy stub kept for compatibility:
+function _saveProfileLegacy(){
   lsSet('stevie_profile',{name:S.name,age:S.age,grade:S.grade,theme:S.theme,voiceId:S.voiceId,avatarId:S.avatarId});
 }
 
@@ -649,42 +750,62 @@ function updateAvatars(){
   document.querySelectorAll('.mav').forEach(el=>el.innerHTML=avSvg(S.avatarId,30));
   const pa=document.getElementById('profil-av');
   if(pa) pa.innerHTML=avSvg(S.avatarId,84);
-  const da=document.getElementById('de-avatar');
-  if(da) da.innerHTML=avSvg(S.avatarId,100);
 }
 
 // ─── INIT ─────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded',function(){
+window.addEventListener('DOMContentLoaded',async function(){
   initStars();
   buildDaysGrid();
-  const prof=lsGet('stevie_profile');
-  if(prof){Object.assign(S,prof);}
-  applyTheme(S.theme);
+
+  // Show loading screen, check auth session
+  document.getElementById('loading-screen').style.display='flex';
+
+  // Auth state listener
+  sb.auth.onAuthStateChange(async function(event,session){
+    if(event==='SIGNED_IN'&&session){await initAfterLogin(session.user);}
+    else if(event==='SIGNED_OUT'){showScreen('splash');}
+  });
+
+  // Check existing session
+  var{data:{session}}=await sb.auth.getSession();
+  if(session){await initAfterLogin(session.user);}
+  else{document.getElementById('loading-screen').style.display='none';showScreen('splash');}
 
   // Splash
   document.getElementById('splash-btn').addEventListener('click',function(){
-    if(!getKey()){showScreen('keyscreen');}
-    else if(!lsGet('stevie_profile')){buildOnboarding();showScreen('onboarding');}
-    else{showScreen('setup');}
+    showScreen('authscreen');showAuthTab('register');
   });
 
-  // Keys
-  document.getElementById('keys-btn').addEventListener('click',function(){
-    const k=document.getElementById('k-ant').value.trim();
-    if(!k.startsWith('sk-')){alert('Bitte einen gültigen Anthropic API-Key eingeben.');return;}
-    localStorage.setItem('stevie_key',k);
-    const ek=document.getElementById('k-el').value.trim();
-    if(ek) localStorage.setItem('stevie_eleven',ek);
-    buildOnboarding();showScreen('onboarding');
-  });
+  // Auth buttons
+  document.getElementById('tab-register').addEventListener('click',function(){showAuthTab('register');});
+  document.getElementById('tab-login').addEventListener('click',function(){showAuthTab('login');});
+  document.getElementById('switch-to-login').addEventListener('click',function(){showAuthTab('login');});
+  document.getElementById('switch-to-register').addEventListener('click',function(){showAuthTab('register');});
+  document.getElementById('reg-btn').addEventListener('click',doRegister);
+  document.getElementById('login-btn').addEventListener('click',doLogin);
+  document.getElementById('forgot-btn').addEventListener('click',function(){showAuthForm('reset');});
+  document.getElementById('reset-btn').addEventListener('click',doReset);
+  document.getElementById('back-from-reset').addEventListener('click',function(){showAuthForm('login');});
+  document.getElementById('resend-btn').addEventListener('click',doResend);
+  document.getElementById('back-to-login').addEventListener('click',function(){showAuthForm('login');});
+  document.getElementById('logout-btn').addEventListener('click',doLogout);
+  document.getElementById('reg-pass2').addEventListener('keydown',function(e){if(e.key==='Enter')doRegister();});
+  document.getElementById('login-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
   // Onboarding
-  document.getElementById('ob-btn').addEventListener('click',function(){
-    const name=document.getElementById('ob-name').value.trim();
-    if(!name){alert('Wie heißt du?');return;}
-    if(!S.age){alert('Bitte wähle dein Alter.');return;}
-    if(!S.grade){alert('Bitte wähle deine Klasse.');return;}
-    S.name=name;saveProfile();
+  document.getElementById('ob-btn').addEventListener('click',async function(){
+    var name=document.getElementById('ob-name').value.trim();
+    var antKey=document.getElementById('ob-ant-key').value.trim();
+    var elKey=document.getElementById('ob-el-key').value.trim();
+    if(!name){toast('Wie heißt du?','err');return;}
+    if(!S.age){toast('Bitte wähle dein Alter.','err');return;}
+    if(!S.grade){toast('Bitte wähle deine Klasse.','err');return;}
+    if(!antKey||!antKey.startsWith('sk-')){toast('Bitte einen gültigen Anthropic API-Key eingeben.','err');return;}
+    S.name=name;
+    localStorage.setItem('stevie_key',antKey);
+    if(elKey)localStorage.setItem('stevie_eleven',elKey);
+    await saveKeys(antKey,elKey||null);
+    await saveProfile();
     document.getElementById('setup-sub').textContent='Hey '+name+'! Sag mir womit wir starten.';
     showScreen('setup');
   });
@@ -692,8 +813,8 @@ window.addEventListener('DOMContentLoaded',function(){
   // Setup
   document.getElementById('setup-btn').addEventListener('click',function(){
     const s=document.getElementById('subject-input').value.trim();
-    if(!s){alert('Bitte gib ein Fach ein!');return;}
-    if(!S.days){alert('Bitte wähle die Anzahl der Tage!');return;}
+    if(!s){toast('Bitte gib ein Fach ein!','err');return;}
+    if(!S.days){toast('Bitte wähle die Anzahl der Tage!','err');return;}
     S.subject=s;S.matImages=[];
     document.getElementById('mat-thumbs').innerHTML='';
     document.getElementById('mat-next-btn').style.display='none';
@@ -731,11 +852,6 @@ window.addEventListener('DOMContentLoaded',function(){
   document.getElementById('stop-btn').addEventListener('click',stopSpeaking);
   document.getElementById('vtgl').addEventListener('click',toggleVoice);
 
-  // New session button
-  document.getElementById('new-session-btn').addEventListener('click',function(){
-    showScreen('setup');
-  });
-
   // Nav
   document.getElementById('nav-chat').addEventListener('click',function(){switchTab('chat');});
   document.getElementById('nav-mappe').addEventListener('click',function(){switchTab('mappe');});
@@ -767,17 +883,6 @@ window.addEventListener('DOMContentLoaded',function(){
     e.stopPropagation();
     document.getElementById('lightbox').classList.remove('open');
   });
-
-  // Pomodoro
-  document.getElementById('pom-btn').addEventListener('click',openPomodoro);
-  document.getElementById('pom-action-btn').addEventListener('click',togglePomodoro);
-  document.getElementById('pom-close-btn').addEventListener('click',function(){
-    document.getElementById('pom-overlay').classList.remove('open');
-  });
-
-  // Day End
-  document.getElementById('de-next-btn').addEventListener('click',advanceDay);
-  document.getElementById('de-done-btn').addEventListener('click',finishLearning);
 });
 
 // ─── SCREENS ──────────────────────────────────────────────
@@ -873,15 +978,11 @@ function compressImage(file,cb){
 async function startApp(skip){
   if(skip)S.matImages=[];
   S.msgs=[];S.doneTopic={};S.currentDay=1;
-  // FIX: hide new-session bar on fresh start
-  document.getElementById('new-session-bar').style.display='none';
   showScreen('app');switchTab('chat');
   document.getElementById('hdr-sub').textContent=S.subject+' · Klasse '+S.grade;
   updateAvatars();
   var faecher=lsGet('stevie_faecher')||[];
-  var fach=faecher.find(function(f){
-    return f.name&&(f.name.toLowerCase()===S.subject.toLowerCase()||S.subject.toLowerCase().includes(f.name.toLowerCase()));
-  })||null;
+  var fach=faecher.find(function(f){return f.name&&(f.name.toLowerCase()===S.subject.toLowerCase()||S.subject.toLowerCase().includes(f.name.toLowerCase()));})||null;
   await generatePlan(fach);
   logSession(S.subject);
   renderProfil();
@@ -903,7 +1004,6 @@ async function generatePlan(fach){
     var d=await res.json();
     var txt=d.content&&d.content.find(function(b){return b.type==='text';});
     S.plan=JSON.parse((txt?txt.text:'[]').replace(/```json|```/g,'').trim());
-    if(!Array.isArray(S.plan)||!S.plan.length)throw new Error('empty');
   } catch(e){
     S.plan=Array.from({length:S.days},function(_,i){return{day:i+1,title:'Tag '+(i+1),topics:[S.subject]};});
   }
@@ -916,9 +1016,7 @@ function startChat(fach){
   if(fach&&fach.topics&&fach.topics.length)matCtx='\n\nIn deiner Mappe habe ich folgende Themen gefunden: '+fach.topics.join(', ')+'.';
   var matCount=fach&&fach.images?fach.images.length:0;
   var greeting='Hey '+S.name+'! Ich bin Stevie, deine Lernbegleiterin.\n\nHeute lernen wir '+S.subject+' zusammen.'+matCtx+(matCount>0?'\n\nDu hast '+matCount+' Seite'+(matCount>1?'n':'')+' in deiner Mappe – ich kenne deinen Stoff bereits.':'')+'\n\nWomit möchtest du anfangen?';
-  // FIX: Don't auto-speak the greeting – first message happens before user interaction (Safari blocks audio).
-  // We add it without triggering speak(), user must tap to activate audio first.
-  addMsg('assistant',greeting,'Motivation',null,true);
+  addMsg('assistant',greeting,'Motivation');
 }
 
 // ─── CHAT ─────────────────────────────────────────────────
@@ -926,7 +1024,7 @@ function getSys(){
   var lvl=S.grade<=4?'Grundschule – sehr einfach':S.grade<=6?'Unterstufe – klar und anschaulich':S.grade<=8?'Mittelstufe – freundlich, etwas Tiefe':'Oberstufe';
   var day=S.plan[S.currentDay-1];
   var faecher=lsGet('stevie_faecher')||[];
-  var fach=faecher.find(function(f){return f.name&&(f.name.toLowerCase()===S.subject.toLowerCase()||S.subject.toLowerCase().includes(f.name.toLowerCase()));});
+  var fach=faecher.find(function(f){return f.name&&(f.name.toLowerCase()===S.subject.toLowerCase()||S.subject.toLowerCase().includes(f.name.toLowerCase()));})||null;
   var matCtx=fach&&fach.topics&&fach.topics.length?'\nThemen aus der Mappe: '+fach.topics.join(', ')+'.':'';
   var planCtx=day?'\nLernplan heute – Tag '+S.currentDay+': '+day.topics.join(', ')+'.':'';
   return 'Du bist Stevie, KI-Lernbegleiterin. Du sprichst mit '+S.name+', '+S.age+' Jahre, '+S.grade+'. Klasse ('+lvl+').\nPersönlichkeit: Warmherzig, klar, ermutigend. Sprich '+S.name+' gelegentlich mit Namen an.\nMethodik: Fragen stellen statt erklären. Immer nur EINE Frage. Kurze Antworten (2-4 Sätze).\nWICHTIG: Kein Markdown, keine Sternchen, kein **fett**, kein *kursiv*. Nur normaler Text.\nWenn du ein Bild bekommst, analysiere es und stelle eine Frage dazu.\nMarkiere jede Antwort: [TAG:Frage] [TAG:Erklärung] [TAG:Feedback] [TAG:Motivation]\nWenn Thema abgeschlossen: [DONE:Themenname]\nFach: '+(S.subject||'unbekannt')+'.'+matCtx+planCtx+'\nAntworte auf Deutsch.';
@@ -950,24 +1048,10 @@ function updateProgress(){
   document.getElementById('bar-fill').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'%';
   document.getElementById('prog-lbl').textContent='Tag '+S.currentDay+'/'+(S.days||1);
-  // FIX B – Check if day is complete
-  if(pct===100&&day.topics.length>0){
-    setTimeout(triggerDayEnd,800);
-  }
 }
 
-// FIX A: addMsg now accepts a suppressSpeak flag for the greeting
-function addMsg(role,content,tag,imgSrc,suppressSpeak){
-  // FIX B: Build proper API-compatible messages history
-  // For user messages with images, we store the full content array
-  // For assistant and plain text, we store just the string
-  if(role==='user'){
-    // Store for API replay – will be rebuilt properly in sendMsg
-    S.msgs.push({role:'user',content:content||'[Bild]'});
-  } else {
-    S.msgs.push({role:'assistant',content:content});
-  }
-
+function addMsg(role,content,tag,imgSrc){
+  S.msgs.push({role:role,content:content});
   var row=document.createElement('div');row.className='mrow '+role;
   if(role==='assistant'){
     var av=document.createElement('div');av.className='mav';av.innerHTML=avSvg(S.avatarId,30);row.appendChild(av);
@@ -984,8 +1068,8 @@ function addMsg(role,content,tag,imgSrc,suppressSpeak){
     rb.addEventListener('click',function(){speak(clean);});row.appendChild(rb);
     var dm=content.match(/\[DONE:([^\]]+)\]/);if(dm)markDone(dm[1]);
     if(content.indexOf('[TAG:Frage]')>=0)setTimeout(function(){addQR(row);},150);
-    // FIX A: Only speak if not suppressed (fixes Safari auto-play block)
-    if(!suppressSpeak){speak(clean);}
+    // Speak immediately
+    speak(clean);
   }
   document.getElementById('messages').appendChild(row);
   document.getElementById('messages').scrollTop=999999;
@@ -1020,40 +1104,13 @@ async function sendMsg(){
   var inp=document.getElementById('msginput'),text=inp.value.trim();
   if(!text&&!S.chatImg)return;
   stopSpeaking();
-
-  // FIX B: Build user content for API correctly
-  var apiUserContent=[];
-  var imgSrc=null;
-  if(S.chatImg){
-    apiUserContent.push({type:'image',source:{type:'base64',media_type:S.chatImg.type,data:S.chatImg.data}});
-    imgSrc=document.getElementById('imgthumb').src;
-  }
-  if(text)apiUserContent.push({type:'text',text:text});
-
-  // Add user message to UI
+  var uc=[],imgSrc=null;
+  if(S.chatImg){uc.push({type:'image',source:{type:'base64',media_type:S.chatImg.type,data:S.chatImg.data}});imgSrc=document.getElementById('imgthumb').src;}
+  if(text)uc.push({type:'text',text:text});
   addMsg('user',text||'[Bild]',null,imgSrc);
-  // FIX B: Replace last entry in S.msgs with correct content (addMsg stored text only)
-  // For image messages, we need the full content array in history for this turn
-  S.msgs[S.msgs.length-1]={role:'user',content:apiUserContent.length===1&&apiUserContent[0].type==='text'?text:apiUserContent};
-
   inp.value='';removeImg();
   document.getElementById('sendbtn').disabled=true;showTyping();
-
-  // FIX B: Build API messages array – only send text for past messages (images only for current turn)
-  var apiMsgs=S.msgs.map(function(m,idx){
-    if(idx===S.msgs.length-1){
-      // Last message = current turn, send as-is (may contain image)
-      return{role:m.role,content:m.content};
-    }
-    // Previous messages: if content is an array, extract only text parts
-    if(Array.isArray(m.content)){
-      var textParts=m.content.filter(function(p){return p.type==='text';});
-      var textStr=textParts.map(function(p){return p.text;}).join(' ')||'[Bild gesendet]';
-      return{role:m.role,content:textStr};
-    }
-    return{role:m.role,content:m.content};
-  });
-
+  var apiMsgs=S.msgs.map(function(m){return{role:m.role,content:m.content};});
   try{
     var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:getSys(),messages:apiMsgs})});
     var d=await res.json();hideTyping();
@@ -1062,7 +1119,7 @@ async function sendMsg(){
     var reply=txt?txt.text:'Hmm, kurzer Fehler.';
     var tm=reply.match(/\[TAG:([^\]]+)\]/);
     addMsg('assistant',reply,tm?tm[1]:null);
-  }catch(e){hideTyping();addMsg('assistant','Ups, da ist was schiefgelaufen: '+e.message,null);}
+  }catch(e){hideTyping();addMsg('assistant','Ups: '+e.message,null);}
   document.getElementById('sendbtn').disabled=false;
 }
 
@@ -1088,7 +1145,7 @@ function speak(text){
   if(ek){
     fetch('https://api.elevenlabs.io/v1/text-to-speech/'+S.voiceId,{method:'POST',headers:{'xi-api-key':ek,'Content-Type':'application/json'},body:JSON.stringify({text:clean,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.8,style:.3,use_speaker_boost:true}})})
     .then(function(r){if(!r.ok)throw new Error('EL error');return r.blob();})
-    .then(function(blob){var url=URL.createObjectURL(blob);curAudio=new Audio(url);curAudio.onended=function(){setSI(false);};curAudio.play().catch(function(){setSI(false);});setSI(true);})
+    .then(function(blob){var url=URL.createObjectURL(blob);curAudio=new Audio(url);curAudio.onended=function(){setSI(false);};curAudio.play();setSI(true);})
     .catch(function(){fallbackSpeak(clean);});
     return;
   }
@@ -1112,7 +1169,7 @@ var recRef=null;
 function toggleListen(){
   if(S.listening){if(recRef)recRef.stop();return;}
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Spracheingabe benötigt Chrome.');return;}
+  if(!SR){toast('Spracheingabe benötigt Chrome.','err');return;}
   recRef=new SR();recRef.lang='de-DE';recRef.continuous=false;recRef.interimResults=false;
   recRef.onresult=function(e){document.getElementById('msginput').value=e.results[0][0].transcript;setL(false);};
   recRef.onerror=recRef.onend=function(){setL(false);};
@@ -1133,148 +1190,10 @@ function switchTab(tab){
   if(tab==='profil')renderProfil();
 }
 
-// ─── POMODORO ─────────────────────────────────────────────
-function openPomodoro(){
-  updatePomUI();
-  document.getElementById('pom-overlay').classList.add('open');
-}
-
-function togglePomodoro(){
-  if(POM.running){
-    // Pause
-    POM.running=false;
-    clearInterval(POM.interval);POM.interval=null;
-    document.getElementById('pom-action-btn').textContent='Weiter';
-    document.getElementById('pom-btn').className='pom-btn';
-  } else {
-    // Start / Resume
-    POM.running=true;
-    document.getElementById('pom-action-btn').textContent='Pause';
-    var phaseClass=POM.phase==='work'?'running':'break';
-    document.getElementById('pom-btn').className='pom-btn '+phaseClass;
-    POM.interval=setInterval(function(){
-      POM.remaining--;
-      updatePomUI();
-      if(POM.remaining<=0){
-        clearInterval(POM.interval);POM.interval=null;
-        POM.running=false;
-        pomPhaseEnd();
-      }
-    },1000);
-  }
-}
-
-function pomPhaseEnd(){
-  if(POM.phase==='work'){
-    POM.rounds++;
-    POM.phase='break';
-    POM.remaining=POM.BREAK;
-    POM.total=POM.BREAK;
-    document.getElementById('pom-modal-title').textContent='Pause verdient!';
-    document.getElementById('pom-modal-sub').textContent='Super gemacht! 5 Minuten erholen – dann weiter.';
-    document.getElementById('pom-phase-lbl').textContent='Pause';
-    document.getElementById('pom-btn').className='pom-btn break';
-    // Auto-open overlay if closed
-    document.getElementById('pom-overlay').classList.add('open');
-  } else {
-    POM.phase='work';
-    POM.remaining=POM.WORK;
-    POM.total=POM.WORK;
-    document.getElementById('pom-modal-title').textContent='Bereit für die nächste Runde?';
-    document.getElementById('pom-modal-sub').textContent='Runde '+POM.rounds+' geschafft! Konzentriert weiter.';
-    document.getElementById('pom-phase-lbl').textContent='Lernzeit';
-    document.getElementById('pom-btn').className='pom-btn';
-    document.getElementById('pom-overlay').classList.add('open');
-  }
-  document.getElementById('pom-action-btn').textContent='Starten';
-  updatePomUI();
-}
-
-function updatePomUI(){
-  var min=Math.floor(POM.remaining/60);
-  var sec=POM.remaining%60;
-  var label=min+':'+(sec<10?'0':'')+sec;
-  document.getElementById('pom-display').textContent=label;
-  document.getElementById('pom-btn-lbl').textContent=label;
-  // Ring: circumference = 2 * pi * 70 = 439.8
-  var circ=439.8;
-  var progress=POM.remaining/POM.total;
-  var offset=circ*(1-progress);
-  document.getElementById('pom-ring').style.strokeDashoffset=offset;
-  if(!POM.running){
-    document.getElementById('pom-action-btn').textContent=POM.remaining===POM.total?'Starten':'Weiter';
-  }
-}
-
-// ─── DAY END RITUAL ────────────────────────────────────────
-function triggerDayEnd(){
-  // Stop pomodoro if running
-  if(POM.running){clearInterval(POM.interval);POM.interval=null;POM.running=false;}
-
-  var day=S.plan[S.currentDay-1];
-  var topicsDone=day?day.topics.filter(function(t){return S.doneTopic[S.currentDay+'_'+t];}).length:0;
-  var isLastDay=S.currentDay>=S.days;
-
-  // Update streak
-  var streak=lsGet('stevie_streak')||{count:0,lastDate:''};
-  var today=new Date().toDateString();
-  if(streak.lastDate!==today){streak.count++;streak.lastDate=today;lsSet('stevie_streak',streak);}
-
-  document.getElementById('de-topics').textContent=topicsDone;
-  document.getElementById('de-day-num').textContent=S.currentDay;
-  document.getElementById('de-streak').textContent=streak.count;
-  document.getElementById('de-title').textContent=isLastDay?'Ziel erreicht!':'Tag '+S.currentDay+' geschafft!';
-  document.getElementById('de-msg').textContent=isLastDay
-    ?'Du hast den ganzen Lernplan durchgearbeitet, '+S.name+'! Das ist richtig stark.'
-    :'Toll gemacht, '+S.name+'! Alle Themen von heute erledigt. Morgen geht es weiter.';
-
-  var nextBtn=document.getElementById('de-next-btn');
-  var doneBtn=document.getElementById('de-done-btn');
-  if(isLastDay){
-    nextBtn.style.display='none';
-    doneBtn.textContent='Alles fertig!';
-    doneBtn.style.background='linear-gradient(135deg,var(--ga),var(--gb),var(--gc))';
-    doneBtn.style.color='white';
-    doneBtn.style.border='none';
-  } else {
-    nextBtn.style.display='block';
-    nextBtn.textContent='Weiter zu Tag '+(S.currentDay+1);
-    doneBtn.textContent='Für heute fertig';
-  }
-
-  updateAvatars();
-  initDeStars();
-  document.getElementById('dayend-overlay').classList.add('open');
-}
-
-function advanceDay(){
-  document.getElementById('dayend-overlay').classList.remove('open');
-  S.currentDay++;
-  S.msgs=[];
-  document.getElementById('messages').innerHTML='';
-  renderTopicRow();updateProgress();
-  var day=S.plan[S.currentDay-1];
-  var greeting='Weiter geht\'s, '+S.name+'! Heute ist Tag '+S.currentDay+'.\n\n'+(day?'Wir schauen uns an: '+day.topics.join(', ')+'.':'')+'\n\nBist du bereit?';
-  addMsg('assistant',greeting,'Motivation',null,true);
-}
-
-function finishLearning(){
-  document.getElementById('dayend-overlay').classList.remove('open');
-  // Show the "new session" bar in chat
-  document.getElementById('new-session-bar').style.display='flex';
-}
-
 // ─── MAPPE ────────────────────────────────────────────────
 var curFachIdx=null;
-var mappeListenerAttached=false; // FIX A: prevent duplicate event listeners
-
 function renderMappe(){
   var list=document.getElementById('faecher-list');list.innerHTML='';
-  // FIX A: Remove old listener by replacing the element with a clone
-  var newList=list.cloneNode(false);
-  list.parentNode.replaceChild(newList,list);
-  list=document.getElementById('faecher-list');
-
   var faecher=lsGet('stevie_faecher')||[];
   faecher.forEach(function(fach,idx){
     var card=document.createElement('div');card.className='fach-card';
@@ -1287,12 +1206,12 @@ function renderMappe(){
     list.appendChild(card);
   });
 
-  // FIX A: Single event listener attached to fresh clone – no duplicates possible
+  // Event delegation
   list.addEventListener('click',function(e){
     var head=e.target.closest('.fach-head');
     if(head){var body=head.nextElementSibling,arr=head.querySelector('.fach-arr');body.classList.toggle('open');arr.classList.toggle('open');return;}
     var matDel=e.target.closest('.mat-del');
-    if(matDel){var fi=parseInt(matDel.dataset.fach),ii=parseInt(matDel.dataset.img);if(!confirm('Seite wirklich löschen?'))return;var f2=lsGet('stevie_faecher')||[];f2[fi].images.splice(ii,1);lsSet('stevie_faecher',f2);renderMappe();return;}
+    if(matDel){var fi=parseInt(matDel.dataset.fach),ii=parseInt(matDel.dataset.img);showConfirm('Seite löschen?','','Löschen',function(ok){if(!ok)return;var f2=lsGet('stevie_faecher')||[];f2[fi].images.splice(ii,1);lsSet('stevie_faecher',f2);renderMappe();});return;}
     var matItem=e.target.closest('.mat-item');
     if(matItem&&matItem.dataset.src){document.getElementById('lb-img').src=matItem.dataset.src;document.getElementById('lightbox').classList.add('open');return;}
     var matAdd=e.target.closest('.mat-add');
@@ -1300,7 +1219,7 @@ function renderMappe(){
     var learnBtn=e.target.closest('[data-learn]');
     if(learnBtn){document.getElementById('subject-input').value=learnBtn.dataset.learn;selectDays(S.days||3);showScreen('setup');return;}
     var delBtn=e.target.closest('[data-del]');
-    if(delBtn){var idx2=parseInt(delBtn.dataset.del);if(!confirm('Fach und alle Materialien wirklich löschen?'))return;var f3=lsGet('stevie_faecher')||[];f3.splice(idx2,1);lsSet('stevie_faecher',f3);renderMappe();return;}
+    if(delBtn){var idx2=parseInt(delBtn.dataset.del);showConfirm('Fach löschen?','Alle Materialien werden entfernt.','Löschen',function(ok){if(!ok)return;var f3=lsGet('stevie_faecher')||[];f3.splice(idx2,1);lsSet('stevie_faecher',f3);renderMappe();});return;}
   });
 }
 
@@ -1347,7 +1266,7 @@ function openAddFach(){
 
 function saveNewFach(){
   var name=document.getElementById('new-fach-name').value.trim();
-  if(!name){alert('Bitte einen Namen eingeben!');return;}
+  if(!name){toast('Bitte einen Namen eingeben!','err');return;}
   var faecher=lsGet('stevie_faecher')||[];
   faecher.push({name:name,images:[],topics:[]});
   lsSet('stevie_faecher',faecher);
@@ -1365,6 +1284,7 @@ function logSession(subj){
 function renderProfil(){
   document.getElementById('p-name').textContent=S.name||'–';
   document.getElementById('p-sub').textContent=S.grade+'. Klasse · '+S.age+' Jahre';
+  var pe=document.getElementById('p-email');if(pe)pe.textContent=currentUser?currentUser.email:'';
   var pa=document.getElementById('profil-av');if(pa)pa.innerHTML=avSvg(S.avatarId,84);
   var faecher=lsGet('stevie_faecher')||[];document.getElementById('stat-f').textContent=faecher.length;
   var sessions=lsGet('stevie_sessions')||[];document.getElementById('stat-s').textContent=sessions.length;
@@ -1385,18 +1305,15 @@ function renderProfil(){
   if(!sessions.length){sl.innerHTML='<p style="font-size:13px;color:#b8a8d0;padding:4px 0;">Noch keine Sessions.</p>';}
   else{
     sl.innerHTML='';
-    // FIX A: Use a fresh clone to avoid duplicate delete listeners
-    var newSl=sl.cloneNode(false);
     sessions.slice(0,8).forEach(function(s,i){
       var row=document.createElement('div');row.className='s-row';
       row.innerHTML='<div class="s-ico"><svg width="16" height="16" style="color:var(--tc);"><use href="#ic-brain"/></svg></div><div class="s-txt">'+s.subj+'</div><div class="s-time">'+s.date+' '+s.time+'</div><button class="s-del" data-idx="'+i+'"><svg width="14" height="14" style="color:#dc2626;"><use href="#ic-trash"/></svg></button>';
-      newSl.appendChild(row);
+      sl.appendChild(row);
     });
-    newSl.addEventListener('click',function(e){
+    sl.addEventListener('click',function(e){
       var btn=e.target.closest('.s-del');
-      if(btn){var idx=parseInt(btn.dataset.idx);if(!confirm('Session löschen?'))return;var s2=lsGet('stevie_sessions')||[];s2.splice(idx,1);lsSet('stevie_sessions',s2);renderProfil();}
+      if(btn){var idx=parseInt(btn.dataset.idx);showConfirm('Session löschen?','','Löschen',function(ok){if(!ok)return;var s2=lsGet('stevie_sessions')||[];s2.splice(idx,1);lsSet('stevie_sessions',s2);renderProfil();});}
     });
-    sl.parentNode.replaceChild(newSl,sl);
   }
 }
 
@@ -1414,7 +1331,7 @@ function saveNote(){
   var fach=document.getElementById('note-fach').value.trim();
   var thema=document.getElementById('note-thema').value.trim();
   var picked=document.querySelector('#note-grid .picked');
-  if(!fach||!picked){alert('Bitte Fach und Note wählen.');return;}
+  if(!fach||!picked){toast('Bitte Fach und Note wählen.','err');return;}
   var noten=lsGet('stevie_noten')||[];
   noten.unshift({fach:fach,thema:thema,note:parseInt(picked.textContent),date:new Date().toLocaleDateString('de-DE')});
   lsSet('stevie_noten',noten);
@@ -1447,15 +1364,18 @@ function buildAvGrid(){
   });
 }
 
-function saveSettings(){
+async function saveSettings(){
   var ak=document.getElementById('s-ant').value.trim();
   var ek=document.getElementById('s-el').value.trim();
   var nm=document.getElementById('s-name').value.trim();
   if(ak)localStorage.setItem('stevie_key',ak);
   if(ek)localStorage.setItem('stevie_eleven',ek);
   if(nm)S.name=nm;
-  saveProfile();updateAvatars();renderProfil();
+  await saveKeys(ak||null,ek||null);
+  await saveProfile();
+  updateAvatars();renderProfil();
   document.getElementById('settings-modal').classList.remove('open');
+  toast('Gespeichert!','ok');
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -1469,34 +1389,56 @@ function initStars(){
   function anim(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(function(s){s.a+=s.sp;if(s.a>1)s.a=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='rgba(200,180,255,'+s.a+')';ctx.fill();});requestAnimationFrame(anim);}
   resize();init();anim();window.addEventListener('resize',function(){resize();init();});
 }
-
-function initDeStars(){
-  var c=document.getElementById('de-stars');if(!c)return;
-  c.width=window.innerWidth;c.height=window.innerHeight;
-  var ctx=c.getContext('2d');
-  var particles=Array.from({length:60},function(){return{x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*3+1,vx:(Math.random()-.5)*.8,vy:(Math.random()-.5)*.8,a:Math.random()};});
-  var running=true;
-  function anim(){
-    if(!running)return;
-    ctx.clearRect(0,0,c.width,c.height);
-    particles.forEach(function(p){
-      p.x+=p.vx;p.y+=p.vy;p.a+=.01;
-      if(p.x<0||p.x>c.width)p.vx*=-1;
-      if(p.y<0||p.y>c.height)p.vy*=-1;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,220,100,'+(.3+.3*Math.sin(p.a))+')';ctx.fill();
-    });
-    requestAnimationFrame(anim);
-  }
-  anim();
-  // Stop when overlay closes
-  var obs=new MutationObserver(function(){
-    if(!document.getElementById('dayend-overlay').classList.contains('open')){running=false;obs.disconnect();}
-  });
-  obs.observe(document.getElementById('dayend-overlay'),{attributes:true,attributeFilter:['class']});
-}
-
 if(window.speechSynthesis)window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};
+
+/*
+════════════════════════════════════════════════
+SUPABASE SQL SETUP — Run once in SQL Editor:
+════════════════════════════════════════════════
+create table if not exists profiles (
+  id uuid references auth.users primary key,
+  name text, age int, grade int, theme text,
+  voice_id text, avatar_id text,
+  updated_at timestamptz default now()
+);
+alter table profiles enable row level security;
+create policy "own profile" on profiles
+  for all using (auth.uid() = id);
+
+create table if not exists user_keys (
+  user_id uuid references auth.users primary key,
+  anthropic_key text, eleven_key text,
+  updated_at timestamptz default now()
+);
+alter table user_keys enable row level security;
+create policy "own keys" on user_keys
+  for all using (auth.uid() = user_id);
+
+create table if not exists stevie_faecher (
+  user_id uuid references auth.users primary key,
+  data jsonb, updated_at timestamptz default now()
+);
+alter table stevie_faecher enable row level security;
+create policy "own faecher" on stevie_faecher
+  for all using (auth.uid() = user_id);
+
+create table if not exists stevie_sessions (
+  user_id uuid references auth.users primary key,
+  data jsonb, updated_at timestamptz default now()
+);
+alter table stevie_sessions enable row level security;
+create policy "own sessions" on stevie_sessions
+  for all using (auth.uid() = user_id);
+
+create table if not exists stevie_noten (
+  user_id uuid references auth.users primary key,
+  data jsonb, updated_at timestamptz default now()
+);
+alter table stevie_noten enable row level security;
+create policy "own noten" on stevie_noten
+  for all using (auth.uid() = user_id);
+════════════════════════════════════════════════
+*/
 </script>
 </body>
 </html>
