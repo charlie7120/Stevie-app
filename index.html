@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Stevie</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0d1a;min-height:100vh;color:#f3eeff;padding-bottom:env(safe-area-inset-bottom);}
@@ -753,31 +753,31 @@ function updateAvatars(){
 }
 
 // ─── INIT ─────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded',async function(){
+window.addEventListener('DOMContentLoaded',function(){
   initStars();
   buildDaysGrid();
 
-  // Show loading screen, check auth session
-  document.getElementById('loading-screen').style.display='flex';
+  function hideLoader(){document.getElementById('loading-screen').style.display='none';}
 
-  // Auth state listener
-  sb.auth.onAuthStateChange(async function(event,session){
-    if(event==='SIGNED_IN'&&session){await initAfterLogin(session.user);}
-    else if(event==='SIGNED_OUT'){document.getElementById('loading-screen').style.display='none';showScreen('splash');}
-  });
+  // Global fallback: never hang longer than 5s
+  var fallback=setTimeout(function(){hideLoader();showScreen('splash');},5000);
 
-  // Check existing session – with fallback so loading screen never hangs
-  var hideLoader=function(){document.getElementById('loading-screen').style.display='none';};
-  var loaderTimeout=setTimeout(function(){hideLoader();showScreen('splash');},5000);
-  try{
-    var{data,error}=await sb.auth.getSession();
-    clearTimeout(loaderTimeout);
-    if(data&&data.session){await initAfterLogin(data.session.user);}
-    else{hideLoader();showScreen('splash');}
-  }catch(e){
-    clearTimeout(loaderTimeout);
-    hideLoader();showScreen('splash');
+  async function startAuth(){
+    clearTimeout(fallback);
+    document.getElementById('loading-screen').style.display='flex';
+    sb.auth.onAuthStateChange(async function(event,session){
+      if(event==='SIGNED_IN'&&session){await initAfterLogin(session.user);}
+      else if(event==='SIGNED_OUT'){hideLoader();showScreen('splash');}
+    });
+    try{
+      var res=await sb.auth.getSession();
+      if(res.data&&res.data.session){await initAfterLogin(res.data.session.user);}
+      else{hideLoader();showScreen('splash');}
+    }catch(e){hideLoader();showScreen('splash');}
   }
+
+  if(typeof supabase!=='undefined'){startAuth();}
+  else{var chk=setInterval(function(){if(typeof supabase!=='undefined'){clearInterval(chk);startAuth();}},100);}
 
   // Splash
   document.getElementById('splash-btn').addEventListener('click',function(){
