@@ -809,6 +809,49 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
   </div>
 </div>
 
+<!-- ════ HUB (nach Login) – Punkt 2 ════ -->
+<div id="hub" class="screen center-screen">
+  <div class="dcard" style="max-width:520px;width:100%;">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;"><svg width="64" height="64" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+      <h2 style="font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:6px;" id="hub-greeting">Hey!</h2>
+      <p style="color:rgba(255,255,255,.5);font-size:14px;">Was möchtest du heute machen?</p>
+    </div>
+
+    <!-- Aktive Lernpläne (max 3 zuletzt genutzte) -->
+    <div id="hub-active-section" style="display:none;margin-bottom:20px;">
+      <label class="fl">Weiter lernen</label>
+      <div id="hub-active-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+    </div>
+
+    <button class="btn" id="hub-new-btn" style="margin-bottom:10px;">+ Neue Lernrunde starten</button>
+    <button class="btn-ghost" id="hub-mappe-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" style="color:rgba(255,255,255,.5);"><use href="#ic-folder"/></svg>
+      Zur Mappe
+    </button>
+  </div>
+</div>
+
+<style>
+.hub-plan-card{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:13px 14px;cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+  transition:all .15s;
+}
+.hub-plan-card:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);}
+.hub-plan-card:active{transform:scale(.98);}
+.hub-plan-ico{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,var(--ga),var(--gb));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.hub-plan-info{flex:1;min-width:0;}
+.hub-plan-fach{font-size:14px;font-weight:700;color:#f3eeff;}
+.hub-plan-meta{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;}
+.hub-plan-arr{color:rgba(255,255,255,.4);}
+</style>
+
 <!-- ════ SETUP & MATERIAL ════ -->
 <div id="setup" class="screen center-screen">
   <div class="dcard" style="max-width:460px;width:100%;">
@@ -1075,7 +1118,8 @@ const S = {
   chatImg:null, matImages:[],
   pendingMaterial:[],
   strugglingTopics:[],
-  elevenKey:null
+  elevenKey:null,
+  activePlanId:null  // NEU: ID des gerade aktiven Plans in der DB
 };
 
 let currentUser = null;
@@ -1191,6 +1235,81 @@ const getSessions = () => dbGetJsonb('sessions').then(d => d || []);
 const setSessions = (v) => dbSetJsonb('sessions', v);
 const getNoten    = () => dbGetJsonb('noten').then(d => d || []);
 const setNoten    = (v) => dbSetJsonb('noten', v);
+
+// ─── PLAENE: Eigene Tabelle, ein Plan = eine Lernrunde ─────────────
+// Im Gegensatz zu faecher/sessions/noten ist plaene KEIN JSONB-Single-Row,
+// sondern eine richtige Tabelle mit mehreren Zeilen pro User.
+
+async function listPlaene(){
+  if(!currentUser) return [];
+  const {data, error} = await sb.from('plaene')
+    .select('*').eq('user_id', currentUser.id)
+    .order('updated_at', {ascending: false});
+  if(error){ console.error('listPlaene:', error); return []; }
+  return data || [];
+}
+
+async function getPlanById(id){
+  if(!currentUser || !id) return null;
+  const {data, error} = await sb.from('plaene')
+    .select('*').eq('user_id', currentUser.id).eq('id', id).maybeSingle();
+  if(error){ console.error('getPlanById:', error); return null; }
+  return data;
+}
+
+async function createPlan({fach_name, plan_name, days, plan, msgs}){
+  if(!currentUser) return null;
+  setSyncState('syncing');
+  const {data, error} = await sb.from('plaene').insert({
+    user_id: currentUser.id,
+    fach_name, plan_name,
+    days: days||1, current_day: 1,
+    plan: plan||[], msgs: msgs||[],
+    done_topic: {}, struggling_topics: []
+  }).select().single();
+  setSyncState(error ? 'error' : 'saved');
+  if(error){ console.error('createPlan:', error); return null; }
+  return data;
+}
+
+async function updatePlan(id, patch){
+  if(!currentUser || !id) return;
+  setSyncState('syncing');
+  const {error} = await sb.from('plaene').update({
+    ...patch, updated_at: new Date().toISOString()
+  }).eq('id', id).eq('user_id', currentUser.id);
+  setSyncState(error ? 'error' : 'saved');
+  if(error) console.error('updatePlan:', error);
+}
+
+async function renamePlan(id, newName){
+  await updatePlan(id, {plan_name: newName});
+}
+
+async function deletePlan(id){
+  if(!currentUser || !id) return;
+  setSyncState('syncing');
+  const {error} = await sb.from('plaene').delete()
+    .eq('id', id).eq('user_id', currentUser.id);
+  setSyncState(error ? 'error' : 'saved');
+  if(error) console.error('deletePlan:', error);
+}
+
+// Aktiven Plan periodisch in DB synchronisieren (debounced)
+let _planSaveTimer = null;
+function scheduleSavePlan(){
+  if(!S.activePlanId) return;
+  clearTimeout(_planSaveTimer);
+  _planSaveTimer = setTimeout(()=>{
+    updatePlan(S.activePlanId, {
+      current_day: S.currentDay,
+      plan: S.plan,
+      msgs: S.msgs,
+      done_topic: S.doneTopic,
+      struggling_topics: S.strugglingTopics
+    });
+  }, 1500);
+}
 
 // ════════════════════════════════════════════════════════════════
 // EINMALIGE LOCALSTORAGE-MIGRATION
@@ -1339,10 +1458,96 @@ async function initAfterLogin(user){
     if(typeof buildOnboarding==='function') buildOnboarding();
     showScreen('onboarding');
   } else {
-    document.getElementById('setup-sub').textContent = 'Hey '+S.name+'! Sag mir womit wir starten.';
-    if(typeof buildDaysGrid==='function') buildDaysGrid();
-    showScreen('setup');
+    // PUNKT 2: Nach Login zum Hub statt direkt ins Setup
+    if(typeof showHub==='function') {
+      await showHub();
+    } else {
+      // Fallback falls showHub noch nicht definiert (wird gleich)
+      showScreen('setup');
+    }
   }
+}
+
+// ─── HUB-SCREEN nach Login (Punkt 2) ──────────────────────────────
+async function showHub(){
+  document.getElementById('hub-greeting').textContent = 'Hey '+(S.name||'')+'!';
+  const plaene = await listPlaene();
+  const list = document.getElementById('hub-active-list');
+  const sec = document.getElementById('hub-active-section');
+  list.innerHTML = '';
+
+  if(plaene.length === 0){
+    sec.style.display = 'none';
+  } else {
+    sec.style.display = 'block';
+    // Maximal 3 zuletzt genutzte Pläne
+    plaene.slice(0, 3).forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'hub-plan-card';
+      const totalTopics = (p.plan||[]).reduce((a,d) => a+(d.topics?.length||0), 0);
+      const doneCount = Object.keys(p.done_topic||{}).length;
+      const updated = new Date(p.updated_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+      card.innerHTML = `
+        <div class="hub-plan-ico"><svg width="20" height="20" style="color:white;"><use href="#ic-folder"/></svg></div>
+        <div class="hub-plan-info">
+          <div class="hub-plan-fach">${escapeHtml(p.fach_name)}${p.plan_name && p.plan_name !== p.fach_name ? ' · '+escapeHtml(p.plan_name) : ''}</div>
+          <div class="hub-plan-meta">Tag ${p.current_day}/${p.days} · ${doneCount}/${totalTopics} Themen · zuletzt ${updated}</div>
+        </div>
+        <span class="hub-plan-arr"><svg width="18" height="18"><use href="#ic-chev"/></svg></span>
+      `;
+      card.addEventListener('click', ()=>resumePlan(p.id));
+      list.appendChild(card);
+    });
+  }
+  showScreen('hub');
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function resumePlan(planId){
+  const p = await getPlanById(planId);
+  if(!p){ toast('Lernplan konnte nicht geladen werden.', 'err'); return; }
+
+  // State aus DB rekonstruieren
+  S.activePlanId = p.id;
+  S.subject = p.fach_name;
+  S.days = p.days;
+  S.currentDay = p.current_day;
+  S.plan = p.plan || [];
+  S.msgs = p.msgs || [];
+  S.doneTopic = p.done_topic || {};
+  S.strugglingTopics = p.struggling_topics || [];
+
+  // App-View
+  document.getElementById('messages').innerHTML = '';
+  showScreen('app'); switchTab('chat');
+  document.getElementById('hdr-sub').textContent = S.subject+' · Klasse '+S.grade;
+  updateAvatars();
+  document.getElementById('acc-menu-name').textContent = S.name||'–';
+  document.getElementById('acc-menu-mail').textContent = currentUser?.email||'–';
+
+  // Bisherige Nachrichten rendern (ohne speak() für die alten)
+  const prevMsgs = S.msgs.slice();
+  S.msgs = []; // wird durch addMsg gleich wieder gefüllt
+  const prevVoice = S.voiceOn; S.voiceOn = false; // Stumm während Replay
+  prevMsgs.forEach(m => {
+    addMsg(m.role, m.content + (m.tag ? ' [TAG:'+m.tag+']' : ''), {imgSrc: m.imgSrc});
+  });
+  S.voiceOn = prevVoice;
+
+  renderTopicRow(); updateProgress();
+
+  if(prevMsgs.length === 0){
+    // Frischer Plan ohne bisherige Nachrichten – Begrüßung
+    startChatGreetingForResume();
+  }
+}
+
+async function startChatGreetingForResume(){
+  const greeting = `Schön, dass du wieder da bist, ${S.name}! Wir sind bei ${S.subject}, Tag ${S.currentDay} von ${S.days}. Womit möchtest du weitermachen? [TAG:Motivation]`;
+  addMsg('assistant', greeting);
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1543,6 +1748,18 @@ LERNMETHODIK (evidenzbasiert):
 
 ${strategy}
 
+FOKUS UND THEMEN-GRENZE (sehr wichtig, Stevies Identität):
+Du bist Stevie, eine LERNBEGLEITERIN für das Fach "${S.subject||'(noch unbekannt)'}". Du bist KEINE allgemeine Chat-KI und KEIN Freund zum Plaudern.
+- Bleibe IMMER beim aktuellen Lernfach und den Themen aus dem Lernplan/der Mappe
+- Wenn das Kind versucht, über andere Themen zu reden (Spiele, andere Fächer, Privates, Witze, allgemeine Fragen): freundlich aber bestimmt zurückführen
+- Beispiele für off-topic Anfragen und gute Antworten:
+  • "Erzähl mir einen Witz" → "Witze sind toll, aber wir wollen ja heute ${S.subject} schaffen! Sollen wir mit einer leichten Frage starten? [TAG:Motivation]"
+  • "Was ist die Hauptstadt von Frankreich?" (bei Fach Mathe) → "Das passt grad nicht zu unserem Mathe-Plan. Frag deinen Erdkundelehrer oder mach in Stevie eine neue Lernrunde für Erdkunde! Jetzt zurück zu uns: [Mathe-Frage] [TAG:Frage]"
+  • "Wie geht es dir?" → kurz freundlich antworten und sofort zum Lernen zurück
+- Bei wiederholten off-topic-Versuchen: kurz und klar werden, kein langes Eingehen darauf
+- AUSNAHME: Wenn das Kind echte Verständnisfragen zum Lernstoff hat, auch wenn sie verwandte Themen berühren – das ist okay
+- AUSNAHME: Wenn das Kind sichtbar belastet wirkt (Trauer, Angst, ernste Probleme): kurz menschlich reagieren, dann sanft zurück zum Lernen oder vorschlagen, mit Eltern zu sprechen
+
 GESPRÄCHSFÜHRUNG:
 - Stelle IMMER NUR EINE Frage pro Nachricht (Überforderung vermeiden)
 - Antworten kurz halten (2-5 Sätze in der Regel)
@@ -1664,6 +1881,7 @@ async function startApp(skip){
   if(skip) S.matImages = [];
   S.msgs = []; S.doneTopic = {}; S.currentDay = 1; S.strugglingTopics = [];
   S.pendingMaterial = [];
+  S.activePlanId = null;
   document.getElementById('messages').innerHTML = '';
   showScreen('app'); switchTab('chat');
   document.getElementById('hdr-sub').textContent = S.subject+' · Klasse '+S.grade;
@@ -1680,6 +1898,18 @@ async function startApp(skip){
 
   await generatePlan(fach, {materialImages: S.matImages});
   await logSession(S.subject);
+
+  // NEU: Plan in DB anlegen
+  const defaultPlanName = `Plan vom ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}`;
+  const created = await createPlan({
+    fach_name: S.subject,
+    plan_name: defaultPlanName,
+    days: S.days,
+    plan: S.plan,
+    msgs: []
+  });
+  if(created) S.activePlanId = created.id;
+
   renderTopicRow(); updateProgress();
   startChatGreeting(fach);
 }
@@ -1748,6 +1978,7 @@ function addMsg(role, content, opts={}){
   const parsed = role==='assistant' ? extractTags(content) : {clean: content, tag:null, done:null, deepen:null};
   const {tag, done, deepen, clean} = parsed;
   S.msgs.push({role, content: clean, tag, deepen});
+  scheduleSavePlan(); // Plan in DB aktualisieren (debounced)
 
   const messages = document.getElementById('messages');
   const row = document.createElement('div');
@@ -1851,6 +2082,7 @@ function markDone(topicName){
   if(m){
     S.doneTopic[S.currentDay+'_'+m] = true;
     renderTopicRow(); updateProgress();
+    scheduleSavePlan();
   }
 }
 
@@ -2645,13 +2877,21 @@ function init(){
   });
   document.getElementById('acc-edit-profile').addEventListener('click', ()=>{ closeAccountMenu(); openProfileModal(); });
   document.getElementById('acc-edit-avatar').addEventListener('click', ()=>{ closeAccountMenu(); openAvatarModal(); });
-  document.getElementById('acc-new-session').addEventListener('click', ()=>{
+  document.getElementById('acc-new-session').addEventListener('click', async ()=>{
     closeAccountMenu();
+    await showHub();
+  });
+  document.getElementById('acc-logout').addEventListener('click', ()=>{ closeAccountMenu(); doLogout(); });
+
+  // Hub (Punkt 2)
+  document.getElementById('hub-new-btn').addEventListener('click', ()=>{
     document.getElementById('subject-input').value = '';
     buildDaysGrid();
     showScreen('setup');
   });
-  document.getElementById('acc-logout').addEventListener('click', ()=>{ closeAccountMenu(); doLogout(); });
+  document.getElementById('hub-mappe-btn').addEventListener('click', ()=>{
+    showScreen('app'); switchTab('mappe');
+  });
 
   // Bottom-Nav
   document.getElementById('nav-chat').addEventListener('click', ()=>switchTab('chat'));
