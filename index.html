@@ -1652,22 +1652,39 @@ async function doLogout(){
   });
 }
 
+// Verhindert mehrfache parallele Init-Calls (Auth-Listener + getSession-Promise)
+let _initInProgress = false;
+
 async function initAfterLogin(user){
-  currentUser = user;
-  await migrateFromLocalStorage();
-  const hasProfile = await loadProfile();
-  document.getElementById('loading-screen').style.display = 'none';
-  if(!hasProfile){
-    if(typeof buildOnboarding==='function') buildOnboarding();
-    showScreen('onboarding');
-  } else {
-    // PUNKT 2: Nach Login zum Hub statt direkt ins Setup
-    if(typeof showHub==='function') {
-      await showHub();
+  if(_initInProgress) return;
+  _initInProgress = true;
+  const ls = document.getElementById('loading-screen');
+  try {
+    currentUser = user;
+    try { await migrateFromLocalStorage(); } catch(e){ console.error('Migration:', e); }
+
+    let hasProfile = false;
+    try { hasProfile = await loadProfile(); }
+    catch(e){ console.error('loadProfile:', e); }
+
+    if(!hasProfile){
+      if(typeof buildOnboarding==='function') buildOnboarding();
+      showScreen('onboarding');
     } else {
-      // Fallback falls showHub noch nicht definiert (wird gleich)
-      showScreen('setup');
+      if(typeof showHub==='function') {
+        await showHub();
+      } else {
+        showScreen('setup');
+      }
     }
+  } catch(e){
+    console.error('initAfterLogin Fehler:', e);
+    // Notfall: zur Auth-Maske, damit User nicht hängenbleibt
+    showScreen('authscreen');
+    toast('Etwas ist schiefgegangen. Bitte neu anmelden.', 'err');
+  } finally {
+    if(ls) ls.style.display = 'none';
+    _initInProgress = false;
   }
 }
 
@@ -3322,7 +3339,7 @@ function updatePremiumVoiceUI(){
   }
 }
 
-function init(){
+async function init(){
   startStars();
 
   // Splash
@@ -3491,27 +3508,56 @@ function init(){
   document.getElementById('avatar-close').addEventListener('click', ()=>document.getElementById('avatar-modal').classList.remove('open'));
   document.getElementById('avatar-save').addEventListener('click', saveAvatarFromModal);
 
+  // ─── Notfall-Reset via URL ─────────────────────────────────────
+  // Wenn die App hängt: stevie-url?reset=1 öffnen → kompletter Logout + Storage-Clear
+  if(new URLSearchParams(location.search).get('reset') === '1'){
+    try {
+      await sb.auth.signOut();
+      // Alle Stevie-bezogenen localStorage-Einträge entfernen
+      Object.keys(localStorage).filter(k => k.startsWith('stevie_') || k.startsWith('sb-')).forEach(k => localStorage.removeItem(k));
+    } catch(e){ console.warn('Reset-Fehler:', e); }
+    // URL-Parameter weg, sauberer Neustart
+    history.replaceState(null, '', location.pathname);
+    document.getElementById('loading-screen').style.display = 'none';
+    showScreen('splash');
+    return;
+  }
+
   // ─── Auth-State-Listener ──────────────────────────────────────
-  // Wird nach Login/Logout/Refresh getriggert. Einziger Einstiegspunkt
-  // in die App nach erfolgreicher Authentifizierung.
+  // Wichtig: NUR DIESER Listener triggert initAfterLogin.
+  // Supabase ruft den Listener auch beim ersten Laden mit der
+  // existierenden Session auf (event = 'INITIAL_SESSION'), deshalb
+  // brauchen wir keinen separaten getSession()-Call mehr.
+  let _initialEventReceived = false;
+
   sb.auth.onAuthStateChange(async (event, session) => {
+    _initialEventReceived = true;
+    const ls = document.getElementById('loading-screen');
+
     if(session?.user){
-      // Splash überspringen wenn schon eingeloggt
-      document.getElementById('loading-screen').style.display = 'flex';
+      if(ls) ls.style.display = 'flex';
       await initAfterLogin(session.user);
     } else {
       currentUser = null;
-      document.getElementById('loading-screen').style.display = 'none';
+      if(ls) ls.style.display = 'none';
+      // Bei Logout: zurück zum Splash. Beim ersten Laden ohne Session: nichts tun
+      // (Splash ist schon active als Default).
+      if(event === 'SIGNED_OUT'){
+        showScreen('splash');
+      }
     }
   });
 
-  // Erste Session abfragen (bei Reload)
-  sb.auth.getSession().then(({data}) => {
-    if(data?.session?.user){
-      document.getElementById('loading-screen').style.display = 'flex';
-      initAfterLogin(data.session.user);
+  // Sicherheits-Timeout: Falls der Auth-Listener aus irgendeinem Grund
+  // nicht innerhalb von 4 Sekunden feuert (Netzwerk-Hick, hängender Token),
+  // den Loading-Screen wegnehmen, damit der User nicht ewig wartet.
+  setTimeout(()=>{
+    if(!_initialEventReceived){
+      console.warn('Auth-Listener hat nicht reagiert – Loading-Screen forciert ausblenden.');
+      const ls = document.getElementById('loading-screen');
+      if(ls) ls.style.display = 'none';
     }
-  });
+  }, 4000);
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
