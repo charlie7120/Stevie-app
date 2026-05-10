@@ -449,6 +449,71 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
   border-top-color:#854d0e;border-radius:50%;animation:spin 1s linear infinite;
 }
 .fach-acts{display:flex;gap:8px;margin-top:14px;}
+
+/* ── Mappe: Sub-Sections (Lernpläne, Klassenarbeiten) ── */
+.fach-section{
+  margin-top:16px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+}
+.fach-section-h{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.fach-section-h h4{
+  font-size:12px;font-weight:700;color:var(--ink-2);
+  text-transform:uppercase;letter-spacing:.4px;
+  display:flex;align-items:center;gap:7px;
+}
+.fach-section-add{
+  background:var(--cbg);border:none;border-radius:8px;
+  padding:5px 10px;font-size:11px;font-weight:700;color:var(--tc);
+  cursor:pointer;display:flex;align-items:center;gap:4px;
+}
+.fach-section-add:hover{background:rgba(167,139,250,.25);}
+
+/* Plan-Karten innerhalb eines Fachs */
+.plan-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:12px;
+  background:var(--surface-3);
+  margin-bottom:6px;cursor:pointer;
+  border:1px solid transparent;
+  transition:all .15s;
+}
+.plan-row:hover{border-color:var(--cbr);background:white;}
+.plan-row-info{flex:1;min-width:0;}
+.plan-row-name{font-size:13px;font-weight:600;color:var(--ink);}
+.plan-row-meta{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.plan-row-acts{display:flex;gap:4px;flex-shrink:0;}
+.plan-row-btn{
+  background:none;border:none;cursor:pointer;
+  padding:5px;border-radius:6px;color:var(--ink-4);
+  display:flex;align-items:center;justify-content:center;
+}
+.plan-row-btn:hover{background:var(--cbg);color:var(--tc);}
+
+/* Klassenarbeit-Karten */
+.ka-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:12px;
+  background:linear-gradient(135deg,#fef3c7,#fef9c3);
+  border:1px solid #fde047;
+  margin-bottom:6px;cursor:pointer;
+  transition:all .15s;
+}
+.ka-row:hover{transform:translateX(2px);}
+.ka-row-ico{
+  width:34px;height:34px;border-radius:10px;
+  background:#fbbf24;color:white;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ka-row-info{flex:1;min-width:0;}
+.ka-row-title{font-size:13px;font-weight:700;color:#92400e;}
+.ka-row-meta{font-size:11px;color:#a16207;margin-top:1px;}
+
+/* Hub-Plan-Card (vom hub-Screen, falls noch nicht definiert) */
+
 .fach-btn{
   flex:1;background:linear-gradient(135deg,var(--ga),var(--gb));
   color:white;border:none;border-radius:12px;
@@ -1037,6 +1102,25 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
   </div>
 </div>
 
+<!-- Klassenarbeit hinzufügen (Punkt 5) -->
+<div class="modal-bg" id="newka-modal">
+  <div class="modal"><div class="mhandle"></div>
+    <div class="mtitle">Klassenarbeit hinzufügen <button class="mclose" id="newka-close">×</button></div>
+    <p style="font-size:12px;color:var(--ink-3);margin-bottom:14px;">Lade Fotos der Aufgaben, deiner Lösung und der Lehrerkorrektur hoch. Stevie analysiert den Stil deines Lehrers und nutzt das für künftige Lernpläne.</p>
+    <label class="ml">Titel</label>
+    <input class="mi" id="newka-title" placeholder="z.B. Klassenarbeit März 2026"/>
+    <label class="ml">Fotos</label>
+    <div id="newka-zone" style="border:2px dashed var(--cbr);border-radius:14px;padding:22px;text-align:center;cursor:pointer;background:var(--cbg);margin-bottom:12px;">
+      <svg width="28" height="28" style="color:var(--tc);margin-bottom:8px;"><use href="#ic-camera"/></svg>
+      <p style="color:var(--ink-3);font-size:13px;"><b style="color:var(--tc);">Tippen</b> um Bilder auszuwählen</p>
+      <p style="font-size:11px;color:var(--ink-4);margin-top:3px;">Aufgabenblatt · Lösungen · Lehrerkorrektur</p>
+    </div>
+    <input type="file" id="newka-file" accept="image/*" multiple style="display:none"/>
+    <div id="newka-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+    <button class="msave" id="newka-save">Hochladen & analysieren</button>
+  </div>
+</div>
+
 <div class="modal-bg" id="profile-modal">
   <div class="modal"><div class="mhandle"></div>
     <div class="mtitle">Profil bearbeiten <button class="mclose" id="profile-close">×</button></div>
@@ -1119,7 +1203,8 @@ const S = {
   pendingMaterial:[],
   strugglingTopics:[],
   elevenKey:null,
-  activePlanId:null  // NEU: ID des gerade aktiven Plans in der DB
+  activePlanId:null,        // ID des gerade aktiven Plans in der DB
+  teacherStyleContext:''    // Gesammelte Stil-Analysen aus Klassenarbeiten dieses Fachs
 };
 
 let currentUser = null;
@@ -1295,6 +1380,16 @@ async function deletePlan(id){
   if(error) console.error('deletePlan:', error);
 }
 
+// Sammelt alle bisherigen Klassenarbeit-Analysen eines Fachs als Lehrer-Stil-Kontext
+async function loadTeacherStyleForFach(fachName){
+  if(!fachName){ S.teacherStyleContext = ''; return; }
+  const all = await listKlassenarbeiten(fachName);
+  const analyses = all.map(k => k.analysis).filter(Boolean);
+  if(!analyses.length){ S.teacherStyleContext = ''; return; }
+  // Mehrere Analysen werden chronologisch gemerged
+  S.teacherStyleContext = analyses.map((a, i) => `(Arbeit ${i+1}) ${a}`).join('\n\n');
+}
+
 // Aktiven Plan periodisch in DB synchronisieren (debounced)
 let _planSaveTimer = null;
 function scheduleSavePlan(){
@@ -1309,6 +1404,104 @@ function scheduleSavePlan(){
       struggling_topics: S.strugglingTopics
     });
   }, 1500);
+}
+
+// ─── KLASSENARBEITEN: Lehrer-Stil-Analyse (Punkt 5) ─────────────
+async function listKlassenarbeiten(fachName){
+  if(!currentUser) return [];
+  let q = sb.from('klassenarbeiten').select('*').eq('user_id', currentUser.id);
+  if(fachName) q = q.eq('fach_name', fachName);
+  const {data, error} = await q.order('updated_at', {ascending: false});
+  if(error){ console.error('listKlassenarbeiten:', error); return []; }
+  return data || [];
+}
+
+async function createKlassenarbeit({fach_name, title, images}){
+  if(!currentUser) return null;
+  setSyncState('syncing');
+  const {data, error} = await sb.from('klassenarbeiten').insert({
+    user_id: currentUser.id,
+    fach_name, title: title||'Klassenarbeit',
+    images: images||[]
+  }).select().single();
+  setSyncState(error ? 'error' : 'saved');
+  if(error){ console.error('createKlassenarbeit:', error); return null; }
+  return data;
+}
+
+async function updateKlassenarbeit(id, patch){
+  if(!currentUser || !id) return;
+  setSyncState('syncing');
+  const {error} = await sb.from('klassenarbeiten').update({
+    ...patch, updated_at: new Date().toISOString()
+  }).eq('id', id).eq('user_id', currentUser.id);
+  setSyncState(error ? 'error' : 'saved');
+  if(error) console.error('updateKlassenarbeit:', error);
+}
+
+async function deleteKlassenarbeit(id){
+  if(!currentUser || !id) return;
+  // Storage-Bilder mitlöschen
+  const {data} = await sb.from('klassenarbeiten').select('images').eq('id', id).maybeSingle();
+  const paths = (data?.images||[]).map(i => i.path).filter(Boolean);
+  if(paths.length) await sb.storage.from(STORAGE_BUCKET).remove(paths);
+  setSyncState('syncing');
+  const {error} = await sb.from('klassenarbeiten').delete()
+    .eq('id', id).eq('user_id', currentUser.id);
+  setSyncState(error ? 'error' : 'saved');
+  if(error) console.error('deleteKlassenarbeit:', error);
+}
+
+// Stil-Analyse einer einzelnen Klassenarbeit
+async function analyzeKlassenarbeit(kaId){
+  const {data: ka} = await sb.from('klassenarbeiten').select('*').eq('id', kaId).maybeSingle();
+  if(!ka || !ka.images?.length) return;
+
+  // Bilder mit base64-Daten brauchen wir für Vision
+  const imgsWithData = ka.images.filter(i => i.data);
+  if(!imgsWithData.length) return;
+
+  const content = imgsWithData.map(img => ({
+    type:'image', source:{type:'base64', media_type:img.type, data:img.data}
+  }));
+  content.push({
+    type:'text',
+    text:`Das ist eine Klassenarbeit aus dem Fach "${ka.fach_name}", Klasse ${S.grade}. Analysiere als Lernbegleiterin den STIL DES LEHRERS:
+
+1. Wie formuliert der Lehrer Aufgaben? (offene Fragen / geschlossene? Multiple-Choice? Aufzählungen? Erklärungsaufgaben?)
+2. Was bewertet der Lehrer in seinen Korrekturen besonders streng oder lobt er besonders? (Rechtschreibung, Begründungen, Skizzen, Vollständigkeit, Fachbegriffe?)
+3. Welche Themen wurden geprüft?
+4. Welche typischen Fehler wurden korrigiert?
+
+Antworte als kompakter Fließtext (max 8 Sätze), den eine andere KI als Kontext nutzen kann, um künftige Lernpläne im Stil dieses Lehrers vorzubereiten.`
+  });
+
+  try {
+    const d = await callClaude({
+      messages: [{role:'user', content}],
+      max_tokens: 600
+    });
+    const txt = d.content?.find(b => b.type==='text');
+    const analysis = txt?.text || '';
+
+    // Themen aus der Arbeit extrahieren als zweiter Call
+    let topics = [];
+    try {
+      const d2 = await callClaude({
+        messages: [{role:'user', content:[
+          ...imgsWithData.map(img => ({type:'image', source:{type:'base64', media_type:img.type, data:img.data}})),
+          {type:'text', text:`Liste die in dieser Klassenarbeit (${ka.fach_name}) abgefragten Themen als JSON-Array kurzer Strings auf. Nur JSON.`}
+        ]}],
+        max_tokens: 300
+      });
+      const t2 = d2.content?.find(b => b.type==='text');
+      topics = JSON.parse((t2?.text||'[]').replace(/```json|```/g,'').trim());
+    } catch(e){ console.warn('Topic-Extract:', e); }
+
+    await updateKlassenarbeit(kaId, {analysis, topics});
+  } catch(e){
+    console.error('analyzeKlassenarbeit:', e);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1519,6 +1712,9 @@ async function resumePlan(planId){
   S.msgs = p.msgs || [];
   S.doneTopic = p.done_topic || {};
   S.strugglingTopics = p.struggling_topics || [];
+
+  // Lehrer-Stil aus früheren Klassenarbeiten dieses Fachs laden
+  await loadTeacherStyleForFach(S.subject);
 
   // App-View
   document.getElementById('messages').innerHTML = '';
@@ -1731,10 +1927,15 @@ function getSysPrompt(){
     ? `\nThemen, die ${S.name||'das Kind'} schwierig fand und wiederholt werden sollten: ${S.strugglingTopics.join(', ')}.` : '';
   const strategy = getSubjectStrategy(S.subject);
 
+  // PUNKT 5: Lehrer-Stil aus früheren Klassenarbeiten einbauen
+  const teacherStyle = S.teacherStyleContext
+    ? `\n\nLEHRER-STIL (aus früheren Klassenarbeiten dieses Lehrers):\n${S.teacherStyleContext}\nNutze diesen Stil bei Übungsfragen und Erklärungen – frage und erkläre so, wie der Lehrer es typischerweise macht.`
+    : '';
+
   return `Du bist Stevie, eine erfahrene KI-Lernbegleiterin mit pädagogischem Tiefgang.
 
 KIND: ${S.name||'das Kind'}, ${S.age} Jahre, ${S.grade}. Klasse (${lvl}).
-FACH: ${S.subject||'(noch unbekannt)'}.${planCtx}${struggling}
+FACH: ${S.subject||'(noch unbekannt)'}.${planCtx}${struggling}${teacherStyle}
 
 PERSÖNLICHKEIT: Warmherzig, geduldig, ermutigend. Niemals belehrend oder von oben herab. Sprich ${S.name||'das Kind'} gelegentlich mit Namen an, aber nicht in jeder Nachricht.
 
@@ -1789,11 +1990,14 @@ Antworte ausschließlich auf Deutsch.`;
 async function generatePlan(fach, options={}){
   const matCtx = fach && fach.topics && fach.topics.length
     ? 'Themen aus der Mappe: '+fach.topics.join(', ')+'.' : '';
+  const teacherCtx = S.teacherStyleContext
+    ? `\n\nLEHRER-STIL (aus früheren Arbeiten):\n${S.teacherStyleContext}\nGewichte den Plan so, dass typische Aufgabenformate des Lehrers besonders geübt werden.`
+    : '';
 
   document.getElementById('prog-title').textContent = 'Stevie plant deinen Lernweg…';
 
   const sysP = `Erstelle einen ${S.days}-Tage-Lernplan für "${S.subject}", Klasse ${S.grade}.
-${matCtx}
+${matCtx}${teacherCtx}
 
 DIDAKTISCHE PRINZIPIEN:
 - Vom Einfachen zum Komplexen
@@ -1896,6 +2100,8 @@ async function startApp(skip){
     S.subject.toLowerCase().includes(f.name.toLowerCase())
   )) || null;
 
+  // Lehrer-Stil aus früheren Klassenarbeiten laden – fließt in generatePlan + späteren Chat
+  await loadTeacherStyleForFach(S.subject);
   await generatePlan(fach, {materialImages: S.matImages});
   await logSession(S.subject);
 
@@ -2357,6 +2563,10 @@ async function renderMappe(){
   const list = document.getElementById('faecher-list'); list.innerHTML = '';
   const faecher = await getFaecher();
 
+  // Alle Pläne und Klassenarbeiten einmal holen, dann pro Fach filtern
+  const allPlaene = await listPlaene();
+  const allKAs = await listKlassenarbeiten();
+
   // Stats
   const totalPages = faecher.reduce((a,f)=>a+(f.images?.length||0), 0);
   const totalTopics = faecher.reduce((a,f)=>a+(f.topics?.length||0), 0);
@@ -2375,21 +2585,75 @@ async function renderMappe(){
 
   faecher.forEach((fach, idx) => {
     const today = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'2-digit'});
+    const fachPlaene = allPlaene.filter(p => p.fach_name?.toLowerCase() === fach.name?.toLowerCase());
+    const fachKAs = allKAs.filter(k => k.fach_name?.toLowerCase() === fach.name?.toLowerCase());
+
     const imgsHtml = (fach.images||[]).map((img, i) =>
       `<div class="mat-item" data-src="${img.src}"><img src="${img.src}" loading="lazy"/><button class="mat-del" data-fach="${idx}" data-img="${i}">×</button><div class="mat-date">${img.date||today}</div></div>`
     ).join('');
     const topicsHtml = fach.topics && fach.topics.length
-      ? `<div class="topics-box"><h4>Erkannte Themen</h4><div class="tlist">${fach.topics.map(t=>`<span class="titem">${t}</span>`).join('')}</div></div>` : '';
+      ? `<div class="topics-box"><h4>Erkannte Themen</h4><div class="tlist">${fach.topics.map(t=>`<span class="titem">${escapeHtml(t)}</span>`).join('')}</div></div>` : '';
     const coverImgs = (fach.images||[]).slice(0,3);
     const coversHtml = coverImgs.length
       ? `<div class="fach-covers">${coverImgs.map(img => `<div class="fach-cover" style="background-image:url('${img.src}')"></div>`).join('')}</div>` : '';
+
+    // Lernpläne-Sektion
+    const plaeneHtml = `
+      <div class="fach-section">
+        <div class="fach-section-h">
+          <h4><svg width="13" height="13" style="color:var(--tc);"><use href="#ic-brain"/></svg> Lernpläne (${fachPlaene.length})</h4>
+          <button class="fach-section-add" data-newplan="${escapeHtml(fach.name)}"><svg width="11" height="11"><use href="#ic-plus"/></svg> Neuer Plan</button>
+        </div>
+        ${fachPlaene.length === 0
+          ? '<p style="font-size:12px;color:var(--ink-4);padding:6px 0;">Noch kein Lernplan für dieses Fach.</p>'
+          : fachPlaene.map(p => {
+              const totalT = (p.plan||[]).reduce((a,d)=>a+(d.topics?.length||0), 0);
+              const doneT = Object.keys(p.done_topic||{}).length;
+              const upd = new Date(p.updated_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+              return `
+                <div class="plan-row" data-resume="${p.id}">
+                  <div class="plan-row-info">
+                    <div class="plan-row-name">${escapeHtml(p.plan_name)}</div>
+                    <div class="plan-row-meta">Tag ${p.current_day}/${p.days} · ${doneT}/${totalT} Themen · ${upd}</div>
+                  </div>
+                  <div class="plan-row-acts">
+                    <button class="plan-row-btn" data-renameplan="${p.id}" title="Umbenennen"><svg width="14" height="14"><use href="#ic-paint"/></svg></button>
+                    <button class="plan-row-btn" data-delplan="${p.id}" title="Löschen"><svg width="14" height="14"><use href="#ic-trash"/></svg></button>
+                  </div>
+                </div>`;
+            }).join('')}
+      </div>`;
+
+    // Klassenarbeiten-Sektion
+    const kaHtml = `
+      <div class="fach-section">
+        <div class="fach-section-h">
+          <h4><svg width="13" height="13" style="color:#92400e;"><use href="#ic-note"/></svg> Klassenarbeiten (${fachKAs.length})</h4>
+          <button class="fach-section-add" data-newka="${escapeHtml(fach.name)}"><svg width="11" height="11"><use href="#ic-plus"/></svg> Hinzufügen</button>
+        </div>
+        ${fachKAs.length === 0
+          ? '<p style="font-size:12px;color:var(--ink-4);padding:6px 0;">Klassenarbeiten hochladen, damit Stevie den Lehrer-Stil lernt.</p>'
+          : fachKAs.map(k => {
+              const upd = new Date(k.updated_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+              const status = k.analysis ? '✓ analysiert' : '⏳ noch nicht analysiert';
+              return `
+                <div class="ka-row" data-ka="${k.id}">
+                  <div class="ka-row-ico"><svg width="16" height="16"><use href="#ic-note"/></svg></div>
+                  <div class="ka-row-info">
+                    <div class="ka-row-title">${escapeHtml(k.title||'Klassenarbeit')}</div>
+                    <div class="ka-row-meta">${(k.images||[]).length} Seiten · ${status} · ${upd}</div>
+                  </div>
+                  <button class="plan-row-btn" data-delka="${k.id}" title="Löschen"><svg width="14" height="14"><use href="#ic-trash"/></svg></button>
+                </div>`;
+            }).join('')}
+      </div>`;
 
     const card = document.createElement('div'); card.className = 'fach-card';
     card.innerHTML = `
       <div class="fach-head">
         <div class="fach-icon"><svg width="22" height="22" style="color:white;"><use href="#ic-folder"/></svg></div>
         <div class="fach-info">
-          <div class="fach-nm">${fach.name}</div>
+          <div class="fach-nm">${escapeHtml(fach.name)}</div>
           <div class="fach-meta">
             <span class="fach-meta-dot"><svg width="11" height="11" style="color:var(--tc);"><use href="#ic-image"/></svg> ${(fach.images||[]).length} Seiten</span>
             <span class="fach-meta-dot"><svg width="11" height="11" style="color:var(--tc);"><use href="#ic-bulb"/></svg> ${(fach.topics||[]).length} Themen</span>
@@ -2399,23 +2663,29 @@ async function renderMappe(){
         <span class="fach-arr"><svg width="18" height="18"><use href="#ic-chev"/></svg></span>
       </div>
       <div class="fach-body">
-        <div class="mat-grid">
-          ${imgsHtml}
-          <div class="mat-add" data-idx="${idx}">
-            <svg width="22" height="22"><use href="#ic-plus"/></svg>
-            <p>Hinzufügen</p>
+        <div class="fach-section">
+          <div class="fach-section-h">
+            <h4><svg width="13" height="13" style="color:var(--tc);"><use href="#ic-image"/></svg> Material (${(fach.images||[]).length})</h4>
           </div>
+          <div class="mat-grid">
+            ${imgsHtml}
+            <div class="mat-add" data-idx="${idx}">
+              <svg width="22" height="22"><use href="#ic-plus"/></svg>
+              <p>Hinzufügen</p>
+            </div>
+          </div>
+          ${fach.analyzing ? '<div class="analyzing"><div class="analyzing-spinner"></div>Stevie analysiert das Material…</div>' : topicsHtml}
         </div>
-        ${fach.analyzing ? '<div class="analyzing"><div class="analyzing-spinner"></div>Stevie analysiert das Material…</div>' : topicsHtml}
+        ${plaeneHtml}
+        ${kaHtml}
         <div class="fach-acts">
-          <button class="fach-btn" data-learn="${fach.name}">Mit Stevie lernen</button>
-          <button class="fach-btn out" data-del="${idx}">Löschen</button>
+          <button class="fach-btn" data-renamefach="${idx}">Umbenennen</button>
+          <button class="fach-btn out" data-del="${idx}">Fach löschen</button>
         </div>
       </div>`;
     list.appendChild(card);
   });
 
-  // Event-Delegation: nur EIN Listener für die ganze Liste
   if(!list._handlerBound){
     list.addEventListener('click', mappeClickHandler);
     list._handlerBound = true;
@@ -2430,6 +2700,111 @@ async function mappeClickHandler(e){
     body.classList.toggle('open'); arr.classList.toggle('open');
     return;
   }
+
+  // Plan: anklicken zum Weitermachen
+  const resumeBtn = e.target.closest('[data-resume]');
+  if(resumeBtn && !e.target.closest('.plan-row-acts')){
+    await resumePlan(resumeBtn.dataset.resume);
+    return;
+  }
+  // Plan: umbenennen
+  const renamePlanBtn = e.target.closest('[data-renameplan]');
+  if(renamePlanBtn){
+    e.stopPropagation();
+    const planId = renamePlanBtn.dataset.renameplan;
+    const p = await getPlanById(planId);
+    if(!p) return;
+    const newName = prompt('Neuer Name für diesen Lernplan:', p.plan_name);
+    if(newName && newName.trim() && newName.trim() !== p.plan_name){
+      await renamePlan(planId, newName.trim());
+      renderMappe();
+    }
+    return;
+  }
+  // Plan: löschen
+  const delPlanBtn = e.target.closest('[data-delplan]');
+  if(delPlanBtn){
+    e.stopPropagation();
+    const planId = delPlanBtn.dataset.delplan;
+    showConfirm('Lernplan löschen?', 'Inkl. Chat-Verlauf. Material und Fach bleiben.', 'Löschen', async (ok)=>{
+      if(!ok) return;
+      await deletePlan(planId);
+      // Falls aktiv: zurücksetzen
+      if(S.activePlanId === planId){
+        S.activePlanId = null; S.msgs = []; S.plan = []; S.doneTopic = {};
+      }
+      renderMappe();
+    });
+    return;
+  }
+  // Neuer Plan für Fach
+  const newPlanBtn = e.target.closest('[data-newplan]');
+  if(newPlanBtn){
+    e.stopPropagation();
+    document.getElementById('subject-input').value = newPlanBtn.dataset.newplan;
+    if(typeof buildDaysGrid==='function') buildDaysGrid();
+    showScreen('setup');
+    return;
+  }
+
+  // Klassenarbeit: anklicken zum Anschauen (Lightbox-Galerie)
+  const kaRow = e.target.closest('[data-ka]');
+  if(kaRow && !e.target.closest('.plan-row-acts') && !e.target.closest('[data-delka]')){
+    e.stopPropagation();
+    const kaId = kaRow.dataset.ka;
+    const {data: ka} = await sb.from('klassenarbeiten').select('*').eq('id', kaId).maybeSingle();
+    if(ka?.images?.[0]?.src){
+      document.getElementById('lb-img').src = ka.images[0].src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    return;
+  }
+  // Klassenarbeit: löschen
+  const delKaBtn = e.target.closest('[data-delka]');
+  if(delKaBtn){
+    e.stopPropagation();
+    const kaId = delKaBtn.dataset.delka;
+    showConfirm('Klassenarbeit löschen?', 'Auch die Stilanalyse für künftige Lernpläne geht verloren.', 'Löschen', async (ok)=>{
+      if(!ok) return;
+      await deleteKlassenarbeit(kaId);
+      renderMappe();
+    });
+    return;
+  }
+  // Neue Klassenarbeit: Modal öffnen
+  const newKaBtn = e.target.closest('[data-newka]');
+  if(newKaBtn){
+    e.stopPropagation();
+    openNewKaModal(newKaBtn.dataset.newka);
+    return;
+  }
+
+  // Fach: umbenennen
+  const renameFachBtn = e.target.closest('[data-renamefach]');
+  if(renameFachBtn){
+    const fIdx = parseInt(renameFachBtn.dataset.renamefach);
+    const faecher = await getFaecher();
+    const oldName = faecher[fIdx]?.name; if(!oldName) return;
+    const newName = prompt('Neuer Name für das Fach:', oldName);
+    if(newName && newName.trim() && newName.trim() !== oldName){
+      // Fach umbenennen
+      faecher[fIdx].name = newName.trim();
+      await setFaecher(faecher);
+      // Pläne und Klassenarbeiten dieses Fachs mit umbenennen
+      const allP = await listPlaene();
+      for(const p of allP.filter(x => x.fach_name === oldName)){
+        await updatePlan(p.id, {fach_name: newName.trim()});
+      }
+      const allK = await listKlassenarbeiten(oldName);
+      for(const k of allK){
+        await updateKlassenarbeit(k.id, {fach_name: newName.trim()});
+      }
+      renderMappe();
+    }
+    return;
+  }
+
+  // bestehende Aktionen
   const matDel = e.target.closest('.mat-del');
   if(matDel){
     e.stopPropagation();
@@ -2458,24 +2833,25 @@ async function mappeClickHandler(e){
     document.getElementById('fach-file').click();
     return;
   }
-  const learnBtn = e.target.closest('[data-learn]');
-  if(learnBtn){
-    document.getElementById('subject-input').value = learnBtn.dataset.learn;
-    if(typeof buildDaysGrid==='function') buildDaysGrid();
-    selectDays(S.days||3);
-    showScreen('setup');
-    return;
-  }
   const delBtn = e.target.closest('[data-del]');
   if(delBtn){
     const idx2 = parseInt(delBtn.dataset.del);
-    showConfirm('Fach löschen?', 'Alle Materialien werden entfernt.', 'Löschen', async (ok)=>{
+    showConfirm('Fach löschen?', 'Material UND alle Lernpläne und Klassenarbeiten dieses Fachs werden entfernt.', 'Löschen', async (ok)=>{
       if(!ok) return;
       const f3 = await getFaecher();
+      const fachName = f3[idx2]?.name;
+      // Storage-Bilder mitlöschen
       const paths = (f3[idx2]?.images||[]).map(i => i.path).filter(Boolean);
       if(paths.length) await sb.storage.from(STORAGE_BUCKET).remove(paths);
       f3.splice(idx2, 1);
       await setFaecher(f3);
+      // Pläne und KAs dieses Fachs mitlöschen
+      if(fachName){
+        const plansToDel = (await listPlaene()).filter(p => p.fach_name === fachName);
+        for(const p of plansToDel) await deletePlan(p.id);
+        const kasToDel = await listKlassenarbeiten(fachName);
+        for(const k of kasToDel) await deleteKlassenarbeit(k.id);
+      }
       renderMappe();
     });
   }
@@ -2514,6 +2890,88 @@ async function handleFachUpload(files){
   }
 
   await analyzeImagesByIdx(idx, newImagesForAnalyze);
+}
+
+// ─── KLASSENARBEIT HINZUFÜGEN (Modal) ─────────────────────────────
+let _newKaFach = null;
+let _newKaImages = []; // [{data, type, src}]
+
+function openNewKaModal(fachName){
+  _newKaFach = fachName;
+  _newKaImages = [];
+  document.getElementById('newka-title').value =
+    `Klassenarbeit vom ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'})}`;
+  document.getElementById('newka-thumbs').innerHTML = '';
+  document.getElementById('newka-modal').classList.add('open');
+}
+
+function handleNewKaFiles(files){
+  Array.from(files).forEach(file => {
+    compressImage(file, (data, type, src)=>{
+      _newKaImages.push({data, type, src});
+      const thumb = document.createElement('div');
+      thumb.style.cssText = 'position:relative;width:60px;height:60px;flex-shrink:0;';
+      thumb.innerHTML = `<img src="${src}" style="width:60px;height:60px;object-fit:cover;border-radius:9px;border:1.5px solid var(--cbr);"/><button style="position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;font-weight:700;">×</button>`;
+      thumb.querySelector('button').addEventListener('click', ()=>{
+        const idx = Array.from(document.getElementById('newka-thumbs').children).indexOf(thumb);
+        _newKaImages.splice(idx, 1); thumb.remove();
+      });
+      document.getElementById('newka-thumbs').appendChild(thumb);
+    });
+  });
+}
+
+async function saveNewKa(){
+  if(!_newKaFach){ toast('Fach nicht gesetzt.', 'err'); return; }
+  if(!_newKaImages.length){ toast('Bitte mindestens ein Bild hochladen.', 'err'); return; }
+  const title = document.getElementById('newka-title').value.trim() || 'Klassenarbeit';
+
+  document.getElementById('newka-modal').classList.remove('open');
+  toast('Bilder werden hochgeladen…', 'ok');
+
+  const today = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  const uploadedImages = [];
+
+  // Bilder in Storage hochladen
+  for(const img of _newKaImages){
+    const blob = dataUrlToBlob(img.src, img.type);
+    const fachId = '_klassenarbeit_'+_newKaFach;
+    const uploaded = await uploadToStorage(blob, 'ka.jpg', fachId);
+    if(uploaded){
+      uploadedImages.push({
+        src: uploaded.url, path: uploaded.path,
+        type: img.type, date: today,
+        data: img.data // base64 temporär für die Analyse
+      });
+    } else {
+      uploadedImages.push({src: img.src, type: img.type, date: today, data: img.data});
+    }
+  }
+
+  // KA in DB anlegen
+  const created = await createKlassenarbeit({
+    fach_name: _newKaFach,
+    title,
+    images: uploadedImages
+  });
+
+  if(!created){ toast('Speichern fehlgeschlagen.', 'err'); return; }
+
+  toast('Stevie analysiert den Lehrerstil…', 'ok');
+  renderMappe(); // Sofort anzeigen mit "noch nicht analysiert"
+
+  // Analyse im Hintergrund (kann 5-15 Sekunden dauern)
+  await analyzeKlassenarbeit(created.id);
+
+  // Nach Analyse: base64-Daten aus den Bildern entfernen (sparen Platz in DB)
+  const cleanedImages = uploadedImages.map(({data, ...rest}) => rest);
+  await updateKlassenarbeit(created.id, {images: cleanedImages});
+
+  // Wenn aktiv im selben Fach gelernt wird: Lehrerstil neu laden
+  if(S.subject === _newKaFach) await loadTeacherStyleForFach(_newKaFach);
+
+  toast('Klassenarbeit analysiert!', 'ok');
+  renderMappe();
 }
 
 function openAddFach(){
@@ -2937,6 +3395,15 @@ function init(){
   document.getElementById('add-fach-btn').addEventListener('click', openAddFach);
   document.getElementById('addfach-close').addEventListener('click', ()=>document.getElementById('addfach-modal').classList.remove('open'));
   document.getElementById('addfach-save').addEventListener('click', saveNewFach);
+
+  // Klassenarbeit-Modal (Punkt 5)
+  document.getElementById('newka-close').addEventListener('click', ()=>document.getElementById('newka-modal').classList.remove('open'));
+  document.getElementById('newka-zone').addEventListener('click', ()=>document.getElementById('newka-file').click());
+  document.getElementById('newka-file').addEventListener('change', e => {
+    if(e.target.files.length) handleNewKaFiles(e.target.files);
+    e.target.value = '';
+  });
+  document.getElementById('newka-save').addEventListener('click', saveNewKa);
   document.getElementById('fach-file').addEventListener('change', e => {
     if(e.target.files.length) handleFachUpload(e.target.files);
     e.target.value = '';
