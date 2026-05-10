@@ -978,6 +978,12 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
             <svg class="acc-item-ico" style="color:var(--ink-3);"><use href="#ic-bulb"/></svg> Neue Lernrunde
           </button>
           <div class="acc-divider"></div>
+          <button class="acc-item" id="acc-premium-voice">
+            <svg class="acc-item-ico" style="color:var(--ink-3);"><use href="#ic-vol"/></svg>
+            <span style="flex:1;">Premium-Stimme</span>
+            <span id="acc-premium-state" style="font-size:11px;font-weight:700;color:#16a34a;background:#f0fdf4;border-radius:99px;padding:3px 9px;border:1px solid #bbf7d0;">An</span>
+          </button>
+          <div class="acc-divider"></div>
           <button class="acc-item danger" id="acc-logout">
             <svg class="acc-item-ico"><use href="#ic-logout"/></svg> Abmelden
           </button>
@@ -1160,6 +1166,9 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 // Edge-Function-URL – muss zum Namen im Supabase-Dashboard passen
 const PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/bright-processor';
 
+// ElevenLabs-Proxy-URL – wenn deine TTS-Edge-Function anders heißt, hier ändern
+const TTS_PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/elevenlabs-proxy';
+
 const SUPA_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -1203,6 +1212,7 @@ const S = {
   pendingMaterial:[],
   strugglingTopics:[],
   elevenKey:null,
+  premiumVoice:true,        // ElevenLabs aktiv? (false = Safari-Fallback)
   activePlanId:null,        // ID des gerade aktiven Plans in der DB
   teacherStyleContext:''    // Gesammelte Stil-Analysen aus Klassenarbeiten dieses Fachs
 };
@@ -2424,29 +2434,56 @@ async function handleAddMaterialInChat(files){
 let curAudio = null;
 const synth = window.speechSynthesis;
 
-function speak(text){
+async function speak(text){
   if(!S.voiceOn) return;
   stopSpeaking();
   const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').trim();
-  if(S.elevenKey){
-    fetch('https://api.elevenlabs.io/v1/text-to-speech/'+S.voiceId, {
-      method:'POST',
-      headers:{'xi-api-key':S.elevenKey, 'Content-Type':'application/json'},
-      body:JSON.stringify({
-        text:clean, model_id:'eleven_multilingual_v2',
-        voice_settings:{stability:.5, similarity_boost:.8, style:.3, use_speaker_boost:true}
-      })
-    })
-    .then(r => { if(!r.ok) throw new Error('EL error'); return r.blob(); })
-    .then(blob => {
+  if(!clean) return;
+
+  // Premium-Stimme über Edge Function (ElevenLabs)
+  if(S.premiumVoice){
+    try {
+      const {data: sess} = await sb.auth.getSession();
+      if(!sess?.session?.access_token){
+        return fallbackSpeak(clean);
+      }
+
+      const res = await fetch(TTS_PROXY_URL, {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+sess.session.access_token
+        },
+        body: JSON.stringify({text: clean, voice_id: S.voiceId})
+      });
+
+      if(!res.ok){
+        // Bei Tageslimit (429): Hinweis und Fallback
+        if(res.status === 429){
+          const d = await res.json().catch(()=>null);
+          toast(d?.error?.message || 'Premium-Stimme heute ausgeschöpft – zurück zur Standard-Stimme.', 'err');
+          return fallbackSpeak(clean);
+        }
+        // Andere Fehler: still fallback
+        console.warn('TTS-Proxy-Fehler:', res.status);
+        return fallbackSpeak(clean);
+      }
+
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       curAudio = new Audio(url);
-      curAudio.onended = ()=>setSI(false);
-      curAudio.play(); setSI(true);
-    })
-    .catch(()=>fallbackSpeak(clean));
+      curAudio.onended = ()=>{ setSI(false); URL.revokeObjectURL(url); };
+      curAudio.onerror = ()=>{ setSI(false); URL.revokeObjectURL(url); };
+      await curAudio.play();
+      setSI(true);
+    } catch(e){
+      console.warn('TTS-Exception:', e);
+      fallbackSpeak(clean);
+    }
     return;
   }
+
+  // Standard-Stimme (Browser)
   fallbackSpeak(clean);
 }
 
@@ -3269,6 +3306,22 @@ function startStars(){
 // ════════════════════════════════════════════════════════════════
 // INIT – alle Event-Listener und Auth-Listener
 // ════════════════════════════════════════════════════════════════
+function updatePremiumVoiceUI(){
+  const el = document.getElementById('acc-premium-state');
+  if(!el) return;
+  if(S.premiumVoice){
+    el.textContent = 'An';
+    el.style.color = '#16a34a';
+    el.style.background = '#f0fdf4';
+    el.style.borderColor = '#bbf7d0';
+  } else {
+    el.textContent = 'Aus';
+    el.style.color = '#dc2626';
+    el.style.background = '#fef2f2';
+    el.style.borderColor = '#fecaca';
+  }
+}
+
 function init(){
   startStars();
 
@@ -3339,7 +3392,20 @@ function init(){
     closeAccountMenu();
     await showHub();
   });
+  document.getElementById('acc-premium-voice').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    S.premiumVoice = !S.premiumVoice;
+    localStorage.setItem('stevie_premium_voice', S.premiumVoice ? '1' : '0');
+    updatePremiumVoiceUI();
+    stopSpeaking();
+    toast(S.premiumVoice ? 'Premium-Stimme an.' : 'Standard-Stimme aktiv.', 'ok');
+  });
   document.getElementById('acc-logout').addEventListener('click', ()=>{ closeAccountMenu(); doLogout(); });
+
+  // Premium-Voice-Setting aus localStorage initial laden (wenn nichts gespeichert: Default an)
+  const stored = localStorage.getItem('stevie_premium_voice');
+  if(stored !== null) S.premiumVoice = stored === '1';
+  updatePremiumVoiceUI();
 
   // Hub (Punkt 2)
   document.getElementById('hub-new-btn').addEventListener('click', ()=>{
