@@ -1196,6 +1196,26 @@ const SUPA_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
+// ─── SICHERER localStorage-WRAPPER ───────────────────────────────
+// Safari blockt localStorage unter bestimmten Bedingungen (ITP).
+// Diese Helper fangen alle Fehler ab und geben null zurück statt zu crashen.
+function lsGet(key){
+  try { return lsGet(key); }
+  catch(e){ return null; }
+}
+function lsSet(key, val){
+  try { lsSet(key, val); return true; }
+  catch(e){ return false; }
+}
+function lsRemove(key){
+  try { lsRemove(key); }
+  catch(e){}
+}
+function lsKeys(){
+  try { return lsKeys(); }
+  catch(e){ return []; }
+}
+
 const STORAGE_BUCKET = 'material';
 
 const THEMES = {
@@ -1544,21 +1564,21 @@ Antworte als kompakter Fließtext (max 8 Sätze), den eine andere KI als Kontext
 // ════════════════════════════════════════════════════════════════
 async function migrateFromLocalStorage(){
   const flag = 'stevie_migrated_v2';
-  if(localStorage.getItem(flag)) return;
+  if(lsGet(flag)) return;
 
   // Schnell-Check: gibt es überhaupt alte Daten? Wenn nicht, sofort fertig.
-  const hasOldData = localStorage.getItem('stevie_faecher') ||
-                     localStorage.getItem('stevie_sessions') ||
-                     localStorage.getItem('stevie_noten');
+  const hasOldData = lsGet('stevie_faecher') ||
+                     lsGet('stevie_sessions') ||
+                     lsGet('stevie_noten');
 
   if(!hasOldData){
     // Kein alter Datenstand – Flag direkt setzen, keine DB-Calls nötig
-    try { localStorage.setItem(flag, '1'); } catch(e){}
+    try { lsSet(flag, '1'); } catch(e){}
     return;
   }
 
   try {
-    const oldFaecher = JSON.parse(localStorage.getItem('stevie_faecher')||'null');
+    const oldFaecher = JSON.parse(lsGet('stevie_faecher')||'null');
     if(Array.isArray(oldFaecher) && oldFaecher.length){
       const cur = await getFaecher();
       if(!cur.length){
@@ -1566,21 +1586,21 @@ async function migrateFromLocalStorage(){
         toast('Mappe übernommen.', 'ok');
       }
     }
-    const oldSess = JSON.parse(localStorage.getItem('stevie_sessions')||'null');
+    const oldSess = JSON.parse(lsGet('stevie_sessions')||'null');
     if(Array.isArray(oldSess) && oldSess.length){
       const cur = await getSessions();
       if(!cur.length) await setSessions(oldSess);
     }
-    const oldNoten = JSON.parse(localStorage.getItem('stevie_noten')||'null');
+    const oldNoten = JSON.parse(lsGet('stevie_noten')||'null');
     if(Array.isArray(oldNoten) && oldNoten.length){
       const cur = await getNoten();
       if(!cur.length) await setNoten(oldNoten);
     }
-    const ek = localStorage.getItem('stevie_eleven');
+    const ek = lsGet('stevie_eleven');
     if(ek) S.elevenKey = ek;
 
-    try { localStorage.setItem(flag, '1'); } catch(e){}
-    localStorage.removeItem('stevie_key');
+    try { lsSet(flag, '1'); } catch(e){}
+    lsRemove('stevie_key');
   } catch(e){
     console.error('Migration error:', e);
   }
@@ -1694,8 +1714,8 @@ async function initAfterLogin(user){
   const ls = document.getElementById('loading-screen');
   if(ls) ls.style.display = 'flex';
 
-  // Fallback-Timeout: nach 20 Sekunden aufgeben
   const forceHide = setTimeout(()=>{
+    console.error('TIMEOUT: initAfterLogin hat nach 20s nicht geendet');
     if(ls) ls.style.display = 'none';
     if(_initInProgress){
       _initInProgress = false;
@@ -1705,23 +1725,27 @@ async function initAfterLogin(user){
   }, 20000);
 
   try {
+    console.log('[INIT] Start, User:', user?.id?.substring(0,8));
     currentUser = user;
 
-    // Migration und Profil PARALLEL laden – spart 1-2 Sekunden
+    console.log('[INIT] Starte Migration + loadProfile parallel');
     const [_, hasProfile] = await Promise.all([
-      migrateFromLocalStorage().catch(e => console.warn('Migration:', e)),
-      loadProfile().catch(e => { console.warn('loadProfile:', e); return false; })
+      migrateFromLocalStorage().catch(e => { console.error('[INIT] Migration:', e); }),
+      loadProfile().catch(e => { console.error('[INIT] loadProfile:', e); return false; })
     ]);
+    console.log('[INIT] hasProfile:', hasProfile);
 
     if(!hasProfile){
+      console.log('[INIT] → Onboarding');
       if(typeof buildOnboarding==='function') buildOnboarding();
       showScreen('onboarding');
     } else {
-      // Hub sofort zeigen, Pläne im Hintergrund nachladen
+      console.log('[INIT] → Hub');
       showHubFast();
     }
+    console.log('[INIT] Fertig');
   } catch(e){
-    console.error('initAfterLogin:', e);
+    console.error('[INIT] Unerwarteter Fehler:', e);
     showScreen('authscreen');
   } finally {
     clearTimeout(forceHide);
@@ -3638,7 +3662,7 @@ async function init(){
   document.getElementById('acc-premium-voice').addEventListener('click', (e)=>{
     e.stopPropagation();
     S.premiumVoice = !S.premiumVoice;
-    localStorage.setItem('stevie_premium_voice', S.premiumVoice ? '1' : '0');
+    lsSet('stevie_premium_voice', S.premiumVoice ? '1' : '0');
     updatePremiumVoiceUI();
     stopSpeaking();
     toast(S.premiumVoice ? 'Premium-Stimme an.' : 'Standard-Stimme aktiv.', 'ok');
@@ -3646,7 +3670,7 @@ async function init(){
   document.getElementById('acc-logout').addEventListener('click', ()=>{ closeAccountMenu(); doLogout(); });
 
   // Premium-Voice-Setting aus localStorage initial laden (wenn nichts gespeichert: Default an)
-  const stored = localStorage.getItem('stevie_premium_voice');
+  const stored = lsGet('stevie_premium_voice');
   if(stored !== null) S.premiumVoice = stored === '1';
   updatePremiumVoiceUI();
 
@@ -3745,9 +3769,9 @@ async function init(){
   if(new URLSearchParams(location.search).get('reset') === '1'){
     try {
       await sb.auth.signOut();
-      Object.keys(localStorage)
+      lsKeys()
         .filter(k => k.startsWith('stevie_') || k.startsWith('sb-'))
-        .forEach(k => localStorage.removeItem(k));
+        .forEach(k => lsRemove(k));
     } catch(e){ console.warn('Reset-Fehler:', e); }
     history.replaceState(null, '', location.pathname);
     showScreen('splash');
