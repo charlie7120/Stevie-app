@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie v6</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -1187,10 +1187,9 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 // WICHTIG: Edge-Function-URL muss zu deinem Supabase-Projekt passen.
 // Format: https://<projektref>.supabase.co/functions/v1/anthropic-proxy
 // Edge-Function-URL – muss zum Namen im Supabase-Dashboard passen
-const PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/bright-processor';
-
-// ElevenLabs-Proxy-URL – wenn deine TTS-Edge-Function anders heißt, hier ändern
-const TTS_PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/elevenlabs-proxy';
+// OpenAI Proxy – eine Function für Chat + TTS
+const PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/openai-proxy';
+const TTS_PROXY_URL = PROXY_URL; // Gleiche Function, mode='tts'
 
 const SUPA_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
@@ -1277,7 +1276,7 @@ const S = {
   pendingMaterial:[], materialWarnings:[],
   strugglingTopics:[],
   elevenKey:null,
-  premiumVoice:true,        // ElevenLabs aktiv? (false = Safari-Fallback)
+  premiumVoice:true,        // OpenAI TTS aktiv? (false = Browser-Fallback)
   activePlanId:null,        // ID des gerade aktiven Plans in der DB
   teacherStyleContext:''    // Gesammelte Stil-Analysen aus Klassenarbeiten dieses Fachs
 };
@@ -1641,7 +1640,7 @@ async function migrateFromLocalStorage(){
 // ════════════════════════════════════════════════════════════════
 // API-CLIENT: Anthropic-Calls über Edge-Function-Proxy
 // ════════════════════════════════════════════════════════════════
-async function callClaude({system, messages, max_tokens=1000}){
+async function callClaude({system, messages, max_tokens=1000, use_deep_model=false}){
   const {data: sess} = await sb.auth.getSession();
   if(!sess?.session?.access_token){
     throw new Error('Du bist nicht angemeldet. Bitte erneut einloggen.');
@@ -1653,7 +1652,7 @@ async function callClaude({system, messages, max_tokens=1000}){
       'Content-Type':'application/json',
       'Authorization':'Bearer '+sess.session.access_token
     },
-    body: JSON.stringify({system, messages, max_tokens})
+    body: JSON.stringify({mode:'chat', system, messages, max_tokens, use_deep_model})
   });
 
   let d;
@@ -2635,12 +2634,15 @@ async function sendMsg(){
   }
   if(text) uc.push({type:'text', text});
 
+  // Deepen-Anfragen: GPT-4o (bessere Qualität für tiefe Erklärungen)
+  const isDeepRequest = text.includes('nochmal richtig gründlich') ||
+                        text.includes('Schritt für Schritt mit Beispielen');
+
   addMsg('user', text||'[Bild]', {imgSrc});
   inp.value = ''; removeImg();
   document.getElementById('sendbtn').disabled = true;
   showTyping();
 
-  // Verlauf für API: nur clean content, letzte User-Msg mit Bild-Inhalt
   const apiMsgs = S.msgs.slice(0, -1).map(m => ({role: m.role, content: m.content}));
   apiMsgs.push({role: 'user', content: uc});
 
@@ -2648,7 +2650,8 @@ async function sendMsg(){
     const d = await callClaude({
       system: getSysPrompt(),
       messages: apiMsgs,
-      max_tokens: 1000
+      max_tokens: 1000,
+      use_deep_model: isDeepRequest
     });
     hideTyping();
     const txt = d.content?.find(b => b.type==='text');
@@ -2743,19 +2746,17 @@ let _ttsLock = false; // Verhindert Race-Condition bei doppeltem Vorlesen
 
 async function speak(text){
   if(!S.voiceOn) return;
-  if(_ttsLock){ stopSpeaking(); } // Vorheriges stoppen wenn neues kommt
+  if(_ttsLock){ stopSpeaking(); }
   const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').trim();
   if(!clean) return;
 
   _ttsLock = true;
 
-  // Premium-Stimme über Edge Function (ElevenLabs)
+  // Premium-Stimme über OpenAI TTS (via openai-proxy, mode='tts')
   if(S.premiumVoice){
     try {
       const {data: sess} = await sb.auth.getSession();
-      if(!sess?.session?.access_token){
-        return fallbackSpeak(clean);
-      }
+      if(!sess?.session?.access_token) return fallbackSpeak(clean);
 
       const res = await fetch(TTS_PROXY_URL, {
         method:'POST',
@@ -2763,18 +2764,17 @@ async function speak(text){
           'Content-Type':'application/json',
           'Authorization':'Bearer '+sess.session.access_token
         },
-        body: JSON.stringify({text: clean, voice_id: S.voiceId})
+        // mode='tts', voice='nova' (warm, weiblich, gut auf Deutsch)
+        body: JSON.stringify({mode:'tts', text: clean, voice:'nova'})
       });
 
       if(!res.ok){
-        // Bei Tageslimit (429): Hinweis und Fallback
         if(res.status === 429){
           const d = await res.json().catch(()=>null);
-          toast(d?.error?.message || 'Premium-Stimme heute ausgeschöpft – zurück zur Standard-Stimme.', 'err');
+          toast(d?.error?.message || 'Vorlesen heute ausgeschöpft.', 'err');
           return fallbackSpeak(clean);
         }
-        // Andere Fehler: still fallback
-        console.warn('TTS-Proxy-Fehler:', res.status);
+        console.warn('TTS-Fehler:', res.status);
         return fallbackSpeak(clean);
       }
 
@@ -2792,7 +2792,6 @@ async function speak(text){
     return;
   }
 
-  // Standard-Stimme (Browser)
   fallbackSpeak(clean);
 }
 
