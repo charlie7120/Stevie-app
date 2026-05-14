@@ -217,6 +217,15 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 .tchip:active{transform:scale(.96);}
 .tchip.done{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
 
+/* Lernplan-Übersicht */
+.pov-day{margin-bottom:10px;}
+.pov-day-title{font-size:11px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:6px;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px;}
+.pov-day-pill{background:linear-gradient(135deg,var(--ga),var(--gb));color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.pov-topics{display:flex;flex-wrap:wrap;gap:5px;}
+.pov-topic{background:var(--surface-3);border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:11px;color:var(--ink-3);cursor:pointer;transition:all .15s;}
+.pov-topic:hover{background:var(--cbg);color:var(--tc);border-color:var(--cbr);}
+.pov-topic.done{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;text-decoration:line-through;}
+
 #messages{
   flex:1;overflow-y:auto;padding:16px 14px 8px;
   display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;
@@ -945,6 +954,12 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
     </div>
     <input type="file" id="mat-file" accept="image/*" multiple style="display:none"/>
     <div id="mat-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+
+    <!-- Textfeld für direkten Text-Input (z.B. E-Mail der Lehrerin) -->
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);display:block;margin-bottom:7px;text-transform:uppercase;letter-spacing:.4px;">Oder Text direkt einfügen</label>
+      <textarea id="mat-text" rows="4" placeholder="z.B. E-Mail der Lehrerin, Themenübersicht, Aufgabenliste… einfach reinkopieren." style="width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:11px 14px;font-size:13px;color:#f3eeff;resize:vertical;font-family:inherit;outline:none;line-height:1.5;"></textarea>
+    </div>
     <button class="btn" id="mat-next-btn" style="display:none;">Lernplan erstellen</button>
     <button class="btn-ghost" id="mat-skip-btn">Ohne Material direkt starten</button>
   </div>
@@ -1002,6 +1017,14 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
       <div class="prog-segments" id="prog-segs"></div>
     </div>
     <div id="topic-row"></div>
+    <!-- Lernplan-Übersicht: aufklappbar -->
+    <div id="plan-overview-bar" style="display:none;background:white;border-bottom:1px solid var(--line);flex-shrink:0;">
+      <button id="plan-overview-toggle" style="width:100%;padding:7px 16px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--ink-3);text-align:left;">
+        <span style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" style="color:var(--tc);"><use href="#ic-brain"/></svg> VOLLSTÄNDIGER LERNPLAN</span>
+        <span id="plan-overview-arr" style="font-size:14px;color:var(--ink-4);">▾</span>
+      </button>
+      <div id="plan-overview-panel" style="display:none;padding:0 16px 12px;max-height:260px;overflow-y:auto;"></div>
+    </div>
     <div id="messages"></div>
     <div id="speak-ind"><svg width="14" height="14" style="color:var(--tc);"><use href="#ic-vol"/></svg> Stevie spricht… <button id="stop-btn" style="background:none;border:none;cursor:pointer;color:var(--tc);font-size:11px;text-decoration:underline;">Stop</button></div>
     <div id="imgprev"><img id="imgthumb" src="" alt=""/><button class="imgdel" id="img-del-btn">×</button></div>
@@ -1208,8 +1231,8 @@ const S = {
   subject:'', days:1, currentDay:1,
   plan:[], doneTopic:{}, msgs:[],
   voiceOn:true, listening:false,
-  chatImg:null, matImages:[],
-  pendingMaterial:[],
+  chatImg:null, matImages:[], matText:'',
+  pendingMaterial:[], materialWarnings:[],
   strugglingTopics:[],
   elevenKey:null,
   premiumVoice:true,        // ElevenLabs aktiv? (false = Safari-Fallback)
@@ -1980,13 +2003,21 @@ FOKUS UND THEMEN-GRENZE (sehr wichtig, Stevies Identität):
 Du bist Stevie, eine LERNBEGLEITERIN für das Fach "${S.subject||'(noch unbekannt)'}". Du bist KEINE allgemeine Chat-KI und KEIN Freund zum Plaudern.
 - Bleibe IMMER beim aktuellen Lernfach und den Themen aus dem Lernplan/der Mappe
 - Wenn das Kind versucht, über andere Themen zu reden (Spiele, andere Fächer, Privates, Witze, allgemeine Fragen): freundlich aber bestimmt zurückführen
-- Beispiele für off-topic Anfragen und gute Antworten:
+- Beispiele für off-topic Anfragen:
   • "Erzähl mir einen Witz" → "Witze sind toll, aber wir wollen ja heute ${S.subject} schaffen! Sollen wir mit einer leichten Frage starten? [TAG:Motivation]"
-  • "Was ist die Hauptstadt von Frankreich?" (bei Fach Mathe) → "Das passt grad nicht zu unserem Mathe-Plan. Frag deinen Erdkundelehrer oder mach in Stevie eine neue Lernrunde für Erdkunde! Jetzt zurück zu uns: [Mathe-Frage] [TAG:Frage]"
-  • "Wie geht es dir?" → kurz freundlich antworten und sofort zum Lernen zurück
-- Bei wiederholten off-topic-Versuchen: kurz und klar werden, kein langes Eingehen darauf
-- AUSNAHME: Wenn das Kind echte Verständnisfragen zum Lernstoff hat, auch wenn sie verwandte Themen berühren – das ist okay
-- AUSNAHME: Wenn das Kind sichtbar belastet wirkt (Trauer, Angst, ernste Probleme): kurz menschlich reagieren, dann sanft zurück zum Lernen oder vorschlagen, mit Eltern zu sprechen
+  • "Was ist die Hauptstadt von Frankreich?" (bei Fach Mathe) → "Das passt grad nicht zu unserem Mathe-Plan – frag mal deinen Erdkunde-Lehrer! Zurück zu uns: [Mathe-Frage] [TAG:Frage]"
+- AUSNAHME THEMA-WECHSEL: Wenn das Kind sagt es möchte ein anderes Thema aus dem Lernplan angehen ("Können wir mit X anfangen?", "Ich möchte lieber Y lernen", "Ich kenne das schon, können wir weiter?") → IMMER sofort akzeptieren und zu dem gewünschten Thema wechseln. Das Kind entscheidet mit, was gelernt wird.
+- AUSNAHME echte Verständnisfragen: Auch wenn sie verwandte Themen berühren – okay
+- AUSNAHME emotionale Belastung: Kurz menschlich reagieren, dann sanft zurück oder Vorschlag mit Eltern zu sprechen
+
+QUICK-REPLIES (sehr wichtig für gute UX):
+Wenn deine Antwort mit [TAG:Frage] endet, füge am Ende ZUSÄTZLICH 3 kontextbezogene Quick-Reply-Optionen hinzu, getrennt mit | und eingeleitet mit [QR:].
+Diese sollen sinnvolle, themenspezifische Antwortmöglichkeiten sein – KEINE allgemeinen "Ja/Nein/Keine Ahnung".
+Beispiel bei einer Frage über Photosynthese:
+[TAG:Frage][QR:Chlorophyll ist zuständig|Sonnenlicht wird gebraucht|Das weiß ich nicht genau]
+Beispiel bei einer Mathe-Frage:
+[TAG:Frage][QR:Ich rechne x mal y|Ich addiere erst|Ich bin unsicher bei diesem Schritt]
+Die Quick-Replies sollen so klingen als würde ein Kind antworten.
 
 GESPRÄCHSFÜHRUNG:
 - Stelle IMMER NUR EINE Frage pro Nachricht (Überforderung vermeiden)
@@ -2021,10 +2052,20 @@ async function generatePlan(fach, options={}){
     ? `\n\nLEHRER-STIL (aus früheren Arbeiten):\n${S.teacherStyleContext}\nGewichte den Plan so, dass typische Aufgabenformate des Lehrers besonders geübt werden.`
     : '';
 
-  document.getElementById('prog-title').textContent = 'Stevie plant deinen Lernweg…';
+  // Textmaterial (z.B. E-Mail der Lehrerin) aus dem State holen
+  const textCtx = options.materialText && options.materialText.trim()
+    ? `\n\nZUSÄTZLICHER TEXT vom Kind/Eltern (z.B. E-Mail der Lehrerin, Themenübersicht):\n${options.materialText.trim()}`
+    : '';
+
+  document.getElementById('prog-title').textContent = 'Stevie liest das Material…';
+
+  const hasImages = options.materialImages && options.materialImages.length > 0;
+  const hasText = !!(options.materialText && options.materialText.trim());
 
   const sysP = `Erstelle einen ${S.days}-Tage-Lernplan für "${S.subject}", Klasse ${S.grade}.
-${matCtx}${teacherCtx}
+${matCtx}${teacherCtx}${textCtx}
+
+${hasImages ? `Es werden ${options.materialImages.length} Bild(er) mitgeschickt. Analysiere sie SORGFÄLTIG und extrahiere ALLE Themen, Überschriften, Aufgaben und Lernziele. Wenn ein Bild unleserlich ist, schreib "unleserlich" als Thema.` : ''}
 
 DIDAKTISCHE PRINZIPIEN:
 - Vom Einfachen zum Komplexen
@@ -2033,33 +2074,75 @@ DIDAKTISCHE PRINZIPIEN:
 - Pro Tag max. 3-4 Themen (kognitive Belastung)
 - Letzte Tage vor einer Prüfung: gezielte Wiederholung statt neuer Stoff
 
-Antworte AUSSCHLIESSLICH mit einem JSON-Array.
-Format: [{"day":1,"title":"Kurzer Tagestitel","topics":["Thema A","Thema B","Thema C"]}]`;
+Antworte mit einem JSON-Objekt mit ZWEI Feldern:
+{
+  "plan": [{"day":1,"title":"Kurzer Tagestitel","topics":["Thema A","Thema B"]}],
+  "unreadable": ["Bild 2 war zu unscharf", "Seite 3 nicht erkennbar"]
+}
+"unreadable" ist ein leeres Array wenn alles lesbar war.
+NUR dieses JSON, kein anderer Text.`;
 
   const userContent = [];
-  if(options.materialImages && options.materialImages.length){
-    options.materialImages.forEach(img => {
+  if(hasImages){
+    options.materialImages.forEach((img, i) => {
+      // Sicherheitscheck: base64-Daten wirklich vorhanden?
+      if(!img.data){
+        console.warn(`Bild ${i+1}: keine base64-Daten vorhanden – wird übersprungen`);
+        return;
+      }
+      console.log(`Bild ${i+1}: ${img.type}, ${img.data.length} Zeichen base64`);
       userContent.push({type:'image', source:{type:'base64', media_type:img.type, data:img.data}});
     });
-    userContent.push({type:'text', text:`Analysiere dieses Material und erstelle den ${S.days}-Tage-Lernplan für ${S.subject}. Nur JSON-Array.`});
-  } else {
-    userContent.push({type:'text', text:'Erstelle den Lernplan. Nur JSON.'});
   }
+  userContent.push({
+    type:'text',
+    text: hasImages
+      ? `Analysiere ${userContent.filter(c=>c.type==='image').length} Bild(er) und erstelle den ${S.days}-Tage-Lernplan für ${S.subject}.${hasText?' Der zusätzliche Text ist im System-Prompt.':''} Nur JSON.`
+      : `Erstelle den ${S.days}-Tage-Lernplan für ${S.subject}.${hasText?' Nutze den zusätzlichen Text aus dem System-Prompt.':''} Nur JSON.`
+  });
+
+  const imgCount = userContent.filter(c=>c.type==='image').length;
+  console.log(`generatePlan: ${imgCount} Bilder + hasText=${hasText}`);
 
   try {
     const d = await callClaude({
       system: sysP,
       messages: [{role:'user', content: userContent}],
-      max_tokens: 800
+      max_tokens: 1000
     });
     const txt = d.content?.find(b => b.type==='text');
-    S.plan = JSON.parse((txt?.text||'[]').replace(/```json|```/g,'').trim());
+    const raw = (txt?.text||'').replace(/```json|```/g,'').trim();
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch(e){
+      // Manchmal kommt trotzdem nur ein Array – Fallback
+      parsed = {plan: JSON.parse(raw), unreadable: []};
+    }
+
+    if(Array.isArray(parsed)){
+      // Altes Format ohne unreadable-Feld
+      S.plan = parsed;
+      S.materialWarnings = [];
+    } else {
+      S.plan = parsed.plan || [];
+      S.materialWarnings = parsed.unreadable || [];
+    }
+
+    // Validierung: wenn Plan leer oder nur Fachname als Topic, ist was schiefgelaufen
+    const isEmpty = S.plan.length === 0 ||
+      S.plan.every(d => d.topics.length === 1 && d.topics[0] === S.subject);
+    if(isEmpty){
+      S.materialWarnings.push('Stevie konnte aus dem Material keine konkreten Themen extrahieren.');
+    }
+
+    console.log(`Plan generiert: ${S.plan.length} Tage, Warnungen: ${S.materialWarnings?.length}`);
+
   } catch(e){
-    console.error('generatePlan:', e);
-    // Fallback: einfacher Tagesplan, damit App nicht hängt
+    console.error('generatePlan fehlgeschlagen:', e);
+    // KEIN stiller Fallback mehr. Plan bleibt leer, Warnung wird gesetzt.
     S.plan = Array.from({length: S.days}, (_, i) => ({
-      day: i+1, title: 'Tag '+(i+1), topics: [S.subject]
+      day: i+1, title: 'Tag '+(i+1), topics: []
     }));
+    S.materialWarnings = ['Stevie konnte keinen Lernplan erstellen: '+e.message];
   }
 }
 
@@ -2109,17 +2192,20 @@ Antworte AUSSCHLIESSLICH mit dem neuen JSON-Array (komplett, alle ${S.days} Tage
 // CHAT-START
 // ════════════════════════════════════════════════════════════════
 async function startApp(skip){
-  if(skip) S.matImages = [];
+  if(skip){ S.matImages = []; S.matText = ''; }
   S.msgs = []; S.doneTopic = {}; S.currentDay = 1; S.strugglingTopics = [];
-  S.pendingMaterial = [];
-  S.activePlanId = null;
+  S.pendingMaterial = []; S.activePlanId = null; S.materialWarnings = [];
   document.getElementById('messages').innerHTML = '';
   showScreen('app'); switchTab('chat');
   document.getElementById('hdr-sub').textContent = S.subject+' · Klasse '+S.grade;
   updateAvatars();
-
   document.getElementById('acc-menu-name').textContent = S.name||'–';
   document.getElementById('acc-menu-mail').textContent = currentUser?.email||'–';
+
+  // Material sofort in Mappe speichern (Bug Fix: vorher passierte das nicht)
+  if(S.matImages.length || S.matText){
+    await saveMaterialToMappe(S.subject, S.matImages, S.matText);
+  }
 
   const faecher = await getFaecher();
   const fach = faecher.find(f => f.name && (
@@ -2127,12 +2213,11 @@ async function startApp(skip){
     S.subject.toLowerCase().includes(f.name.toLowerCase())
   )) || null;
 
-  // Lehrer-Stil aus früheren Klassenarbeiten laden – fließt in generatePlan + späteren Chat
   await loadTeacherStyleForFach(S.subject);
-  await generatePlan(fach, {materialImages: S.matImages});
+  await generatePlan(fach, {materialImages: S.matImages, materialText: S.matText});
   await logSession(S.subject);
 
-  // NEU: Plan in DB anlegen
+  // Plan in DB anlegen
   const defaultPlanName = `Plan vom ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}`;
   const created = await createPlan({
     fach_name: S.subject,
@@ -2145,6 +2230,46 @@ async function startApp(skip){
 
   renderTopicRow(); updateProgress();
   startChatGreeting(fach);
+
+  // Erkennungs-Feedback wenn Probleme aufgetreten sind
+  if(S.materialWarnings && S.materialWarnings.length){
+    setTimeout(()=>{
+      const warn = S.materialWarnings.join(' / ');
+      addMsg('assistant',
+        `Kurzer Hinweis: ${warn}\n\nDu kannst einzelne Bilder nochmal über den Anhänge-Button schicken, dann überarbeite ich den Plan. Oder sag mir welche Themen fehlen! [TAG:Feedback]`
+      );
+    }, 1500);
+  }
+}
+
+// Material beim Setup direkt in die Mappe speichern (Bug Fix)
+async function saveMaterialToMappe(fachName, images, text){
+  if(!currentUser || (!images.length && !text)) return;
+  const faecher = await getFaecher();
+  let idx = faecher.findIndex(f => f.name?.toLowerCase() === fachName.toLowerCase());
+  if(idx < 0){
+    faecher.push({name: fachName, images:[], topics:[], textContext:''});
+    idx = faecher.length - 1;
+  }
+  const today = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'});
+  if(!faecher[idx].images) faecher[idx].images = [];
+
+  // Bilder in Storage hochladen
+  for(const img of images){
+    const blob = dataUrlToBlob('data:'+img.type+';base64,'+img.data, img.type);
+    const uploaded = await uploadToStorage(blob, 'page.jpg', fachName);
+    const entry = uploaded
+      ? {src: uploaded.url, path: uploaded.path, type: img.type, date: today}
+      : {src: 'data:'+img.type+';base64,'+img.data, type: img.type, date: today};
+    faecher[idx].images.push(entry);
+  }
+
+  // Textmaterial als Kontext speichern
+  if(text && text.trim()){
+    faecher[idx].textContext = (faecher[idx].textContext ? faecher[idx].textContext+'\n\n' : '') + text.trim();
+  }
+
+  await setFaecher(faecher);
 }
 
 function startChatGreeting(fach){
@@ -2169,8 +2294,51 @@ function renderTopicRow(){
     const c = document.createElement('div');
     c.className = 'tchip'+(done?' done':'');
     c.textContent = (done?'✓ ':'')+t;
-    c.addEventListener('click', ()=>autoSend('Frag mich etwas über "'+t+'"!'));
+    c.addEventListener('click', ()=>autoSend('Lass uns jetzt mit dem Thema "'+t+'" weitermachen.'));
     row.appendChild(c);
+  });
+
+  // Lernplan-Übersicht rendern
+  renderPlanOverview();
+}
+
+function renderPlanOverview(){
+  const bar = document.getElementById('plan-overview-bar');
+  const panel = document.getElementById('plan-overview-panel');
+  if(!bar || !panel || !S.plan.length){ if(bar) bar.style.display='none'; return; }
+
+  bar.style.display = 'block';
+  panel.innerHTML = S.plan.map((day, di) => {
+    const topics = day.topics.map(t => {
+      const done = S.doneTopic[(di+1)+'_'+t];
+      const isCurrent = (di+1) === S.currentDay;
+      return `<span class="pov-topic${done?' done':''}" data-day="${di+1}" data-topic="${escapeHtml(t)}">${done?'✓ ':''}${escapeHtml(t)}</span>`;
+    }).join('');
+    const isToday = (di+1) === S.currentDay;
+    return `<div class="pov-day">
+      <div class="pov-day-title">
+        <span class="pov-day-pill" style="${isToday?'':'opacity:.5;'}">TAG ${di+1}</span>
+        <span style="${isToday?'color:var(--ink-2);':'opacity:.6;'}">${escapeHtml(day.title||'')}</span>
+        ${isToday?'<span style="font-size:10px;color:var(--tc);background:var(--cbg);padding:2px 7px;border-radius:99px;border:1px solid var(--cbr);">Heute</span>':''}
+      </div>
+      <div class="pov-topics">${topics||'<span style="font-size:11px;color:var(--ink-4);">Keine Themen</span>'}</div>
+    </div>`;
+  }).join('');
+
+  // Click auf Thema in der Übersicht = direkt dazu springen
+  panel.querySelectorAll('.pov-topic:not(.done)').forEach(el => {
+    el.addEventListener('click', ()=>{
+      const day = parseInt(el.dataset.day);
+      const topic = el.dataset.topic;
+      if(day !== S.currentDay){
+        S.currentDay = day;
+        renderTopicRow(); updateProgress();
+      }
+      autoSend('Lass uns jetzt mit dem Thema "'+topic+'" weitermachen.');
+      // Übersicht zuklappen
+      document.getElementById('plan-overview-panel').style.display = 'none';
+      document.getElementById('plan-overview-arr').textContent = '▾';
+    });
   });
 }
 
@@ -2198,26 +2366,27 @@ function extractTags(content){
   const tag = content.match(/\[TAG:([^\]]+)\]/)?.[1] || null;
   const done = content.match(/\[DONE:([^\]]+)\]/)?.[1] || null;
   const deepen = content.match(/\[DEEPEN:([^\]]+)\]/)?.[1] || null;
+  const qrMatch = content.match(/\[QR:([^\]]+)\]/);
+  const qrOptions = qrMatch ? qrMatch[1].split('|').map(s=>s.trim()).filter(Boolean) : null;
   const clean = content
     .replace(/\[TAG:[^\]]+\]/g,'')
     .replace(/\[DONE:[^\]]+\]/g,'')
     .replace(/\[DEEPEN:[^\]]+\]/g,'')
+    .replace(/\[QR:[^\]]+\]/g,'')
     .trim();
-  return {tag, done, deepen, clean};
+  return {tag, done, deepen, clean, qrOptions};
 }
 
 function addMsg(role, content, opts={}){
-  // Wichtig: NUR clean speichern (ohne Tag-Markup), sonst frisst es bei jedem Send Tokens
-  const parsed = role==='assistant' ? extractTags(content) : {clean: content, tag:null, done:null, deepen:null};
-  const {tag, done, deepen, clean} = parsed;
+  const parsed = role==='assistant' ? extractTags(content) : {clean: content, tag:null, done:null, deepen:null, qrOptions:null};
+  const {tag, done, deepen, clean, qrOptions} = parsed;
   S.msgs.push({role, content: clean, tag, deepen});
-  scheduleSavePlan(); // Plan in DB aktualisieren (debounced)
+  scheduleSavePlan();
 
   const messages = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = 'mrow '+role;
 
-  // Stevie-Avatar links bei Assistant-Nachrichten
   if(role==='assistant'){
     const av = document.createElement('div'); av.className = 'mav';
     av.innerHTML = '<svg width="32" height="32" viewBox="0 0 110 110"><use href="#stevie-face"/></svg>';
@@ -2247,7 +2416,6 @@ function addMsg(role, content, opts={}){
     rb.addEventListener('click', ()=>speak(clean));
     row.appendChild(rb);
   } else {
-    // PUNKT 3: User-Avatar rechts bei eigenen Nachrichten
     const av = document.createElement('div');
     av.className = 'mav mav-user';
     av.innerHTML = avSvg(S.avatarId, 32);
@@ -2259,16 +2427,16 @@ function addMsg(role, content, opts={}){
   if(role==='assistant'){
     if(done) markDone(done);
 
-    // PUNKT 6: Vertiefungs-Angebot als gelbe Karte
     if(deepen){
       addDeepenCard(deepen);
       if(!S.strugglingTopics.includes(deepen)) S.strugglingTopics.push(deepen);
     }
 
-    // Quick-Replies bei Fragen
-    if(tag === 'Frage') setTimeout(()=>addQR(), 150);
+    // Smart Quick-Replies: aus Antwort wenn vorhanden, sonst keine statischen
+    if(tag === 'Frage'){
+      setTimeout(()=> addQR(qrOptions), 150);
+    }
 
-    // Sprechen
     speak(clean);
   }
 
@@ -2295,11 +2463,18 @@ function addDeepenCard(topic){
   messages.scrollTop = messages.scrollHeight;
 }
 
-function addQR(){
+function addQR(smartOptions){
   const messages = document.getElementById('messages');
   const qr = document.createElement('div');
   qr.className = 'qr-row';
-  ['Ich weiß es!','Bin unsicher','Keine Ahnung','Weiter'].forEach(l => {
+
+  // Smart Quick-Replies von Stevie bevorzugen
+  // Fallback: nur "Weiter zu anderem Thema" wenn keine Smart-Options da
+  const options = (smartOptions && smartOptions.length)
+    ? smartOptions
+    : ['Kannst du die Frage nochmal anders stellen?', 'Ich möchte ein anderes Thema'];
+
+  options.forEach(l => {
     const b = document.createElement('button');
     b.className = 'qr'; b.textContent = l;
     b.addEventListener('click', ()=>{ qr.remove(); autoSend(l); });
@@ -2451,11 +2626,15 @@ async function handleAddMaterialInChat(files){
 let curAudio = null;
 const synth = window.speechSynthesis;
 
+let _ttsLock = false; // Verhindert Race-Condition bei doppeltem Vorlesen
+
 async function speak(text){
   if(!S.voiceOn) return;
-  stopSpeaking();
+  if(_ttsLock){ stopSpeaking(); } // Vorheriges stoppen wenn neues kommt
   const clean = text.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').trim();
   if(!clean) return;
+
+  _ttsLock = true;
 
   // Premium-Stimme über Edge Function (ElevenLabs)
   if(S.premiumVoice){
@@ -2489,8 +2668,8 @@ async function speak(text){
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       curAudio = new Audio(url);
-      curAudio.onended = ()=>{ setSI(false); URL.revokeObjectURL(url); };
-      curAudio.onerror = ()=>{ setSI(false); URL.revokeObjectURL(url); };
+      curAudio.onended = ()=>{ setSI(false); _ttsLock = false; URL.revokeObjectURL(url); };
+      curAudio.onerror = ()=>{ setSI(false); _ttsLock = false; URL.revokeObjectURL(url); };
       await curAudio.play();
       setSI(true);
     } catch(e){
@@ -2509,11 +2688,16 @@ function fallbackSpeak(clean){
   utt.lang = 'de-DE'; utt.rate = .95; utt.pitch = 1.1;
   const v = synth.getVoices().find(v => v.lang.startsWith('de'));
   if(v) utt.voice = v;
-  utt.onend = ()=>setSI(false);
+  utt.onend = ()=>{ setSI(false); _ttsLock = false; };
+  utt.onerror = ()=>{ setSI(false); _ttsLock = false; };
   synth.speak(utt); setSI(true);
 }
 
-function stopSpeaking(){ if(curAudio){ curAudio.pause(); curAudio = null; } synth.cancel(); setSI(false); }
+function stopSpeaking(){
+  _ttsLock = false;
+  if(curAudio){ curAudio.pause(); curAudio = null; }
+  synth.cancel(); setSI(false);
+}
 function setSI(v){ const el = document.getElementById('speak-ind'); if(el) el.style.display = v?'flex':'none'; }
 
 function toggleVoice(){
@@ -3394,8 +3578,16 @@ async function init(){
     handleMatUpload(e.target.files);
     e.target.value = '';
   });
-  document.getElementById('mat-next-btn').addEventListener('click', ()=>startApp(false));
-  document.getElementById('mat-skip-btn').addEventListener('click', ()=>startApp(true));
+  document.getElementById('mat-next-btn').addEventListener('click', ()=>{
+    S.matText = document.getElementById('mat-text')?.value || '';
+    startApp(false);
+  });
+  document.getElementById('mat-skip-btn').addEventListener('click', ()=>{
+    S.matText = document.getElementById('mat-text')?.value || '';
+    // Als "skip" gilt nur wenn wirklich weder Bilder noch Text da sind
+    const hasText = S.matText.trim().length > 0;
+    startApp(!hasText && !S.matImages.length);
+  });
 
   // Header / App
   document.getElementById('vtgl').addEventListener('click', toggleVoice);
@@ -3450,6 +3642,13 @@ async function init(){
   });
   document.getElementById('micbtn').addEventListener('click', toggleListen);
   document.getElementById('stop-btn').addEventListener('click', stopSpeaking);
+  document.getElementById('plan-overview-toggle').addEventListener('click', ()=>{
+    const panel = document.getElementById('plan-overview-panel');
+    const arr = document.getElementById('plan-overview-arr');
+    const open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : 'block';
+    arr.textContent = open ? '▾' : '▴';
+  });
 
   // Attach-Button: öffnet Material-Sheet (Punkt 4)
   document.getElementById('attach-btn').addEventListener('click', openMaterialSheet);
