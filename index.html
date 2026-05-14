@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie v7</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -1205,6 +1205,8 @@ const _supabaseReadyPromise = new Promise(resolve => {
       .then(()=>{ console.log('[PING] Supabase bereit'); resolve(true); })
       .catch(()=>{ console.log('[PING] Supabase Ping fehlgeschlagen'); resolve(false); });
   }, 100);
+  // Absoluter Fallback nach 30s – Supabase braucht manchmal 20-25s zum Aufwachen
+  setTimeout(()=>resolve(false), 30000);
 });
 
 // ─── TIMEOUT-WRAPPER für DB-Calls ────────────────────────────────
@@ -3841,35 +3843,45 @@ async function init(){
 
   showScreen('splash'); // Immer sofort Splash zeigen
 
-  // Auth-Listener nur für Logout und neuen Login nach dem Ping
+  // Auth-Listener für Logout und manuellen Login
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('[AUTH]', event, session?.user?.id?.substring(0,8)||'–');
     if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
       currentUser = null;
       document.getElementById('loading-screen').style.display = 'none';
       showScreen('splash');
+      return;
     }
-    // SIGNED_IN nach manuellem Login (nicht beim ersten Laden)
+    // Manueller Login (User hat gerade Zugangsdaten eingegeben)
     if(event === 'SIGNED_IN' && session?.user && !currentUser && !_initInProgress){
-      // Ping abwarten falls noch nicht fertig
-      await _supabaseReadyPromise;
-      await initAfterLogin(session.user);
+      console.log('[AUTH] Manueller Login – warte auf Supabase...');
+      // Auf Supabase warten – mit eigenem längeren Timeout
+      await Promise.race([
+        _supabaseReadyPromise,
+        new Promise(resolve => setTimeout(resolve, 25000))
+      ]);
+      console.log('[AUTH] Supabase bereit – starte initAfterLogin');
+      if(!currentUser && !_initInProgress){
+        await initAfterLogin(session.user);
+      }
     }
   });
 
-  // Nach dem Ping: Session prüfen und ggf. App starten
-  // Ping läuft schon (100ms nach Seitenaufruf gestartet)
+  // Boot-Sequenz: Ping abwarten, dann Session prüfen
+  // Ping läuft schon seit 100ms (gestartet beim Laden der Seite)
   const pingDone = await Promise.race([
     _supabaseReadyPromise,
-    new Promise(resolve => setTimeout(()=>resolve(false), 15000))
+    new Promise(resolve => setTimeout(()=>resolve(false), 30000)) // 30s statt 15s
   ]);
   console.log('[BOOT] Ping fertig:', pingDone, '– prüfe Session');
 
   const {data: sessionData} = await sb.auth.getSession().catch(()=>({data:null}));
   if(sessionData?.session?.user && !currentUser && !_initInProgress){
+    console.log('[BOOT] Session gefunden – starte App');
     await initAfterLogin(sessionData.session.user);
+  } else if(!sessionData?.session){
+    console.log('[BOOT] Keine Session – Splash bleibt');
   }
-  // Kein else nötig – Splash ist schon aktiv
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
