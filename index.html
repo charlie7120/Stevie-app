@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie v4</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -1199,11 +1199,14 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 // Supabase sofort aufwecken – fire & forget
 // Free-tier schläft nach Inaktivität ein. Dieser Ping startet den Aufwach-Prozess
 // beim Laden der Seite, bevor der User auf Anmelden drückt.
-setTimeout(()=>{
-  sb.from('profiles').select('id', {head:true, count:'exact'})
-    .then(()=> console.log('[PING] Supabase bereit'))
-    .catch(()=> console.log('[PING] Supabase Ping fehlgeschlagen'));
-}, 100);
+// Als Promise gespeichert damit initAfterLogin darauf warten kann.
+const _supabaseReadyPromise = new Promise(resolve => {
+  setTimeout(()=>{
+    sb.from('profiles').select('id', {head:true, count:'exact'})
+      .then(()=>{ console.log('[PING] Supabase bereit'); resolve(true); })
+      .catch(()=>{ console.log('[PING] Supabase Ping fehlgeschlagen'); resolve(false); });
+  }, 100);
+});
 
 // ─── TIMEOUT-WRAPPER für DB-Calls ────────────────────────────────
 // Wenn ein Supabase-Call hängt, gibt dieser Helper nach ms Millisekunden
@@ -1341,36 +1344,23 @@ function updateAvatars(){
 
 async function loadProfile(){
   if(!currentUser) return false;
-
-  // Supabase free-tier schläft manchmal ein – beim ersten Timeout retry
-  for(let attempt = 1; attempt <= 2; attempt++){
-    const timeoutMs = attempt === 1 ? 8000 : 12000;
-    const query = sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-    const result = await withTimeout(query, timeoutMs, {data: null, error: {message:'timeout'}});
-    const {data, error} = result;
-
-    if(error){
-      if(error.message === 'timeout'){
-        console.warn(`[INIT] loadProfile Timeout (Versuch ${attempt}/2)`);
-        if(attempt < 2) continue; // nochmal versuchen
-        console.warn('[INIT] loadProfile: beide Versuche timeout – Onboarding');
-        return false;
-      }
-      console.error('loadProfile:', error);
-      return false;
-    }
-
-    if(!data || !data.name) return false;
-    S.name = data.name||'';
-    S.age = data.age||11;
-    S.grade = data.grade||5;
-    S.theme = data.theme||'purple';
-    S.voiceId = data.voice_id||VOICES[0].id;
-    S.avatarId = data.avatar_id||'stevie';
-    applyTheme(S.theme);
-    return true;
+  // Nach dem Ping ist Supabase wach – ein Versuch mit großzügigem Timeout reicht
+  const query = sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  const result = await withTimeout(query, 8000, {data: null, error: {message:'timeout'}});
+  const {data, error} = result;
+  if(error){
+    console.warn('[INIT] loadProfile:', error.message);
+    return false;
   }
-  return false;
+  if(!data || !data.name) return false;
+  S.name = data.name||'';
+  S.age = data.age||11;
+  S.grade = data.grade||5;
+  S.theme = data.theme||'purple';
+  S.voiceId = data.voice_id||VOICES[0].id;
+  S.avatarId = data.avatar_id||'stevie';
+  applyTheme(S.theme);
+  return true;
 }
 
 async function saveProfile(){
@@ -3843,41 +3833,44 @@ async function init(){
     return;
   }
 
-  // ─── Auth-State-Listener ──────────────────────────────────────
-  // Strategie: NUR der onAuthStateChange-Listener steuert den App-Flow.
-  // Kein separater getSession()-Call mehr – Supabase ruft den Listener
-  // sowieso mit INITIAL_SESSION auf, auch beim ersten Laden.
-  // Das verhindert Race-Conditions zwischen zwei parallelen Init-Calls.
+  // ─── Strategie: Splash zuerst, dann Supabase aufwecken, dann Auth ──
+  // 1. Splash sofort zeigen (User sieht nie einen Spinner beim Laden)
+  // 2. Ping weckt Supabase auf während User den Splash sieht
+  // 3. Erst wenn Ping fertig (oder 15s vorbei): Auth-State prüfen
+  // 4. Wenn Session vorhanden: initAfterLogin (Supabase ist jetzt wach)
+  // 5. Wenn keine Session: Splash bleibt, User meldet sich an
 
+  showScreen('splash'); // Immer sofort Splash zeigen
+
+  // Auth-Listener nur für Logout und neuen Login nach dem Ping
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('[AUTH]', event, session?.user?.id?.substring(0,8)||'–');
-
     if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
       currentUser = null;
       document.getElementById('loading-screen').style.display = 'none';
       showScreen('splash');
-      return;
     }
-
-    // Nur beim ersten Login-Event initialisieren.
-    // TOKEN_REFRESHED und weitere Events ignorieren wenn schon eingeloggt.
-    if(event === 'INITIAL_SESSION' || event === 'SIGNED_IN'){
-      if(session?.user && !currentUser && !_initInProgress){
-        await initAfterLogin(session.user);
-      }
+    // SIGNED_IN nach manuellem Login (nicht beim ersten Laden)
+    if(event === 'SIGNED_IN' && session?.user && !currentUser && !_initInProgress){
+      // Ping abwarten falls noch nicht fertig
+      await _supabaseReadyPromise;
+      await initAfterLogin(session.user);
     }
   });
 
-  // Fallback: falls Auth-Listener nach 8s nicht gefeuert hat
-  setTimeout(()=>{
-    if(!_initInProgress && !currentUser){
-      const ls = document.getElementById('loading-screen');
-      if(ls && ls.style.display === 'flex'){
-        ls.style.display = 'none';
-        showScreen('splash');
-      }
-    }
-  }, 8000);
+  // Nach dem Ping: Session prüfen und ggf. App starten
+  // Ping läuft schon (100ms nach Seitenaufruf gestartet)
+  const pingDone = await Promise.race([
+    _supabaseReadyPromise,
+    new Promise(resolve => setTimeout(()=>resolve(false), 15000))
+  ]);
+  console.log('[BOOT] Ping fertig:', pingDone, '– prüfe Session');
+
+  const {data: sessionData} = await sb.auth.getSession().catch(()=>({data:null}));
+  if(sessionData?.session?.user && !currentUser && !_initInProgress){
+    await initAfterLogin(sessionData.session.user);
+  }
+  // Kein else nötig – Splash ist schon aktiv
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
