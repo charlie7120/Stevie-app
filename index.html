@@ -1675,26 +1675,37 @@ async function doLogout(){
   });
 }
 
-// Verhindert mehrfache parallele Init-Calls (Auth-Listener + getSession-Promise)
 let _initInProgress = false;
 
 async function initAfterLogin(user){
   if(_initInProgress) return;
   _initInProgress = true;
+
   const ls = document.getElementById('loading-screen');
+  if(ls) ls.style.display = 'flex';
+
+  // Absoluter Sicherheits-Timeout: nach 8 Sekunden wird loading IMMER ausgeblendet
+  const forceHide = setTimeout(()=>{
+    if(ls) ls.style.display = 'none';
+    if(_initInProgress){
+      _initInProgress = false;
+      showScreen('authscreen');
+      toast('Verbindung zu langsam – bitte neu anmelden.', 'err');
+    }
+  }, 8000);
+
   try {
     currentUser = user;
     try { await migrateFromLocalStorage(); } catch(e){ console.error('Migration:', e); }
 
     let hasProfile = false;
-    try { hasProfile = await loadProfile(); }
-    catch(e){ console.error('loadProfile:', e); }
+    try { hasProfile = await loadProfile(); } catch(e){ console.error('loadProfile:', e); }
 
     if(!hasProfile){
       if(typeof buildOnboarding==='function') buildOnboarding();
       showScreen('onboarding');
     } else {
-      if(typeof showHub==='function') {
+      if(typeof showHub==='function'){
         await showHub();
       } else {
         showScreen('setup');
@@ -1702,10 +1713,10 @@ async function initAfterLogin(user){
     }
   } catch(e){
     console.error('initAfterLogin Fehler:', e);
-    // Notfall: zur Auth-Maske, damit User nicht hängenbleibt
     showScreen('authscreen');
     toast('Etwas ist schiefgegangen. Bitte neu anmelden.', 'err');
   } finally {
+    clearTimeout(forceHide);
     if(ls) ls.style.display = 'none';
     _initInProgress = false;
   }
@@ -3708,55 +3719,49 @@ async function init(){
   document.getElementById('avatar-save').addEventListener('click', saveAvatarFromModal);
 
   // ─── Notfall-Reset via URL ─────────────────────────────────────
-  // Wenn die App hängt: stevie-url?reset=1 öffnen → kompletter Logout + Storage-Clear
   if(new URLSearchParams(location.search).get('reset') === '1'){
     try {
       await sb.auth.signOut();
-      // Alle Stevie-bezogenen localStorage-Einträge entfernen
-      Object.keys(localStorage).filter(k => k.startsWith('stevie_') || k.startsWith('sb-')).forEach(k => localStorage.removeItem(k));
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('stevie_') || k.startsWith('sb-'))
+        .forEach(k => localStorage.removeItem(k));
     } catch(e){ console.warn('Reset-Fehler:', e); }
-    // URL-Parameter weg, sauberer Neustart
     history.replaceState(null, '', location.pathname);
-    document.getElementById('loading-screen').style.display = 'none';
     showScreen('splash');
     return;
   }
 
   // ─── Auth-State-Listener ──────────────────────────────────────
-  // Wichtig: NUR DIESER Listener triggert initAfterLogin.
-  // Supabase ruft den Listener auch beim ersten Laden mit der
-  // existierenden Session auf (event = 'INITIAL_SESSION'), deshalb
-  // brauchen wir keinen separaten getSession()-Call mehr.
-  let _initialEventReceived = false;
+  // WICHTIG: Loading-Screen wird NIEMALS vom Listener gesetzt.
+  // initAfterLogin() zeigt ihn selbst kurz an und blendet ihn in finally aus.
+  // So kann der Loading-Screen niemals hängenbleiben.
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    _initialEventReceived = true;
-    const ls = document.getElementById('loading-screen');
-
-    if(session?.user){
-      if(ls) ls.style.display = 'flex';
-      await initAfterLogin(session.user);
-    } else {
+    if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
       currentUser = null;
-      if(ls) ls.style.display = 'none';
-      // Bei Logout: zurück zum Splash. Beim ersten Laden ohne Session: nichts tun
-      // (Splash ist schon active als Default).
-      if(event === 'SIGNED_OUT'){
-        showScreen('splash');
-      }
+      document.getElementById('loading-screen').style.display = 'none';
+      showScreen('splash');
+      return;
+    }
+    if(session?.user && !_initInProgress){
+      await initAfterLogin(session.user);
     }
   });
 
-  // Sicherheits-Timeout: Falls der Auth-Listener aus irgendeinem Grund
-  // nicht innerhalb von 4 Sekunden feuert (Netzwerk-Hick, hängender Token),
-  // den Loading-Screen wegnehmen, damit der User nicht ewig wartet.
-  setTimeout(()=>{
-    if(!_initialEventReceived){
-      console.warn('Auth-Listener hat nicht reagiert – Loading-Screen forciert ausblenden.');
-      const ls = document.getElementById('loading-screen');
-      if(ls) ls.style.display = 'none';
-    }
-  }, 4000);
+  // Beim Reload: Session direkt aus Supabase holen (schneller als Listener)
+  // Mit eigenem Timeout damit es nie hängt
+  const sessionPromise = sb.auth.getSession();
+  const timeoutPromise = new Promise(resolve => setTimeout(()=>resolve({data:null}), 3000));
+
+  const {data: sessionData} = await Promise.race([sessionPromise, timeoutPromise]);
+
+  if(sessionData?.session?.user){
+    await initAfterLogin(sessionData.session.user);
+  } else {
+    // Keine Session oder Timeout – Splash zeigen
+    document.getElementById('loading-screen').style.display = 'none';
+    showScreen('splash');
+  }
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
