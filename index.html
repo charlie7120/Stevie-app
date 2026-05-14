@@ -1546,6 +1546,17 @@ async function migrateFromLocalStorage(){
   const flag = 'stevie_migrated_v2';
   if(localStorage.getItem(flag)) return;
 
+  // Schnell-Check: gibt es überhaupt alte Daten? Wenn nicht, sofort fertig.
+  const hasOldData = localStorage.getItem('stevie_faecher') ||
+                     localStorage.getItem('stevie_sessions') ||
+                     localStorage.getItem('stevie_noten');
+
+  if(!hasOldData){
+    // Kein alter Datenstand – Flag direkt setzen, keine DB-Calls nötig
+    try { localStorage.setItem(flag, '1'); } catch(e){}
+    return;
+  }
+
   try {
     const oldFaecher = JSON.parse(localStorage.getItem('stevie_faecher')||'null');
     if(Array.isArray(oldFaecher) && oldFaecher.length){
@@ -1568,8 +1579,7 @@ async function migrateFromLocalStorage(){
     const ek = localStorage.getItem('stevie_eleven');
     if(ek) S.elevenKey = ek;
 
-    localStorage.setItem(flag, '1');
-    // Sicherheit: alten Anthropic-Key explizit aus dem Browser entfernen
+    try { localStorage.setItem(flag, '1'); } catch(e){}
     localStorage.removeItem('stevie_key');
   } catch(e){
     console.error('Migration error:', e);
@@ -1684,37 +1694,35 @@ async function initAfterLogin(user){
   const ls = document.getElementById('loading-screen');
   if(ls) ls.style.display = 'flex';
 
-  // Absoluter Sicherheits-Timeout: nach 30 Sekunden wird loading IMMER ausgeblendet
+  // Fallback-Timeout: nach 20 Sekunden aufgeben
   const forceHide = setTimeout(()=>{
     if(ls) ls.style.display = 'none';
     if(_initInProgress){
       _initInProgress = false;
       showScreen('authscreen');
-      toast('Laden dauert zu lang – bitte Seite neu laden.', 'err');
+      toast('Bitte Seite neu laden.', 'err');
     }
-  }, 30000);
+  }, 20000);
 
   try {
     currentUser = user;
-    try { await migrateFromLocalStorage(); } catch(e){ console.error('Migration:', e); }
 
-    let hasProfile = false;
-    try { hasProfile = await loadProfile(); } catch(e){ console.error('loadProfile:', e); }
+    // Migration und Profil PARALLEL laden – spart 1-2 Sekunden
+    const [_, hasProfile] = await Promise.all([
+      migrateFromLocalStorage().catch(e => console.warn('Migration:', e)),
+      loadProfile().catch(e => { console.warn('loadProfile:', e); return false; })
+    ]);
 
     if(!hasProfile){
       if(typeof buildOnboarding==='function') buildOnboarding();
       showScreen('onboarding');
     } else {
-      if(typeof showHub==='function'){
-        await showHub();
-      } else {
-        showScreen('setup');
-      }
+      // Hub sofort zeigen, Pläne im Hintergrund nachladen
+      showHubFast();
     }
   } catch(e){
-    console.error('initAfterLogin Fehler:', e);
+    console.error('initAfterLogin:', e);
     showScreen('authscreen');
-    toast('Etwas ist schiefgegangen. Bitte neu anmelden.', 'err');
   } finally {
     clearTimeout(forceHide);
     if(ls) ls.style.display = 'none';
@@ -1723,6 +1731,21 @@ async function initAfterLogin(user){
 }
 
 // ─── HUB-SCREEN nach Login (Punkt 2) ──────────────────────────────
+
+// Zeigt Hub sofort – Pläne werden im Hintergrund nachgeladen
+function showHubFast(){
+  document.getElementById('hub-greeting').textContent = 'Hey '+(S.name||'')+'!';
+  document.getElementById('hub-active-section').style.display = 'none';
+  document.getElementById('hub-active-list').innerHTML =
+    '<p style="font-size:13px;color:rgba(255,255,255,.4);padding:4px 0;">Lädt…</p>';
+  showScreen('hub');
+  updateAvatars();
+  document.getElementById('acc-menu-name').textContent = S.name||'–';
+  document.getElementById('acc-menu-mail').textContent = currentUser?.email||'–';
+  // Pläne im Hintergrund nachladen
+  showHub().catch(e => console.warn('Hub-Nachladen:', e));
+}
+
 async function showHub(){
   document.getElementById('hub-greeting').textContent = 'Hey '+(S.name||'')+'!';
   const plaene = await listPlaene();
