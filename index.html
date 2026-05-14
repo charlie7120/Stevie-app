@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie v9</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -353,57 +353,75 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 /* ════════════════════════════════════════════════════════════════
    MAPPE – Punkt 2: moderne Karten mit Cover-Vorschau
    ════════════════════════════════════════════════════════════════ */
-#mappe-tab{overflow-y:auto;background:var(--surface-3);padding:0 0 16px;}
-.mappe-hdr{
-  background:white;padding:18px 18px 16px;
-  border-bottom:1px solid var(--line);flex-shrink:0;
-}
-.mappe-hdr h2{
-  font-size:22px;font-weight:800;color:var(--ink);
-  margin-bottom:3px;letter-spacing:-.4px;
-}
-.mappe-hdr p{font-size:13px;color:var(--ink-3);}
-.mappe-stats{display:flex;gap:8px;margin-top:14px;}
-.mappe-stat{
-  flex:1;background:linear-gradient(135deg,var(--cbg),rgba(255,255,255,.4));
-  border:1px solid var(--cbr);border-radius:14px;padding:10px 12px;
-  display:flex;flex-direction:column;gap:1px;
-}
-.mappe-stat-num{font-size:20px;font-weight:800;color:var(--tc);letter-spacing:-.5px;}
-.mappe-stat-lbl{font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+#mappe-tab{overflow-y:auto;background:#f0ebff;padding-bottom:20px;}
 
-.fach-card{
-  background:white;border-radius:20px;margin:14px 14px 0;
-  box-shadow:0 4px 18px rgba(60,30,100,.07);overflow:hidden;
-  transition:transform .15s,box-shadow .15s;
+/* Hero-Banner mit Bild */
+.mappe-hero{
+  position:relative;height:180px;overflow:hidden;
+  background:linear-gradient(135deg,#2d1060,#4c1d95);
+  flex-shrink:0;
 }
-.fach-card:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(60,30,100,.1);}
-.fach-head{
-  display:flex;align-items:center;gap:13px;
-  padding:16px 18px;cursor:pointer;position:relative;
+.mappe-hero-img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+.mappe-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(45,16,96,.15),rgba(45,16,96,.65));}
+.mappe-hero-content{position:absolute;bottom:0;left:0;right:0;padding:16px 20px 20px;}
+.mappe-hero-title{font-size:28px;font-weight:800;color:white;letter-spacing:-.5px;margin-bottom:3px;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+.mappe-hero-sub{font-size:13px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.3);}
+
+/* Stats – schwebend über dem Hero-Rand */
+.mappe-stats{
+  display:flex;gap:10px;padding:0 16px;
+  margin-top:-28px;position:relative;z-index:2;margin-bottom:16px;
 }
-.fach-head:hover{background:var(--surface-3);}
-.fach-icon{
-  width:46px;height:46px;border-radius:14px;
+.mappe-stat{
+  flex:1;background:white;border-radius:16px;padding:14px 10px;
+  text-align:center;box-shadow:0 4px 20px rgba(60,30,100,.18);
+  border:1px solid rgba(150,100,200,.08);
+}
+.mappe-stat-ico{font-size:20px;margin-bottom:3px;display:block;}
+.mappe-stat-num{
+  font-size:22px;font-weight:800;display:block;
   background:linear-gradient(135deg,var(--ga),var(--gb));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-.5px;
+}
+.mappe-stat-lbl{font-size:10px;color:var(--ink-4);font-weight:700;text-transform:uppercase;letter-spacing:.4px;display:block;margin-top:2px;}
+
+/* Fach-Karten – bunt */
+.fach-card{
+  background:white;border-radius:20px;margin:0 14px 14px;
+  box-shadow:0 4px 18px rgba(60,30,100,.1);overflow:hidden;
+  transition:transform .15s,box-shadow .15s;
+  border-top:4px solid transparent;
+}
+.fach-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(60,30,100,.15);}
+.fach-head{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;position:relative;}
+.fach-head:hover{background:rgba(150,100,200,.03);}
+.fach-icon{
+  width:52px;height:52px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.25);
+  flex-shrink:0;font-size:26px;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
 }
 .fach-info{flex:1;min-width:0;}
-.fach-nm{font-weight:700;font-size:16px;color:var(--ink);letter-spacing:-.2px;}
-.fach-meta{font-size:12px;color:var(--ink-3);margin-top:2px;display:flex;gap:8px;}
+.fach-nm{font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.2px;}
+.fach-meta{font-size:12px;color:var(--ink-3);margin-top:3px;display:flex;gap:10px;align-items:center;}
 .fach-meta-dot{display:inline-flex;align-items:center;gap:4px;}
-.fach-arr{margin-left:auto;color:var(--ink-4);transition:transform .2s;}
+.fach-arr{margin-left:auto;color:var(--ink-4);transition:transform .2s;flex-shrink:0;}
 .fach-arr.open{transform:rotate(90deg);}
 .fach-covers{display:flex;margin-left:auto;margin-right:8px;}
-.fach-cover{
-  width:28px;height:28px;border-radius:8px;
-  border:2px solid white;margin-left:-8px;
-  background:#e9d5ff;background-size:cover;background-position:center;
-  box-shadow:0 1px 4px rgba(0,0,0,.1);
-}
-.fach-body{display:none;padding:0 18px 18px;border-top:1px solid var(--line);}
+.fach-cover{width:32px;height:32px;border-radius:9px;border:2.5px solid white;margin-left:-10px;background:#e9d5ff;background-size:cover;background-position:center;box-shadow:0 2px 6px rgba(0,0,0,.12);}
+.fach-body{display:none;padding:0 18px 18px;border-top:1px solid #f0ebff;}
 .fach-body.open{display:block;}
+
+/* Neues Fach – einladend */
+.add-fach{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:white;border:2.5px dashed #c4b5fd;
+  border-radius:20px;margin:0 14px 20px;padding:20px;cursor:pointer;
+  font-size:15px;font-weight:700;color:var(--tc);transition:all .15s;
+}
+.add-fach:hover{background:rgba(167,139,250,.08);border-color:var(--ga);}
+.add-fach:active{transform:scale(.98);}
 .mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0;}
 .mat-item{
   position:relative;border-radius:12px;overflow:hidden;
@@ -1039,17 +1057,38 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
   </div>
 
   <div id="mappe-tab" class="app-tab">
-    <div class="mappe-hdr">
-      <h2>Meine Mappe</h2>
-      <p>Lade dein Lernmaterial hoch – Stevie liest alles.</p>
-      <div class="mappe-stats">
-        <div class="mappe-stat"><div class="mappe-stat-num" id="mappe-stat-faecher">0</div><div class="mappe-stat-lbl">Fächer</div></div>
-        <div class="mappe-stat"><div class="mappe-stat-num" id="mappe-stat-pages">0</div><div class="mappe-stat-lbl">Seiten</div></div>
-        <div class="mappe-stat"><div class="mappe-stat-num" id="mappe-stat-topics">0</div><div class="mappe-stat-lbl">Themen</div></div>
+    <!-- Hero-Banner mit Bild -->
+    <div class="mappe-hero">
+      <img src="Stevie_Mappe.jpg" alt="Meine Mappe" class="mappe-hero-img"/>
+      <div class="mappe-hero-overlay"></div>
+      <div class="mappe-hero-content">
+        <div class="mappe-hero-title">Meine Mappe</div>
+        <div class="mappe-hero-sub">Dein Lernmaterial – Stevie liest alles.</div>
+      </div>
+    </div>
+    <!-- Stats – schwebend über dem Hero-Rand -->
+    <div class="mappe-stats">
+      <div class="mappe-stat">
+        <span class="mappe-stat-ico">📚</span>
+        <span class="mappe-stat-num" id="mappe-stat-faecher">0</span>
+        <span class="mappe-stat-lbl">Fächer</span>
+      </div>
+      <div class="mappe-stat">
+        <span class="mappe-stat-ico">📄</span>
+        <span class="mappe-stat-num" id="mappe-stat-pages">0</span>
+        <span class="mappe-stat-lbl">Seiten</span>
+      </div>
+      <div class="mappe-stat">
+        <span class="mappe-stat-ico">💡</span>
+        <span class="mappe-stat-num" id="mappe-stat-topics">0</span>
+        <span class="mappe-stat-lbl">Themen</span>
       </div>
     </div>
     <div id="faecher-list"></div>
-    <div class="add-fach" id="add-fach-btn"><svg width="18" height="18" style="color:var(--tc);"><use href="#ic-plus"/></svg> Neues Fach hinzufügen</div>
+    <div class="add-fach" id="add-fach-btn">
+      <svg width="20" height="20" style="color:var(--tc);"><use href="#ic-plus"/></svg>
+      Neues Fach hinzufügen
+    </div>
     <input type="file" id="fach-file" accept="image/*" multiple style="display:none"/>
   </div>
 
@@ -2911,6 +2950,36 @@ async function analyzeImagesByIdx(idx, justUploaded){
 // ─── MAPPE ────────────────────────────────────────────────────────
 let curFachIdx = null;
 
+// Fachspezifische Icons und Farben
+const FACH_STYLES = {
+  'Mathe':       {emoji:'🔢', bg:'#dbeafe', border:'#3b82f6', icon:'#1d4ed8'},
+  'Mathematik':  {emoji:'🔢', bg:'#dbeafe', border:'#3b82f6', icon:'#1d4ed8'},
+  'Deutsch':     {emoji:'📖', bg:'#fef3c7', border:'#f59e0b', icon:'#92400e'},
+  'Englisch':    {emoji:'🌍', bg:'#d1fae5', border:'#10b981', icon:'#065f46'},
+  'Biologie':    {emoji:'🌿', bg:'#d1fae5', border:'#22c55e', icon:'#15803d'},
+  'Physik':      {emoji:'⚡', bg:'#fef9c3', border:'#eab308', icon:'#854d0e'},
+  'Chemie':      {emoji:'🧪', bg:'#ede9fe', border:'#8b5cf6', icon:'#5b21b6'},
+  'Geschichte':  {emoji:'🏛️', bg:'#fee2e2', border:'#ef4444', icon:'#991b1b'},
+  'Erdkunde':    {emoji:'🌎', bg:'#ccfbf1', border:'#14b8a6', icon:'#134e4a'},
+  'Geographie':  {emoji:'🗺️', bg:'#ccfbf1', border:'#14b8a6', icon:'#134e4a'},
+  'Musik':       {emoji:'🎵', bg:'#fce7f3', border:'#ec4899', icon:'#9d174d'},
+  'Kunst':       {emoji:'🎨', bg:'#fef3c7', border:'#f97316', icon:'#9a3412'},
+  'Sport':       {emoji:'⚽', bg:'#dcfce7', border:'#16a34a', icon:'#14532d'},
+  'Informatik':  {emoji:'💻', bg:'#dbeafe', border:'#6366f1', icon:'#3730a3'},
+  'Französisch': {emoji:'🗼', bg:'#fee2e2', border:'#f43f5e', icon:'#9f1239'},
+  'Latein':      {emoji:'🏺', bg:'#fef3c7', border:'#d97706', icon:'#78350f'},
+  'Spanisch':    {emoji:'💃', bg:'#fee2e2', border:'#dc2626', icon:'#7f1d1d'},
+  'Religion':    {emoji:'✨', bg:'#ede9fe', border:'#7c3aed', icon:'#4c1d95'},
+  'Ethik':       {emoji:'🌟', bg:'#ede9fe', border:'#7c3aed', icon:'#4c1d95'},
+  'Politik':     {emoji:'🏛️', bg:'#dbeafe', border:'#2563eb', icon:'#1e3a8a'},
+};
+const FACH_DEFAULT = {emoji:'📂', bg:'#ede9fe', border:'#7c3aed', icon:'#4c1d95'};
+
+function getFachStyle(name){
+  const key = Object.keys(FACH_STYLES).find(k => name?.toLowerCase().includes(k.toLowerCase()));
+  return key ? FACH_STYLES[key] : FACH_DEFAULT;
+}
+
 async function renderMappe(){
   const list = document.getElementById('faecher-list'); list.innerHTML = '';
   const faecher = await getFaecher();
@@ -3000,39 +3069,47 @@ async function renderMappe(){
             }).join('')}
       </div>`;
 
+    const style = getFachStyle(fach.name);
+    const totalTopicCount = (fach.topics||[]).length;
+    const doneTopicCount = fachPlaene.reduce((a,p)=>a+Object.keys(p.done_topic||{}).length,0);
+    const progressPct = totalTopicCount ? Math.min(100,Math.round(doneTopicCount/totalTopicCount*100)) : 0;
+
     const card = document.createElement('div'); card.className = 'fach-card';
+    card.style.borderTopColor = style.border;
     card.innerHTML = `
       <div class="fach-head">
-        <div class="fach-icon"><svg width="22" height="22" style="color:white;"><use href="#ic-folder"/></svg></div>
+        <div class="fach-icon" style="background:${style.bg};">${style.emoji}</div>
         <div class="fach-info">
           <div class="fach-nm">${escapeHtml(fach.name)}</div>
           <div class="fach-meta">
-            <span class="fach-meta-dot"><svg width="11" height="11" style="color:var(--tc);"><use href="#ic-image"/></svg> ${(fach.images||[]).length} Seiten</span>
-            <span class="fach-meta-dot"><svg width="11" height="11" style="color:var(--tc);"><use href="#ic-bulb"/></svg> ${(fach.topics||[]).length} Themen</span>
+            <span class="fach-meta-dot" style="color:${style.icon};">📄 ${(fach.images||[]).length} Seiten</span>
+            <span class="fach-meta-dot" style="color:${style.icon};">💡 ${(fach.topics||[]).length} Themen</span>
+            ${fachPlaene.length?`<span class="fach-meta-dot" style="color:${style.icon};">📋 ${fachPlaene.length} Pläne</span>`:''}
           </div>
         </div>
         ${coversHtml}
         <span class="fach-arr"><svg width="18" height="18"><use href="#ic-chev"/></svg></span>
       </div>
+      ${progressPct>0?`<div style="padding:0 18px 10px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:${style.icon};font-weight:700;margin-bottom:4px;"><span>Lernfortschritt</span><span>${progressPct}%</span></div><div style="height:6px;background:${style.bg};border-radius:99px;overflow:hidden;"><div style="height:100%;width:${progressPct}%;background:${style.border};border-radius:99px;"></div></div></div>`:''}
       <div class="fach-body">
         <div class="fach-section">
           <div class="fach-section-h">
-            <h4><svg width="13" height="13" style="color:var(--tc);"><use href="#ic-image"/></svg> Material (${(fach.images||[]).length})</h4>
+            <h4 style="color:${style.icon};">📄 Material (${(fach.images||[]).length})</h4>
           </div>
           <div class="mat-grid">
             ${imgsHtml}
-            <div class="mat-add" data-idx="${idx}">
-              <svg width="22" height="22"><use href="#ic-plus"/></svg>
-              <p>Hinzufügen</p>
+            <div class="mat-add" data-idx="${idx}" style="border-color:${style.border};background:${style.bg};">
+              <svg width="22" height="22" style="color:${style.icon};"><use href="#ic-plus"/></svg>
+              <p style="color:${style.icon};">Hinzufügen</p>
             </div>
           </div>
-          ${fach.analyzing ? '<div class="analyzing"><div class="analyzing-spinner"></div>Stevie analysiert das Material…</div>' : topicsHtml}
+          ${fach.analyzing?'<div class="analyzing"><div class="analyzing-spinner"></div>Stevie analysiert das Material…</div>':topicsHtml}
         </div>
         ${plaeneHtml}
         ${kaHtml}
         <div class="fach-acts">
-          <button class="fach-btn" data-renamefach="${idx}">Umbenennen</button>
-          <button class="fach-btn out" data-del="${idx}">Fach löschen</button>
+          <button class="fach-btn" style="background:${style.border};" data-renamefach="${idx}">Umbenennen</button>
+          <button class="fach-btn out" style="border-color:${style.border};color:${style.icon};" data-del="${idx}">Fach löschen</button>
         </div>
       </div>`;
     list.appendChild(card);
