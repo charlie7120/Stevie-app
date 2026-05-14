@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie v8</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -722,7 +722,7 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 <div id="authscreen" class="screen center-screen">
   <div class="dcard" style="max-width:420px;width:100%;">
     <div style="text-align:center;margin-bottom:24px;">
-      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;"><svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+      <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;margin:0 auto 12px;box-shadow:0 0 0 3px rgba(167,139,250,.3);"><img src="Stevie_Bild.png" alt="Stevie" style="width:100%;height:100%;object-fit:cover;"/></div>
       <h2 style="font-size:19px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Willkommen bei Stevie</h2>
       <p style="color:rgba(255,255,255,.4);font-size:13px;">Erstelle ein Konto oder melde dich an.</p>
     </div>
@@ -829,31 +829,31 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
   <canvas id="stars"></canvas>
   <div class="splash-inner">
     <div style="position:relative;display:inline-block;margin-bottom:20px;">
-      <div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));display:flex;align-items:center;justify-content:center;animation:pulse-ring 2s infinite;overflow:hidden;">
-        <svg width="120" height="120" viewBox="0 0 110 110"><use href="#stevie-face"/></svg>
+      <div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,#3d1585,#6d28d9);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 4px rgba(167,139,250,.3),0 0 48px rgba(124,58,237,.4);">
+        <img src="Stevie_Bild.png" alt="Stevie" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
       </div>
     </div>
-    <div class="splash-title">Stevie</div>
-    <p style="font-size:15px;color:rgba(255,255,255,.6);margin-bottom:28px;line-height:1.6;">Deine <b style="color:var(--acc);">persönliche Lernbegleiterin</b><br>Lern smarter. Fühl dich sicher. Schreib bessere Noten.</p>
+    <div class="splash-title">Stevie kennt deinen Unterricht.</div>
+    <p style="font-size:15px;color:rgba(255,255,255,.65);margin-bottom:28px;line-height:1.7;max-width:340px;margin-left:auto;margin-right:auto;">Foto von der Mappe rein – Stevie lernt mit dir genau das, was dein Lehrer unterrichtet.</p>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
       <div style="display:flex;gap:10px;">
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;">
           <div style="width:34px;height:34px;border-radius:9px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="17" height="17" style="color:var(--acc);"><use href="#ic-folder"/></svg></div>
-          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Meine Mappe</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Material hochladen</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Dein Unterricht</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Mappe, Buch, Checkliste rein</div></div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;">
           <div style="width:34px;height:34px;border-radius:9px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="17" height="17" style="color:var(--acc);"><use href="#ic-brain"/></svg></div>
-          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Lernplan</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Individuell & smart</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Lehrerspezifisch</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Stevie lernt deinen Lehrerstil</div></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;">
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;">
           <div style="width:34px;height:34px;border-radius:9px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="17" height="17" style="color:var(--acc);"><use href="#ic-mic"/></svg></div>
-          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Sprechen</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Frag einfach nach</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">24/7 Nachhilfe</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Immer da, nie ungeduldig</div></div>
         </div>
         <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;">
-          <div style="width:34px;height:34px;border-radius:9px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="17" height="17" style="color:var(--acc);"><use href="#ic-note"/></svg></div>
-          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Noten tracken</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Fortschritt sehen</div></div>
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--cbg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="17" height="17" style="color:var(--acc);"><use href="#ic-star"/></svg></div>
+          <div><div style="font-size:13px;font-weight:700;color:#f3eeff;">Bessere Noten</div><div style="font-size:11px;color:rgba(255,255,255,.4);">Fortschritt der zählt</div></div>
         </div>
       </div>
     </div>
@@ -865,7 +865,7 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 <div id="onboarding" class="screen center-screen">
   <div class="dcard" style="max-width:500px;width:100%;">
     <div style="text-align:center;margin-bottom:22px;">
-      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 10px;overflow:hidden;"><svg width="60" height="60" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+      <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;margin:0 auto 10px;box-shadow:0 0 0 3px rgba(167,139,250,.3);"><img src="Stevie_Bild.png" alt="Stevie" style="width:100%;height:100%;object-fit:cover;"/></div>
       <h2 style="font-size:20px;font-weight:700;color:#f3eeff;margin-bottom:4px;">Wer bist du?</h2>
       <p style="color:rgba(255,255,255,.4);font-size:13px;">Stevie passt sich genau auf dich an.</p>
     </div>
@@ -887,7 +887,7 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 <div id="hub" class="screen center-screen">
   <div class="dcard" style="max-width:520px;width:100%;">
     <div style="text-align:center;margin-bottom:22px;">
-      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ga),var(--gc));margin:0 auto 12px;overflow:hidden;"><svg width="64" height="64" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+      <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;margin:0 auto 12px;box-shadow:0 0 0 3px rgba(167,139,250,.3);"><img src="Stevie_Bild.png" alt="Stevie" style="width:100%;height:100%;object-fit:cover;"/></div>
       <h2 style="font-size:22px;font-weight:700;color:#f3eeff;margin-bottom:6px;" id="hub-greeting">Hey!</h2>
       <p style="color:rgba(255,255,255,.5);font-size:14px;">Was möchtest du heute machen?</p>
     </div>
@@ -968,7 +968,7 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
 <!-- ════ MAIN APP ════ -->
 <div id="app" class="screen">
   <div class="app-hdr">
-    <div class="hav" id="hdr-av"><svg width="42" height="42" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+    <div class="hav" id="hdr-av"><img src="Stevie_Bild.png" alt="Stevie" style="width:42px;height:42px;object-fit:cover;border-radius:14px;"/></div>
     <div class="hinfo">
       <h2>Stevie</h2>
       <p id="hdr-sub">Lernbegleiterin</p>
@@ -1057,7 +1057,7 @@ body.t-rose   {--ga:#be185d;--gb:#db2777;--gc:#f9a8d4;--acc:#fbcfe8;--cbg:rgba(2
     <div class="p-hero">
       <svg class="p-hero-bg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice"><circle cx="350" cy="30" r="120" fill="white"/><circle cx="50" cy="160" r="90" fill="white"/></svg>
       <div class="p-av-wrap">
-        <div class="p-av" id="profil-av"><svg width="84" height="84" viewBox="0 0 110 110"><use href="#stevie-face"/></svg></div>
+        <div class="p-av" id="profil-av"><img src="Stevie_Bild.png" alt="Stevie" style="width:84px;height:84px;object-fit:cover;border-radius:50%;"/></div>
       </div>
       <div class="p-name" id="p-name">–</div>
       <div class="p-sub" id="p-sub">–</div>
@@ -1329,7 +1329,7 @@ function applyTheme(key){
 
 function updateAvatars(){
   const hav = document.getElementById('hdr-av');
-  if(hav) hav.innerHTML = '<svg width="42" height="42" viewBox="0 0 110 110"><use href="#stevie-face"/></svg>';
+  if(hav) hav.innerHTML = '<img src="Stevie_Bild.png" alt="Stevie" style="width:42px;height:42px;object-fit:cover;border-radius:14px;"/>';
   const pa = document.getElementById('profil-av');
   if(pa) pa.innerHTML = avSvg(S.avatarId, 84);
   // Account-Initial im Header (Punkt 1)
@@ -2503,7 +2503,7 @@ function addMsg(role, content, opts={}){
 
   if(role==='assistant'){
     const av = document.createElement('div'); av.className = 'mav';
-    av.innerHTML = '<svg width="32" height="32" viewBox="0 0 110 110"><use href="#stevie-face"/></svg>';
+    av.innerHTML = '<img src="Stevie_Bild.png" alt="Stevie" style="width:32px;height:32px;object-fit:cover;border-radius:50%;"/>';
     row.appendChild(av);
   }
 
@@ -2613,7 +2613,7 @@ function showTyping(){
   const d = document.createElement('div');
   d.className = 'mrow'; d.id = 'typing';
   const av = document.createElement('div'); av.className = 'mav';
-  av.innerHTML = '<svg width="32" height="32" viewBox="0 0 110 110"><use href="#stevie-face"/></svg>';
+  av.innerHTML = '<img src="Stevie_Bild.png" alt="Stevie" style="width:32px;height:32px;object-fit:cover;border-radius:50%;"/>';
   d.appendChild(av);
   const b = document.createElement('div'); b.className = 'bubble s';
   b.innerHTML = '<div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
