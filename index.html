@@ -1196,6 +1196,16 @@ const SUPA_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
+// ─── TIMEOUT-WRAPPER für DB-Calls ────────────────────────────────
+// Wenn ein Supabase-Call hängt, gibt dieser Helper nach ms Millisekunden
+// ein leeres Ergebnis zurück statt ewig zu warten.
+function withTimeout(promise, ms, fallback){
+  return Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(()=>resolve(fallback), ms))
+  ]);
+}
+
 // ─── SICHERER localStorage-WRAPPER ───────────────────────────────
 // Safari blockt localStorage unter bestimmten Bedingungen (ITP).
 // Diese Helper fangen alle Fehler ab und geben null zurück statt zu crashen.
@@ -1322,9 +1332,14 @@ function updateAvatars(){
 
 async function loadProfile(){
   if(!currentUser) return false;
-  const {data, error} = await sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-  if(error){ console.error('loadProfile:', error); return false; }
-  // Trigger erstellt leere Zeile bei Signup – wir prüfen auf "ist befüllt"
+  const query = sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  const result = await withTimeout(query, 5000, {data: null, error: {message: 'timeout'}});
+  const {data, error} = result;
+  if(error){
+    if(error.message !== 'timeout') console.error('loadProfile:', error);
+    else console.warn('[INIT] loadProfile Timeout – kein Profil geladen');
+    return false;
+  }
   if(!data || !data.name) return false;
   S.name = data.name||'';
   S.age = data.age||11;
@@ -1351,9 +1366,14 @@ async function saveProfile(){
 
 async function dbGetJsonb(table){
   if(!currentUser) return null;
-  const {data, error} = await sb.from(table)
+  const query = sb.from(table)
     .select('data').eq('user_id', currentUser.id).maybeSingle();
-  if(error){ console.error('dbGetJsonb '+table+':', error); return null; }
+  const result = await withTimeout(query, 6000, {data: null, error: {message:'timeout'}});
+  const {data, error} = result;
+  if(error){
+    if(error.message !== 'timeout') console.error('dbGetJsonb '+table+':', error);
+    return null;
+  }
   return data ? data.data : null;
 }
 
@@ -3785,20 +3805,25 @@ async function init(){
   // Das verhindert Race-Conditions zwischen zwei parallelen Init-Calls.
 
   sb.auth.onAuthStateChange(async (event, session) => {
+    console.log('[AUTH]', event, session?.user?.id?.substring(0,8)||'–');
+
     if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
       currentUser = null;
       document.getElementById('loading-screen').style.display = 'none';
       showScreen('splash');
       return;
     }
-    if(session?.user){
-      await initAfterLogin(session.user);
+
+    // Nur beim ersten Login-Event initialisieren.
+    // TOKEN_REFRESHED und weitere Events ignorieren wenn schon eingeloggt.
+    if(event === 'INITIAL_SESSION' || event === 'SIGNED_IN'){
+      if(session?.user && !currentUser && !_initInProgress){
+        await initAfterLogin(session.user);
+      }
     }
   });
 
-  // Sicherheits-Timeout: Falls onAuthStateChange gar nicht feuert
-  // (extrem seltener Fall: Supabase SDK nicht geladen, JS-Fehler etc.)
-  // Splash nach 6 Sekunden erzwingen damit User nicht ewig wartet.
+  // Fallback: falls Auth-Listener nach 8s nicht gefeuert hat
   setTimeout(()=>{
     if(!_initInProgress && !currentUser){
       const ls = document.getElementById('loading-screen');
@@ -3807,7 +3832,7 @@ async function init(){
         showScreen('splash');
       }
     }
-  }, 6000);
+  }, 8000);
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
