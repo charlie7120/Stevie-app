@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>Stevie 3</title>
+<title>Stevie</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -1195,6 +1195,15 @@ const TTS_PROXY_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co/functions/v1/ele
 const SUPA_URL = 'https://vltfdbpvksvfvrwenasv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsdGZkYnB2a3N2ZnZyd2VuYXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzUyNzUsImV4cCI6MjA5Mzg1MTI3NX0.oMc96t1c3aK4VGE54pYQW7Sy3YOh0tqKpb9Ji_pAsbM';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// Supabase sofort aufwecken – fire & forget
+// Free-tier schläft nach Inaktivität ein. Dieser Ping startet den Aufwach-Prozess
+// beim Laden der Seite, bevor der User auf Anmelden drückt.
+setTimeout(()=>{
+  sb.from('profiles').select('id', {head:true, count:'exact'})
+    .then(()=> console.log('[PING] Supabase bereit'))
+    .catch(()=> console.log('[PING] Supabase Ping fehlgeschlagen'));
+}, 100);
 
 // ─── TIMEOUT-WRAPPER für DB-Calls ────────────────────────────────
 // Wenn ein Supabase-Call hängt, gibt dieser Helper nach ms Millisekunden
