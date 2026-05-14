@@ -1684,15 +1684,15 @@ async function initAfterLogin(user){
   const ls = document.getElementById('loading-screen');
   if(ls) ls.style.display = 'flex';
 
-  // Absoluter Sicherheits-Timeout: nach 8 Sekunden wird loading IMMER ausgeblendet
+  // Absoluter Sicherheits-Timeout: nach 30 Sekunden wird loading IMMER ausgeblendet
   const forceHide = setTimeout(()=>{
     if(ls) ls.style.display = 'none';
     if(_initInProgress){
       _initInProgress = false;
       showScreen('authscreen');
-      toast('Verbindung zu langsam – bitte neu anmelden.', 'err');
+      toast('Laden dauert zu lang – bitte Seite neu laden.', 'err');
     }
-  }, 8000);
+  }, 30000);
 
   try {
     currentUser = user;
@@ -3732,9 +3732,10 @@ async function init(){
   }
 
   // ─── Auth-State-Listener ──────────────────────────────────────
-  // WICHTIG: Loading-Screen wird NIEMALS vom Listener gesetzt.
-  // initAfterLogin() zeigt ihn selbst kurz an und blendet ihn in finally aus.
-  // So kann der Loading-Screen niemals hängenbleiben.
+  // Strategie: NUR der onAuthStateChange-Listener steuert den App-Flow.
+  // Kein separater getSession()-Call mehr – Supabase ruft den Listener
+  // sowieso mit INITIAL_SESSION auf, auch beim ersten Laden.
+  // Das verhindert Race-Conditions zwischen zwei parallelen Init-Calls.
 
   sb.auth.onAuthStateChange(async (event, session) => {
     if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
@@ -3743,25 +3744,23 @@ async function init(){
       showScreen('splash');
       return;
     }
-    if(session?.user && !_initInProgress){
+    if(session?.user){
       await initAfterLogin(session.user);
     }
   });
 
-  // Beim Reload: Session direkt aus Supabase holen (schneller als Listener)
-  // Mit eigenem Timeout damit es nie hängt
-  const sessionPromise = sb.auth.getSession();
-  const timeoutPromise = new Promise(resolve => setTimeout(()=>resolve({data:null}), 3000));
-
-  const {data: sessionData} = await Promise.race([sessionPromise, timeoutPromise]);
-
-  if(sessionData?.session?.user){
-    await initAfterLogin(sessionData.session.user);
-  } else {
-    // Keine Session oder Timeout – Splash zeigen
-    document.getElementById('loading-screen').style.display = 'none';
-    showScreen('splash');
-  }
+  // Sicherheits-Timeout: Falls onAuthStateChange gar nicht feuert
+  // (extrem seltener Fall: Supabase SDK nicht geladen, JS-Fehler etc.)
+  // Splash nach 6 Sekunden erzwingen damit User nicht ewig wartet.
+  setTimeout(()=>{
+    if(!_initInProgress && !currentUser){
+      const ls = document.getElementById('loading-screen');
+      if(ls && ls.style.display === 'flex'){
+        ls.style.display = 'none';
+        showScreen('splash');
+      }
+    }
+  }, 6000);
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────
